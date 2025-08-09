@@ -219,7 +219,10 @@
           credentials: 'include',
           body: JSON.stringify({ plan_id: planId })
         });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(errorText || 'خطا در ایجاد سفارش');
+        }
         const data = await res.json();
         currentOrderId = data.order_id;
         document.getElementById('order_id').value = currentOrderId;
@@ -246,8 +249,12 @@
       msgEl.textContent = 'در حال ارسال...';
       try {
         const res = await fetch('/api/orders/upload_receipt/', { method: 'POST', body: fd, credentials: 'include' });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || 'ارسال ناموفق');
+        const responseText = await res.text();
+        if (!res.ok) {
+            throw new Error(responseText || 'خطا در ارسال.');
+        }
+        const data = JSON.parse(responseText);
+        if (!data.ok) throw new Error(data.message || 'ارسال ناموفق');
         msgEl.textContent = data.message;
       } catch (err) {
         msgEl.textContent = 'خطا: ' + (err.message || err);
@@ -258,22 +265,29 @@
       if (!currentOrderId) return;
       const msgEl = document.getElementById('msg');
       msgEl.textContent = 'در حال بررسی...';
-      const res = await fetch(`/api/orders/status/${currentOrderId}/`, { credentials: 'include' });
-      const data = await res.json();
-      if (!data.ok) {
-        msgEl.textContent = 'خطا در بررسی وضعیت.';
-        return;
-      }
-      const st = data.order.status;
-      if (st === 'approved' && data.order.vpn_account) {
-        const v = data.order.vpn_account;
-        msgEl.innerHTML = 'تایید شد ✅<br/>اکانت شما:<br/>Username: <b>' + v.username + '</b><br/>Password: <b>' + v.password + '</b><br/>Server: <b>' + v.server_address + '</b>';
-      } else if (st === 'rejected') {
-        msgEl.textContent = 'سفارش رد شد. لطفاً با پشتیبانی تماس بگیرید.';
-      } else if (st === 'submitted') {
-        msgEl.textContent = 'در انتظار تایید ادمین...';
-      } else {
-        msgEl.textContent = 'در انتظار پرداخت...';
+      try {
+        const res = await fetch(`/api/orders/status/${currentOrderId}/`, { credentials: 'include' });
+        const responseText = await res.text();
+        if (!res.ok) {
+            throw new Error(responseText || 'خطا در بررسی وضعیت.');
+        }
+        const data = JSON.parse(responseText);
+        if (!data.ok) {
+            throw new Error(data.message || 'خطا در بررسی وضعیت.');
+        }
+        const st = data.order.status;
+        if (st === 'approved' && data.order.vpn_account) {
+          const v = data.order.vpn_account;
+          msgEl.innerHTML = 'تایید شد ✅<br/>اکانت شما:<br/>Username: <b>' + v.username + '</b><br/>Password: <b>' + v.password + '</b><br/>Server: <b>' + v.server_address + '</b>';
+        } else if (st === 'rejected') {
+          msgEl.textContent = 'سفارش رد شد. لطفاً با پشتیبانی تماس بگیرید.';
+        } else if (st === 'submitted') {
+          msgEl.textContent = 'در انتظار تایید ادمین...';
+        } else {
+          msgEl.textContent = 'در انتظار پرداخت...';
+        }
+      } catch (err) {
+        msgEl.textContent = 'خطا: ' + (err.message || err);
       }
     }
   </script>
