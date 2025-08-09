@@ -32,11 +32,13 @@ ALLOWED_HOSTS = ["*", "n8n-cozy.runflare.run"]
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "accounts",
     'django_extensions'
 ]
@@ -117,7 +119,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+
+# Media for uploaded receipts
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -125,3 +131,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8382768243:AAHv8Jj_8Z0D25h-AqaFIfoC9Zj54gka_C4")
+ADMIN_TELEGRAM_CHAT_ID = os.environ.get("ADMIN_TELEGRAM_CHAT_ID", "6717722573")
+BANK_CARD_NUMBER = os.environ.get("BANK_CARD_NUMBER", "6037-69XX-XXXX-XXXX")
+VPN_SERVER_ADDRESS = os.environ.get("VPN_SERVER_ADDRESS", "vpn.example.com")

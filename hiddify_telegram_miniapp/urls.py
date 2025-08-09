@@ -17,11 +17,26 @@ Including another URLconf
 
 # from django.contrib import admin
 from django.urls import path
-from accounts.views import home, dashboard, telegram_auth_view
+from django.conf import settings
+from django.conf.urls.static import static
+from accounts.views import (
+    home, dashboard, telegram_auth_view,
+    api_plans, api_create_order, api_upload_receipt, api_order_status, telegram_webhook
+)
 
 urlpatterns = [
     #    path("admin/", admin.site.urls),
     path("", home, name="home"),
     path("dashboard/", dashboard, name="dashboard"),
     path("auth/telegram/", telegram_auth_view, name="telegram_auth"),
+
+    path("api/plans/", api_plans, name="api_plans"),
+    path("api/orders/create/", api_create_order, name="api_create_order"),
+    path("api/orders/upload_receipt/", api_upload_receipt, name="api_upload_receipt"),
+    path("api/orders/status/<int:order_id>/", api_order_status, name="api_order_status"),
+
+    path("telegram/webhook/", telegram_webhook, name="telegram_webhook"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

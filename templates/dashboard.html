@@ -3,10 +3,197 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard</title>
+  <title>خرید پلن VPN</title>
+  <style>
+    :root {
+      --bg: #0f0c29; /* love gradient */
+      --bg2: #302b63;
+      --bg3: #24243e;
+      --card: rgba(255,255,255,0.08);
+      --accent: #ff6ec7; /* romantic pink */
+      --accent2: #8a2be2;
+      --text: #f5f7ff;
+      --muted: #cfd2ff;
+    }
+    body {
+      margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Vazirmatn", sans-serif;
+      background: linear-gradient(135deg, var(--bg), var(--bg2), var(--bg3));
+      min-height: 100vh; color: var(--text);
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+    h1 { font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { color: var(--muted); margin-top: -8px; }
+
+    .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
+    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(8px); position: relative; overflow: hidden; }
+    .card::after { content: ""; position: absolute; inset: -2px; background: radial-gradient(600px 200px at top right, rgba(255,110,199,0.25), transparent); pointer-events:none }
+    .price { font-size: 22px; font-weight: 800; color: #fff; }
+    .meta { color: var(--muted); font-size: 14px; margin-top: 6px; }
+    .btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: 0; padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 700; }
+    .btn:disabled { opacity: .6; cursor: not-allowed }
+
+    .section { margin-top: 36px; }
+    .list { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; }
+    .list h3 { margin-top: 0; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); }
+    .modal.show { display: flex; }
+    .modal .dialog { background: #15132a; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; max-width: 520px; width: 92%; padding: 20px; color: #f7f8ff; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    code.copy { background: #1f1c3a; padding: 6px 10px; border-radius: 8px; }
+    .muted { color: var(--muted); }
+    .close { background: transparent; border: 0; color: #fff; font-size: 22px; cursor: pointer; }
+    input[type=file] { color: #fff; }
+    .hr { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
+  </style>
 </head>
 <body>
-  <h3>خوش آمدید!</h3>
-  <p>شما با اکانت تلگرام لاگین شده‌اید.</p>
+  {% load humanize %}
+  <div class="container">
+    <h1>پلن‌های VIP عاشقانه ❤️</h1>
+    <div class="subtitle">سرعت بالا، اتصال پایدار، طراحی رمانتیک برای شما</div>
+
+    <div class="plans">
+      {% for p in plans %}
+      <div class="card">
+        <h2>{{ p.name }}</h2>
+        <div class="meta">مدت: {{ p.duration_days }} روز • حجم: {% if p.data_gb %}{{ p.data_gb }} گیگ{% else %}نامحدود{% endif %}</div>
+        <p class="muted">{{ p.description }}</p>
+        <div class="row" style="justify-content: space-between; margin-top: 8px;">
+          <div class="price">{{ p.price_irr|intcomma }} ریال</div>
+          <button class="btn buy-btn" data-plan-id="{{ p.id }}" data-plan-name="{{ p.name|escape }}" data-price="{{ p.price_irr }}">خرید</button>
+        </div>
+      </div>
+      {% empty %}
+      <div class="muted">هیچ پلنی فعال نیست.</div>
+      {% endfor %}
+    </div>
+
+    <div class="section">
+      <div class="list">
+        <h3>اکانت‌های من</h3>
+        {% for a in user_accounts %}
+          <div class="row" style="justify-content: space-between;">
+            <div>{{ a.username }} @ {{ a.server_address }}</div>
+            <div class="muted">تا: {{ a.expires_at|date:'Y-m-d H:i' }}</div>
+          </div>
+        {% empty %}
+          <div class="muted">هنوز اکانتی فعال ندارید.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="list">
+        <h3>آخرین سفارش‌های من</h3>
+        {% for o in user_orders %}
+          <div class="row" style="justify-content: space-between;">
+            <div>#{{ o.id }} - {{ o.plan.name }}</div>
+            <div class="muted">{{ o.get_status_display }}</div>
+          </div>
+        {% empty %}
+          <div class="muted">سفارشی ثبت نشده است.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="buyModal" class="modal" onclick="if(event.target===this) hideModal()">
+    <div class="dialog">
+      <div class="row" style="justify-content: space-between;">
+        <h3 id="m_title">پرداخت کارت به کارت</h3>
+        <button class="close" onclick="hideModal()">×</button>
+      </div>
+      <div class="muted">لطفاً مبلغ را کارت به کارت کنید و رسید را آپلود نمایید.</div>
+      <div class="hr"></div>
+      <div>شماره کارت:</div>
+      <div class="row" style="justify-content: space-between;">
+        <code id="card" class="copy">{{ bank_card_number }}</code>
+        <button class="btn" onclick="copyCard()">کپی</button>
+      </div>
+      <div style="margin-top: 12px;">مبلغ: <b id="m_amount"></b></div>
+      <div class="hr"></div>
+      <form id="receiptForm">
+        <input type="hidden" name="order_id" id="order_id" />
+        <input type="file" name="receipt" accept="image/*,application/pdf" required />
+        <div style="margin-top: 12px; display:flex; gap:8px;">
+          <button type="submit" class="btn">ارسال رسید</button>
+          <button type="button" class="btn" onclick="checkStatus()">بررسی وضعیت</button>
+        </div>
+      </form>
+      <div id="msg" class="muted" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <script>
+    const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '٬') + ' ریال';
+    let currentOrderId = null;
+
+    document.querySelectorAll('.buy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const planId = parseInt(btn.dataset.planId);
+        const name = btn.dataset.planName;
+        const amount = parseInt(btn.dataset.price);
+        startBuy(planId, name, amount);
+      });
+    });
+
+    async function startBuy(planId, name, amount) {
+      try {
+        const res = await fetch('/api/orders/create/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ plan_id: planId })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        currentOrderId = data.order_id;
+        document.getElementById('order_id').value = currentOrderId;
+        document.getElementById('m_title').textContent = 'پرداخت ' + name;
+        document.getElementById('m_amount').textContent = fmt(data.amount_irr);
+        showModal();
+      } catch (e) {
+        alert('خطا در ایجاد سفارش: ' + (e.message || e));
+      }
+    }
+
+    function showModal() { document.getElementById('buyModal').classList.add('show'); }
+    function hideModal() { document.getElementById('buyModal').classList.remove('show'); }
+    function copyCard() { const t = document.getElementById('card').textContent; navigator.clipboard.writeText(t); }
+
+    document.getElementById('receiptForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      try {
+        const res = await fetch('/api/orders/upload_receipt/', { method: 'POST', body: fd, credentials: 'include' });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || 'ارسال ناموفق');
+        document.getElementById('msg').textContent = data.message;
+      } catch (err) {
+        document.getElementById('msg').textContent = 'خطا: ' + (err.message || err);
+      }
+    });
+
+    async function checkStatus() {
+      if (!currentOrderId) return;
+      const res = await fetch(`/api/orders/status/${currentOrderId}/`, { credentials: 'include' });
+      const data = await res.json();
+      if (!data.ok) return;
+      const st = data.order.status;
+      if (st === 'approved' && data.order.vpn_account) {
+        const v = data.order.vpn_account;
+        document.getElementById('msg').innerHTML = 'تایید شد ✅<br/>اکانت شما:<br/>Username: <b>' + v.username + '</b><br/>Password: <b>' + v.password + '</b><br/>Server: <b>' + v.server_address + '</b>';
+      } else if (st === 'rejected') {
+        document.getElementById('msg').textContent = 'سفارش رد شد. لطفاً با پشتیبانی تماس بگیرید.';
+      } else if (st === 'submitted') {
+        document.getElementById('msg').textContent = 'در انتظار تایید ادمین...';
+      } else {
+        document.getElementById('msg').textContent = 'در انتظار پرداخت...';
+      }
+    }
+  </script>
 </body>
 </html> 

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model, login
@@ -7,8 +7,10 @@ from django.db import transaction
 from django.conf import settings
 import json
 
-from .models import TelegramProfile
+from .models import TelegramProfile, Plan, Order, VPNAccount
 from .utils import verify_telegram_init_data
+from .telegram import notify_admin_order_submitted, handle_admin_callback
+from .vpn import create_vpn_account_for_order
 
 User = get_user_model()
 
@@ -19,7 +21,15 @@ def home(request):
 
 @login_required
 def dashboard(request):
-    return render(request, "dashboard.html")
+    plans = Plan.objects.filter(is_active=True).order_by("order_index", "id")
+    user_accounts = VPNAccount.objects.filter(user=request.user).order_by("-created_at")[:5]
+    user_orders = Order.objects.filter(user=request.user).order_by("-created_at")[:10]
+    return render(request, "dashboard.html", {
+        "plans": plans,
+        "user_accounts": user_accounts,
+        "user_orders": user_orders,
+        "bank_card_number": getattr(settings, 'BANK_CARD_NUMBER', None),
+    })
 
 
 @csrf_exempt
@@ -71,3 +81,88 @@ def telegram_auth_view(request):
         return JsonResponse({"ok": True, "user_id": user.id})
     except Exception as e:
         return HttpResponseBadRequest(str(e))
+
+
+@login_required
+def api_plans(request):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(["GET"])
+    plans = list(Plan.objects.filter(is_active=True).order_by("order_index", "id").values(
+        "id", "name", "description", "price_irr", "duration_days", "data_gb"
+    ))
+    return JsonResponse({"ok": True, "plans": plans})
+
+
+@csrf_exempt
+@login_required
+def api_create_order(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    try:
+        payload = json.loads(request.body.decode())
+        plan_id = int(payload.get("plan_id"))
+        plan = get_object_or_404(Plan, id=plan_id, is_active=True)
+        with transaction.atomic():
+            order = Order.objects.create(
+                user=request.user,
+                plan=plan,
+                amount_irr=plan.price_irr,
+                status=Order.Status.PENDING_PAYMENT,
+            )
+        return JsonResponse({
+            "ok": True,
+            "order_id": order.id,
+            "bank_card_number": getattr(settings, 'BANK_CARD_NUMBER', None),
+            "amount_irr": order.amount_irr,
+        })
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
+
+
+@csrf_exempt
+@login_required
+def api_upload_receipt(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    order_id = request.POST.get("order_id")
+    file = request.FILES.get("receipt")
+    if not order_id or not file:
+        return HttpResponseBadRequest("order_id and receipt are required")
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    try:
+        with transaction.atomic():
+            order.receipt = file
+            order.status = Order.Status.SUBMITTED
+            order.save(update_fields=["receipt", "status", "updated_at"])
+        notify_admin_order_submitted(order)
+        return JsonResponse({"ok": True, "message": "رسید ارسال شد. منتظر تایید ادمین بمانید."})
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
+
+
+@login_required
+def api_order_status(request, order_id: int):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    data = {
+        "id": order.id,
+        "status": order.status,
+    }
+    if order.status == Order.Status.APPROVED and hasattr(order, 'vpn_account') and order.vpn_account:
+        data["vpn_account"] = {
+            "username": order.vpn_account.username,
+            "password": order.vpn_account.password,
+            "server_address": order.vpn_account.server_address,
+        }
+    return JsonResponse({"ok": True, "order": data})
+
+
+@csrf_exempt
+def telegram_webhook(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    try:
+        update = json.loads(request.body.decode())
+        handle_admin_callback(update, on_approve=create_vpn_account_for_order)
+        return JsonResponse({"ok": True})
+    except Exception:
+        return JsonResponse({"ok": True})
