@@ -134,3 +134,6 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8382768243:AAHv8Jj_8Z
 ADMIN_TELEGRAM_CHAT_ID = os.environ.get("ADMIN_TELEGRAM_CHAT_ID", "6717722573")
 BANK_CARD_NUMBER = os.environ.get("BANK_CARD_NUMBER", "6037-69XX-XXXX-XXXX")
 VPN_SERVER_ADDRESS = os.environ.get("VPN_SERVER_ADDRESS", "vpn.example.com")
+
+# Redirect unauthenticated users to home (Telegram auth) instead of Django login page
+LOGIN_URL = "/"
