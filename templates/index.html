@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fa">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telegram Mini App Auth</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 24px; }
+    button { padding: 12px 16px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h3>ورود خودکار با تلگرام</h3>
+  <p id="status">در حال آماده‌سازی...</p>
+  <button id="retry" style="display:none">تلاش مجدد</button>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    tg?.ready();
+
+    async function auth() {
+      try {
+        const initData = tg?.initData || "";
+        if (!initData) {
+          document.getElementById("status").textContent = "initData موجود نیست. لطفاً از داخل تلگرام باز کنید.";
+          document.getElementById("retry").style.display = "inline-block";
+          return;
+        }
+        const res = await fetch("/auth/telegram/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ init_data: initData })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById("status").textContent = "ورود موفق. در حال انتقال...";
+          window.location.href = "/dashboard/";
+        } else {
+          throw new Error("Auth failed");
+        }
+      } catch (err) {
+        document.getElementById("status").textContent = "خطا در ورود: " + (err?.message || err);
+        document.getElementById("retry").style.display = "inline-block";
+      }
+    }
+
+    document.getElementById("retry").addEventListener("click", auth);
+    auth();
+  </script>
+</body>
+</html> 
