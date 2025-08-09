@@ -4,50 +4,165 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>خرید پلن VPN</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <style>
     :root {
-      --bs-body-bg: #111;
-      --bs-body-color: #eee;
-      --bs-secondary-bg: #191919;
-      --bs-tertiary-bg: #222;
-      --bs-primary: #0d6efd;
-      --bs-primary-rgb: 13, 110, 253;
-      --bs-border-color: rgba(255, 255, 255, 0.1);
+      /* New Color Palette */
+      --bs-body-bg: #0d1117;
+      --bs-body-color: #e6edf3;
+      --bs-secondary-bg: #161b22;
+      --bs-tertiary-bg: #21262d;
+      --bs-primary: #238636; /* A successful green */
+      --bs-primary-rgb: 35, 134, 54;
+      --bs-accent-color: #30a8f2;
+      --bs-border-color: rgba(240, 246, 252, 0.1);
+      --bs-body-font-family: 'Vazirmatn', sans-serif;
     }
+
     body {
-      padding-bottom: 80px; /* For bottom nav */
+      font-family: var(--bs-body-font-family);
+      padding-bottom: 90px; /* For bottom nav */
+      background-color: var(--bs-body-bg);
     }
+
+    /* Section transition */
+    main > section {
+      transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+      transform: translateY(0);
+    }
+    main > section:not(.active) {
+      opacity: 0;
+      display: none;
+      transform: translateY(10px);
+    }
+
+    /* Card Styling */
     .card {
-      background: var(--bs-secondary-bg);
+      background-color: var(--bs-secondary-bg);
       border: 1px solid var(--bs-border-color);
+      border-radius: 12px;
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+      border-top: 3px solid transparent;
+      border-image: linear-gradient(to right, var(--bs-primary), var(--bs-accent-color)) 1;
     }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Main Button Styling */
+    .btn-primary {
+      background-image: linear-gradient(45deg, var(--bs-primary) 0%, #2ea0a0 100%);
+      border: none;
+      font-weight: 500;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(var(--bs-primary-rgb), 0.3);
+    }
+
+    /* Animation for cards on load */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .col {
+      animation: fadeInUp 0.5s ease-out forwards;
+      opacity: 0; /* Start hidden */
+    }
+    /* Staggered animation */
+    {% for p in plans %}
+    .row .col:nth-child({{ forloop.counter }}) {
+      animation-delay: {{ forloop.counter0|mult:0.1 }}s;
+    }
+    {% endfor %}
+
+    /* Bottom Navigation */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       padding: 0.5rem 0;
-      background: var(--bs-tertiary-bg);
+      background: rgba(22, 27, 34, 0.8); /* Semi-transparent bg */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-top: 1px solid var(--bs-border-color);
       z-index: 1030;
     }
-    .nav-link {
-      color: var(--bs-body-color);
-      transition: color .2s ease;
+    .bottom-nav .nav-link {
+      color: #8b949e;
+      transition: color .2s ease, transform .2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.8rem;
     }
-    .nav-link.active {
-      color: var(--bs-primary);
+    .bottom-nav .nav-link .bi {
+      font-size: 1.4rem;
     }
-    .nav-link .bi {
-      font-size: 1.5rem;
+    .bottom-nav .nav-link.active {
+      color: var(--bs-accent-color);
+      transform: scale(1.1);
     }
+
+    /* Modal Styling */
     .modal-content {
-      background: var(--bs-secondary-bg);
+      background: var(--bs-tertiary-bg);
+      border-radius: 12px;
+      border: 1px solid var(--bs-border-color);
     }
     .btn-copy {
       cursor: pointer;
+    }
+
+    /* History List Styling */
+    .list-group-item {
+      background-color: var(--bs-secondary-bg) !important;
+      color: var(--bs-body-color) !important;
+      border-radius: 8px !important;
+      margin-bottom: 10px;
+      border: 1px solid var(--bs-border-color) !important;
+      padding: 1rem 1.25rem;
+    }
+    .status-badge {
+      font-size: 0.8rem;
+      padding: 0.3em 0.6em;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .status-approved { background-color: rgba(var(--bs-primary-rgb), 0.2); color: var(--bs-primary); }
+    .status-submitted { background-color: rgba(255, 165, 0, 0.2); color: orange; }
+    .status-rejected { background-color: rgba(220, 53, 69, 0.2); color: #dc3545; }
+    .status-pending { background-color: rgba(108, 117, 125, 0.2); color: #6c757d; }
+
+    .form-control {
+        background-color: var(--bs-tertiary-bg);
+        border-color: var(--bs-border-color);
+        color: var(--bs-body-color);
+    }
+    .form-control:focus {
+        background-color: var(--bs-tertiary-bg);
+        border-color: var(--bs-accent-color);
+        color: var(--bs-body-color);
+        box-shadow: 0 0 0 0.25rem rgba(48, 168, 242, 0.25);
     }
   </style>
 </head>
@@ -55,242 +170,329 @@
   {% load humanize %}
   {% load currency %}
 
-  <main class="container-fluid mt-3">
-    <div id="buy-section">
-      <div class="text-center">
-        <h1>خرید سرویس</h1>
-        <p class="lead text-white-50">کیفیت پایدار، قیمت منصفانه، نصب سریع</p>
+  <main class="container-fluid mt-4">
+    <section id="buy-section" class="active">
+      <div class="text-center mb-5">
+        <h1 class="fw-bold">خرید سرویس</h1>
+        <p class="lead" style="color: #8b949e;">کیفیت پایدار، قیمت منصفانه، نصب سریع</p>
       </div>
 
-      <div class="row row-cols-1 row-cols-md-2 g-3 mt-3">
+      <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for p in plans %}
         <div class="col">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title">{{ p.name }}</h5>
-              <p class="card-text text-white-50">
-                مدت: {{ p.duration_days }} روز • حجم: {% if p.data_gb %}{{ p.data_gb }} گیگ{% else %}نامحدود{% endif %}
+          <div class="card text-center h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title fw-bold fs-4">{{ p.name }}</h5>
+              <p class="card-text" style="color: #8b949e;">
+                <i class="bi bi-calendar-check"></i> مدت: {{ p.duration_days }} روز •
+                <i class="bi bi-hdd-stack"></i> حجم: {% if p.data_gb %}{{ p.data_gb }} گیگابایت{% else %}نامحدود{% endif %}
               </p>
-              <p class="card-text">{{ p.description }}</p>
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <span class="h5">{{ p.price_irr|toman|intcomma }} تومان</span>
-                <button class="btn btn-primary buy-btn" data-plan-id="{{ p.id }}" data-plan-name="{{ p.name|escape }}" data-price="{{ p.price_irr }}">خرید</button>
+              <p class="card-text mt-3 mb-4 flex-grow-1">{{ p.description }}</p>
+              <div class="d-flex justify-content-between align-items-center mt-auto">
+                <span class="h5 fw-bold">{{ p.price_irr|toman|intcomma }} <small class="fw-light">تومان</small></span>
+                <button class="btn btn-primary buy-btn" data-plan-id="{{ p.id }}" data-plan-name="{{ p.name|escape }}" data-price="{{ p.price_irr }}">
+                  <i class="bi bi-cart3"></i> خرید
+                </button>
               </div>
             </div>
           </div>
         </div>
         {% empty %}
-        <p class="text-center text-white-50">هیچ پلنی فعال نیست.</p>
+        <p class="text-center" style="color: #8b949e;">متاسفانه در حال حاضر پلن فعالی برای فروش وجود ندارد.</p>
         {% endfor %}
       </div>
-    </div>
+    </section>
 
-    <div id="history-section" style="display: none;">
-      <div class="text-center">
-        <h1>سوابق</h1>
-        <p class="lead text-white-50">اکانت‌ها و سفارش‌های قبلی شما</p>
+    <section id="history-section">
+      <div class="text-center mb-5">
+        <h1 class="fw-bold">سوابق شما</h1>
+        <p class="lead" style="color: #8b949e;">اکانت‌ها و سفارش‌های قبلی</p>
       </div>
 
-      <div class="list-group mt-4">
-        <h4 class="text-center mb-3">اکانت‌ها�� من</h4>
-        {% for a in user_accounts %}
-          <div class="list-group-item list-group-item-action flex-column align-items-start bg-transparent text-white">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{ a.username }}</h5>
-              <small>تا: {{ a.expires_at|date:'Y-m-d' }}</small>
+      <div class="mb-5">
+        <h4 class="mb-3"><i class="bi bi-person-check-fill text-primary"></i> اکانت‌های فعال من</h4>
+        <div id="user-accounts-list" class="list-group">
+          {% for a in user_accounts %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1 fw-bold">{{ a.username }}</h5>
+                <small><i class="bi bi-calendar-x"></i> انقضا: {{ a.expires_at|date:'Y-m-d' }}</small>
+              </div>
+              <p class="mb-0 mt-2 font-monospace">{{ a.server_address }}</p>
             </div>
-            <p class="mb-1">{{ a.server_address }}</p>
-          </div>
-        {% empty %}
-          <p class="text-center text-white-50">هنوز اکانتی فعال ندارید.</p>
-        {% endfor %}
+          {% empty %}
+            <p class="text-center" style="color: #8b949e;">هنوز اکانتی برای شما فعال نشده است.</p>
+          {% endfor %}
+        </div>
       </div>
 
-      <div class="list-group mt-4">
-        <h4 class="text-center mb-3">آخرین سفارش‌ها</h4>
-        {% for o in user_orders %}
-          <div class="list-group-item list-group-item-action flex-column align-items-start bg-transparent text-white">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">#{{ o.id }} - {{ o.plan.name }}</h5>
-              <small>{{ o.get_status_display }}</small>
+      <div>
+        <h4 class="mb-3"><i class="bi bi-receipt-cutoff text-primary"></i> آخرین سفارش‌ها</h4>
+        <div class="list-group">
+          {% for o in user_orders %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between align-items-center">
+                <h5 class="mb-1">سفارش #{{ o.id }} <small class="text-white-50">- {{ o.plan.name }}</small></h5>
+                <span class="status-badge status-{{ o.status }}">{{ o.get_status_display }}</span>
+              </div>
             </div>
-          </div>
-        {% empty %}
-          <p class="text-center text-white-50">سفارشی ثبت نشده است.</p>
-        {% endfor %}
+          {% empty %}
+            <p class="text-center" style="color: #8b949e;">تاکنون سفارشی ثبت نکرده‌اید.</p>
+          {% endfor %}
+        </div>
       </div>
-    </div>
+    </section>
   </main>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
     <div class="d-flex justify-content-around w-100">
-      <a href="#" class="nav-link active" id="nav-buy">
-        <i class="bi bi-bag-heart"></i>
+      <a href="#" class="nav-link active" id="nav-buy" data-section="buy-section">
+        <i class="bi bi-bag-heart-fill"></i>
         <div>خرید</div>
       </a>
-      <a href="#" class="nav-link" id="nav-history">
+      <a href="#" class="nav-link" id="nav-history" data-section="history-section">
         <i class="bi bi-clock-history"></i>
         <div>سوابق</div>
       </a>
     </div>
   </nav>
 
-  <!-- Modal -->
   <div class="modal fade" id="buyModal" tabindex="-1" aria-labelledby="buyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header border-0">
           <h5 class="modal-title" id="m_title">پرداخت کارت به کارت</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p class="text-white-50">لطفاً مبلغ را کارت به کارت کنید و رسید را آپلود نمایید.</p>
-          <hr/>
+          <p style="color: #8b949e;">لطفاً مبلغ مشخص شده را به شماره کارت زیر واریز کرده و از رسید پرداختی خود عکس گرفته و در فرم زیر بارگذاری کنید.</p>
+          <hr class="border-secondary"/>
           <div class="mb-3">
-            <div>شماره کارت:</div>
+            <label for="card" class="form-label">شماره کارت:</label>
             <div class="input-group">
-              <input type="text" class="form-control" id="card" value="{{ bank_card_number }}" readonly>
-              <span class="input-group-text btn-copy" onclick="copyCard()"><i class="bi bi-clipboard"></i></span>
+              <input type="text" class="form-control font-monospace" id="card" value="{{ bank_card_number }}" readonly>
+              <span class="input-group-text btn-copy" id="copy-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="کپی کردن شماره کارت" onclick="copyCard()">
+                  <i class="bi bi-clipboard" id="copy-icon"></i>
+              </span>
             </div>
           </div>
-          <div class="mb-3">مبلغ: <b id="m_amount"></b></div>
-          <hr/>
+          <div class="mb-3">مبلغ قابل پرداخت: <b id="m_amount" class="fs-5 text-warning"></b></div>
+          <hr class="border-secondary"/>
           <form id="receiptForm">
             <input type="hidden" name="order_id" id="order_id" />
             <div class="mb-3">
-              <label for="receipt" class="form-label">فایل رسید:</label>
+              <label for="receipt" class="form-label">فایل رسید پرداخت:</label>
               <input class="form-control" type="file" name="receipt" id="receipt" accept="image/*,application/pdf" required>
             </div>
-            <div class="d-flex justify-content-end gap-2">
-              <button type="button" class="btn btn-secondary" onclick="checkStatus()">بررسی وضعیت</button>
-              <button type="submit" class="btn btn-primary">ارسال رسید</button>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="button" class="btn btn-outline-secondary" onclick="checkStatus()">بررسی وضعیت</button>
+              <button type="submit" class="btn btn-primary" id="submitReceiptBtn">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                ارسال رسید
+              </button>
             </div>
           </form>
-          <div id="msg" class="text-white-50 mt-3"></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi bi-info-circle-fill me-2" id="toast-icon"></i>
+        <strong class="me-auto" id="toast-title">پیام سیستم</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" id="toast-body">
+        متن پیام در اینجا قرار می‌گیرد.
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script>
-    // Tab switching logic
-    const navBuy = document.getElementById('nav-buy');
-    const navHistory = document.getElementById('nav-history');
-    const buySection = document.getElementById('buy-section');
-    const historySection = document.getElementById('history-section');
-
-    navBuy.addEventListener('click', (e) => {
-      e.preventDefault();
-      buySection.style.display = 'block';
-      historySection.style.display = 'none';
-      navBuy.classList.add('active');
-      navHistory.classList.remove('active');
-    });
-
-    navHistory.addEventListener('click', (e) => {
-      e.preventDefault();
-      buySection.style.display = 'none';
-      historySection.style.display = 'block';
-      navHistory.classList.add('active');
-      navBuy.classList.remove('active');
-    });
-
-    // Modal and form logic
-    const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '٬') + ' تومان';
-    let currentOrderId = null;
-    const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
-
-    document.querySelectorAll('.buy-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const planId = parseInt(btn.dataset.planId);
-        const name = btn.dataset.planName;
-        const amountIrr = parseInt(btn.dataset.price);
-        startBuy(planId, name, amountIrr);
+    document.addEventListener('DOMContentLoaded', function () {
+      // Initialize Bootstrap components
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
       });
-    });
 
-    async function startBuy(planId, name, amountIrr) {
-      try {
-        const res = await fetch('/api/orders/create/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ plan_id: planId })
+      const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
+      const toastEl = document.getElementById('liveToast');
+      const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
+
+      // --- Helper Functions ---
+      const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' تومان';
+      let currentOrderId = null;
+
+      function showToast(message, type = 'info') {
+        const toastIcon = document.getElementById('toast-icon');
+        const toastTitle = document.getElementById('toast-title');
+
+        // Reset classes
+        toastIcon.className = "bi me-2";
+
+        switch (type) {
+            case 'success':
+                toastIcon.classList.add('bi-check-circle-fill', 'text-success');
+                toastTitle.textContent = 'موفقیت';
+                break;
+            case 'error':
+                toastIcon.classList.add('bi-exclamation-triangle-fill', 'text-danger');
+                toastTitle.textContent = 'خطا';
+                break;
+            default:
+                toastIcon.classList.add('bi-info-circle-fill', 'text-primary');
+                toastTitle.textContent = 'اطلاعیه';
+                break;
+        }
+        document.getElementById('toast-body').innerHTML = message;
+        bsToast.show();
+      }
+
+      // --- Tab Switching Logic ---
+      const navLinks = document.querySelectorAll('.bottom-nav .nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetSectionId = link.dataset.section;
+
+          // Deactivate all
+          document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
+          navLinks.forEach(l => l.classList.remove('active'));
+
+          // Activate target
+          document.getElementById(targetSectionId).classList.add('active');
+          link.classList.add('active');
         });
-        if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(errorText || 'خطا در ایجاد سفارش');
+      });
+
+      // --- Buy Process Logic ---
+      document.querySelectorAll('.buy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const planId = parseInt(btn.dataset.planId);
+          const name = btn.dataset.planName;
+          const amountIrr = parseInt(btn.dataset.price);
+          startBuy(planId, name, amountIrr);
+        });
+      });
+
+      async function startBuy(planId, name, amountIrr) {
+        try {
+          const res = await fetch('/api/orders/create/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ plan_id: planId })
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.detail || data.message || 'خطا در ایجاد سفارش');
+          }
+          currentOrderId = data.order_id;
+          document.getElementById('order_id').value = currentOrderId;
+          document.getElementById('m_title').textContent = 'پرداخت پلن ' + name;
+          document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
+          buyModal.show();
+        } catch (e) {
+          showToast('خطا در ایجاد سفارش: ' + e.message, 'error');
         }
-        const data = await res.json();
-        currentOrderId = data.order_id;
-        document.getElementById('order_id').value = currentOrderId;
-        document.getElementById('m_title').textContent = 'پرداخت ' + name;
-        document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
-        buyModal.show();
-      } catch (e) {
-        alert('خطا در ایجاد سفارش: ' + (e.message || e));
       }
-    }
 
-    window.copyCard = function() {
-      const cardInput = document.getElementById('card');
-      cardInput.select();
-      cardInput.setSelectionRange(0, 99999); // For mobile devices
-      navigator.clipboard.writeText(cardInput.value);
-      // You can add a tooltip or some feedback here
-    }
+      // --- Modal and Form Logic ---
+      window.copyCard = function() {
+        const cardInput = document.getElementById('card');
+        navigator.clipboard.writeText(cardInput.value).then(() => {
+          const icon = document.getElementById('copy-icon');
+          const tooltip = bootstrap.Tooltip.getInstance(document.getElementById('copy-btn'));
+          icon.classList.replace('bi-clipboard', 'bi-check-lg');
+          tooltip.setContent({ '.tooltip-inner': 'کپی شد!' });
+          tooltip.show();
+          setTimeout(() => {
+            icon.classList.replace('bi-check-lg', 'bi-clipboard');
+            tooltip.setContent({ '.tooltip-inner': 'کپی کردن شماره کارت' });
+            tooltip.hide();
+          }, 2000);
+        });
+      }
 
-    document.getElementById('receiptForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fd = new FormData(e.target);
-      const msgEl = document.getElementById('msg');
-      msgEl.textContent = 'در حال ارسال...';
-      try {
-        const res = await fetch('/api/orders/upload_receipt/', { method: 'POST', body: fd, credentials: 'include' });
-        const responseText = await res.text();
-        if (!res.ok) {
-            throw new Error(responseText || 'خطا در ارسال.');
+      document.getElementById('receiptForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = document.getElementById('submitReceiptBtn');
+        const spinner = submitBtn.querySelector('.spinner-border');
+
+        const fd = new FormData(form);
+
+        submitBtn.disabled = true;
+        spinner.classList.remove('d-none');
+
+        try {
+          const res = await fetch('/api/orders/upload_receipt/', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include',
+            headers: { 'Accept': 'application/json' },
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
+          }
+          showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
+          // buyModal.hide(); // Optional: close modal on success
+        } catch (err) {
+          showToast('خطا: ' + err.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            spinner.classList.add('d-none');
         }
-        const data = JSON.parse(responseText);
-        if (!data.ok) throw new Error(data.message || 'ارسال ناموفق');
-        msgEl.textContent = data.message;
-      } catch (err) {
-        msgEl.textContent = 'خطا: ' + (err.message || err);
+      });
+
+      window.checkStatus = async function() {
+        if (!currentOrderId) {
+            showToast('ابتدا باید یک سفارش ایجاد کنید.', 'info');
+            return;
+        }
+
+        showToast('در حال بررسی وضعیت سفارش...', 'info');
+
+        try {
+          const res = await fetch(`/api/orders/status/${currentOrderId}/`, {
+              credentials: 'include',
+              headers: { 'Accept': 'application/json' },
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || 'خطا در دریافت وضعیت');
+
+          const st = data.order.status;
+          if (st === 'approved' && data.order.vpn_account) {
+            const v = data.order.vpn_account;
+            const accountInfo = `
+              <div class="text-start">
+                <strong class="d-block mb-2">اکانت شما با موفقیت فعال شد! ✅</strong>
+                <div>نام کاربری: <b class="font-monospace">${v.username}</b></div>
+                <div>رمز عبور: <b class="font-monospace">${v.password}</b></div>
+                <div>آدرس سرور: <b class="font-monospace">${v.server_address}</b></div>
+                <small class="d-block mt-2 text-white-50">این اطلاعات به لیست اکانت‌های شما در تب سوابق نیز اضافه شد.</small>
+              </div>`;
+            showToast(accountInfo, 'success');
+            buyModal.hide();
+            // Optionally, refresh the history tab content dynamically
+            setTimeout(() => window.location.reload(), 5000); // Simple reload to show new data
+          } else if (st === 'rejected') {
+            showToast('سفارش شما رد شده است. لطفاً با پشتیبانی تماس بگیرید.', 'error');
+          } else if (st === 'submitted') {
+            showToast('رسید شما ارسال شده و در انتظار تایید توسط ادمین می‌باشد.', 'info');
+          } else { // pending
+            showToast('سفارش شما همچنان در انتظار پرداخت و ارسال رسید است.', 'info');
+          }
+        } catch (err) {
+          showToast('خطا در بررسی وضعیت: ' + err.message, 'error');
+        }
       }
     });
-
-    window.checkStatus = async function() {
-      if (!currentOrderId) return;
-      const msgEl = document.getElementById('msg');
-      msgEl.textContent = 'در حال بررسی...';
-      try {
-        const res = await fetch(`/api/orders/status/${currentOrderId}/`, { credentials: 'include' });
-        const responseText = await res.text();
-        if (!res.ok) {
-            throw new Error(responseText || 'خطا در بررسی وضعیت.');
-        }
-        const data = JSON.parse(responseText);
-        if (!data.ok) {
-            throw new Error(data.message || 'خطا در بررسی وضعیت.');
-        }
-        const st = data.order.status;
-        if (st === 'approved' && data.order.vpn_account) {
-          const v = data.order.vpn_account;
-          msgEl.innerHTML = 'تایید شد ✅<br/>اکانت شما:<br/>Username: <b>' + v.username + '</b><br/>Password: <b>' + v.password + '</b><br/>Server: <b>' + v.server_address + '</b>';
-        } else if (st === 'rejected') {
-          msgEl.textContent = 'سفارش رد شد. لطفاً با پشتیبانی تماس بگیرید.';
-        } else if (st === 'submitted') {
-          msgEl.textContent = 'در انتظار تایید ادمین...';
-        } else {
-          msgEl.textContent = 'در انتظار پرداخت...';
-        }
-      } catch (err) {
-        msgEl.textContent = 'خطا: ' + (err.message || err);
-      }
-    }
   </script>
 </body>
 </html>
- 
