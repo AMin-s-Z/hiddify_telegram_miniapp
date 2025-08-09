@@ -40,7 +40,8 @@ def telegram_auth_view(request):
     try:
         payload = json.loads(request.body.decode())
         init_data_str = payload.get("init_data", "")
-        verified = verify_telegram_init_data(init_data_str, settings.TELEGRAM_BOT_TOKEN, max_age_seconds=120)
+        max_age = getattr(settings, 'TELEGRAM_INIT_MAX_AGE_SECONDS', 120)
+        verified = verify_telegram_init_data(init_data_str, settings.TELEGRAM_BOT_TOKEN, max_age_seconds=max_age)
         tg_user = verified["user"]
         telegram_id = int(tg_user["id"])
         first_name = tg_user.get("first_name", "")

@@ -137,3 +137,6 @@ VPN_SERVER_ADDRESS = os.environ.get("VPN_SERVER_ADDRESS", "vpn.example.com")
 
 # Redirect unauthenticated users to home (Telegram auth) instead of Django login page
 LOGIN_URL = "/"
+
+# Telegram initData max age allowance (seconds)
+TELEGRAM_INIT_MAX_AGE_SECONDS = int(os.environ.get("TELEGRAM_INIT_MAX_AGE_SECONDS", "86400"))
