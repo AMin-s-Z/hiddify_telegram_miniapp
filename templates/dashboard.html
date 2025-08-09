@@ -3,51 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد پروکسی لینک</title>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>فروشگاه آلبالو وی پی ان</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* استایل‌های پایه */
         :root {
-            --primary-dark: #1e0038;
-            --primary-main: #7417CA;
-            --primary-light: #AB53E7;
-            --secondary-main: #2ac375;
-            --dark-bg: #0a0214;
-            --card-bg: rgba(21, 0, 42, 0.75);
-            --text-primary: #F7F9FF;
-            --text-secondary: #BBB0CC;
-            --gradient-primary: linear-gradient(135deg, var(--primary-main), var(--primary-light));
+            --primary: #8e44ad;
+            --primary-dark: #6c3483;
+            --primary-light: #bb8fce;
+            --secondary: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #3498db;
+            --radius: 12px;
+            --shadow: 0 10px 30px rgba(0,0,0,0.15);
+            --transition: all 0.3s ease;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Vazirmatn', sans-serif;
         }
 
         body {
-            background: var(--dark-bg);
-            color: var(--text-primary);
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(116, 23, 202, 0.1) 0%, transparent 30%),
-                radial-gradient(circle at 90% 80%, rgba(42, 195, 117, 0.1) 0%, transparent 30%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1f33, #292d4a);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 20px;
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(142, 68, 173, 0.15) 0%, transparent 30%),
+                        radial-gradient(circle at 90% 80%, rgba(231, 76, 60, 0.15) 0%, transparent 30%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
 
-        .dashboard-header {
-            background: linear-gradient(90deg, var(--primary-dark), var(--primary-main));
-            border-radius: 15px;
-            padding: 15px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        /* هدر */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .logo-wrapper {
+        .logo {
             display: flex;
             align-items: center;
             gap: 15px;
@@ -56,40 +76,39 @@
         .logo-icon {
             width: 50px;
             height: 50px;
-            background: var(--gradient-primary);
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             font-size: 24px;
-            box-shadow: 0 5px 15px rgba(116, 23, 202, 0.4);
+            color: white;
         }
 
         .logo-text h1 {
-            font-size: 1.8rem;
+            font-size: 24px;
             margin-bottom: 5px;
         }
 
         .logo-text p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
         }
 
         .user-info {
             display: flex;
             align-items: center;
             gap: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 20px;
-            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
         }
 
         .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(45deg, var(--secondary-main), var(--primary-light));
+            background: linear-gradient(to right, var(--info), var(--primary));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -97,178 +116,224 @@
             color: white;
         }
 
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        .user-name {
+            font-weight: 500;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
+        .user-level {
+            font-size: 12px;
+            color: var(--primary-light);
+        }
+
+        /* بخش‌های اصلی */
+        .section-title {
+            font-size: 22px;
+            margin: 30px 0 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
             display: flex;
             align-items: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            gap: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: rgba(30, 40, 60, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .feature-item i {
+            color: var(--success);
+            margin-left: 12px;
+            font-size: 20px;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .price {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .price-value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(to right, #f1c40f, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .price-period {
+            opacity: 0.8;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius);
+            border: none;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
             position: relative;
             overflow: hidden;
-            border-left: 4px solid var(--secondary-main);
         }
 
-        .stat-card:nth-child(2) {
-            border-left-color: #ff9500;
+        .btn:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 5px 20px rgba(142, 68, 173, 0.5);
         }
 
-        .stat-card:nth-child(3) {
-            border-left-color: var(--primary-light);
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
         }
 
-        .stat-icon {
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .popular-plan .card-header {
+            background: linear-gradient(to right, var(--secondary), #c0392b);
+        }
+
+        .popular-plan .btn {
+            background: linear-gradient(to right, var(--secondary), #c0392b);
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            left: -8px;
+            background: linear-gradient(to right, var(--warning), #e67e22);
+            color: white;
+            padding: 6px 25px;
+            font-weight: 600;
+            border-radius: 0 30px 30px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+        }
+
+        /* دکمه تماس با پشتیبانی */
+        .support-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
             width: 60px;
             height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(to right, var(--info), #2980b9);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            margin-left: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 100;
+            animation: pulse 2s infinite;
+            transition: var(--transition);
         }
 
-        .stat-text h3 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+        .support-btn:hover {
+            transform: scale(1.1);
+            animation: none;
         }
 
-        .stat-text p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
         }
 
-        .plans-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .plan-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transform: translateY(0);
-            border-top: 4px solid rgba(116, 23, 202, 0.3);
-        }
-
-        .plan-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(116, 23, 202, 0.3);
-        }
-
-        .popular-badge {
-            position: absolute;
-            top: 20px;
-            left: -15px;
-            background: var(--gradient-primary);
-            color: white;
-            padding: 5px 25px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transform: rotate(-30deg);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .plan-header {
-            padding: 25px 20px 15px;
+        /* فوتر */
+        footer {
             text-align: center;
+            padding: 40px 20px 20px;
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 50px;
         }
 
-        .plan-header h3 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
-
-        .plan-price {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(to right, #e9d5ff, #c084fc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin: 10px 0;
-        }
-
-        .plan-price .period {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            display: block;
-            margin-top: 10px;
-        }
-
-        .plan-features {
-            padding: 0 20px 20px;
-        }
-
-        .plan-feature {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-        }
-
-        .plan-feature i {
-            color: var(--secondary-main);
-            margin-left: 10px;
-            font-size: 1.2rem;
-        }
-
-        .plan-feature:last-child {
-            border-bottom: none;
-        }
-
-        .plan-actions {
-            padding: 0 20px 25px;
-        }
-
-        .buy-btn {
-            display: block;
-            width: 100%;
-            background: var(--gradient-primary);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .buy-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(116, 23, 202, 0.4);
-        }
-
+        /* مدال پرداخت */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.8);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .modal-overlay.active {
@@ -277,14 +342,15 @@
         }
 
         .payment-modal {
-            background: var(--dark-bg);
+            background: linear-gradient(135deg, #252e48, #1c2333);
             border-radius: 20px;
             width: 90%;
             max-width: 500px;
             padding: 30px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             transform: translateY(30px);
-            transition: transform 0.4s ease;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .modal-overlay.active .payment-modal {
@@ -296,155 +362,220 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .modal-header h3 {
-            font-size: 1.5rem;
+            font-size: 22px;
             font-weight: 600;
+            color: var(--primary-light);
         }
 
         .close-btn {
             background: transparent;
             border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
+            color: var(--light);
+            font-size: 28px;
             cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+            transform: rotate(90deg);
         }
 
         .bank-card {
-            background: linear-gradient(45deg, #6715c0, #9e43e7);
-            border-radius: 15px;
+            background: linear-gradient(135deg, #673ab7, #7b1fa2);
+            border-radius: var(--radius);
             padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .bank-card p {
-            margin-bottom: 5px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .bank-card .card-number {
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            margin: 15px 0;
-            font-family: monospace;
-        }
-
-        .copy-btn {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .card-detail {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card-detail p {
-            margin-bottom:, 10px;
-        }
-
-        .detail-value {
-            font-weight: 600;
-            color: var(--primary-light);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            display: block;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            margin: 20px 0;
-            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
             position: relative;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
+            overflow: hidden;
         }
 
-        .file-label:hover {
-            background: rgba(255, 255, 255, 0.08);
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
         }
 
-        .file-label i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: var(--text-secondary);
+        .bank-card-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+            opacity: 0.9;
         }
 
-        .file-label .file-name {
-            color: var(--text-secondary);
-            margin-top: 10px;
-            font-size: 0.9rem;
-            display: block;
+        .card-number {
+            font-family: monospace;
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            text-align: center;
+            word-break: break-all;
         }
 
-        .modal-actions {
+        .button-group {
             display: flex;
             gap: 15px;
         }
 
+        .btn-copy {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .payment-details {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .detail-label {
+            opacity: 0.8;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #f1c40f;
+        }
+
+        .receipt-upload {
+            margin: 25px 0;
+        }
+
+        .file-label {
+            display: block;
+            width: 100%;
+            padding: 30px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-label:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+        }
+
+        .file-label i {
+            font-size: 42px;
+            display: block;
+            margin-bottom: 15px;
+            color: var(--primary-light);
+        }
+
+        .file-name {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
         .modal-btn {
             flex: 1;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: var(--radius);
             font-weight: 600;
-            border: none;
             cursor: pointer;
-            text-align: center;
+            border: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .secondary-btn {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--text-secondary);
-        }
-
-        .primary-btn {
-            background: var(--secondary-main);
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
             color: white;
         }
 
-        .primary-btn:hover {
-            background: #1fb45d;
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.2);
         }
 
-        .secondary-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .btn-submit {
+            background: linear-gradient(to right, var(--success), #229954);
+            color: white;
         }
 
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            filter: brightness(1.1);
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.5);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* توست‌های اطلاع‌رسانی */
         .toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: #2d3748;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            background: var(--dark);
+            box-shadow: var(--shadow);
             display: flex;
             align-items: center;
+            gap: 15px;
             z-index: 2000;
             transform: translateX(150%);
-            transition: transform 0.4s ease;
+            transition: var(--transition);
         }
 
         .toast.active {
@@ -452,419 +583,465 @@
         }
 
         .toast i {
-            font-size: 1.5rem;
-            margin-left: 15px;
+            font-size: 24px;
         }
 
-        .toast.success i {
-            color: #48bb78;
+        .toast-success {
+            border-left: 4px solid var(--success);
         }
 
-        .toast.error i {
-            color: #f56565;
+        .toast-success i {
+            color: var(--success);
         }
 
-        .loader {
-            display: inline-block;
-            margin-right: 10px;
+        .toast-error {
+            border-left: 4px solid var(--secondary);
         }
 
-        .loader:after {
-            content: " ";
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            border-color: #fff transparent #fff transparent;
-            animation: loader 1.2s linear infinite;
+        .toast-error i {
+            color: var(--secondary);
         }
 
-        @keyframes loader {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* انیمیشن‌ها */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes slideDown {
-            0% { opacity: 0; transform: translateY(-50px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+        .plan1 { animation: fadeIn 0.5s ease-out 0.1s forwards; }
+        .plan2 { animation: fadeIn 0.5s ease-out 0.3s forwards; }
+        .plan3 { animation: fadeIn 0.5s ease-out 0.5s forwards; }
+        .animated { opacity: 0; }
 
-        .plan-card {
-            animation: slideDown 0.4s ease forwards;
-            opacity: 0;
-        }
+        /* مسئولیت‌پذیری */
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .plan-card:nth-child(1) { animation-delay: 0.1s; }
-        .plan-card:nth-child(2) { animation-delay: 0.3s; }
-        .plan-card:nth-child(3) { animation-delay: 0.5s; }
-        .plan-card:nth-child(4) { animation-delay: 0.7s; }
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="dashboard-header">
-        <div class="logo-wrapper">
-            <div class="logo-icon">
-                <i class="fas fa-lock"></i>
+    <div class="container">
+        <!-- هدر -->
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>آلبالو وی پی ان</h1>
+                    <p>ناشناس امن قدرتمند</p>
+                </div>
             </div>
-            <div class="logo-text">
-                <h1>پروکسی لینک</h1>
-                <p>ارائه‌دهنده سرویس‌های امن و پرسرعت</p>
+
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div class="user-name">مرتضی رضایی</div>
+                    <div class="user-level">عضویت طلایی</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- پلن‌ها -->
+        <h2 class="section-title">
+            <i class="fas fa-crown"></i>
+            طرح‌های ویژه آلبالو وی پی ان
+        </h2>
+
+        <div class="card-grid">
+            <!-- پلن پایه -->
+            <div class="card plan1 animated">
+                <div class="card-header">
+                    <h3 class="card-title">طرح پایه</h3>
+                    <p class="card-subtitle">مناسب کاربران معمولی</p>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>پهنای بانذ نامحدود</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>سرعت تا 150 مگابیت</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>30 لوکیشن جهانی</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>پشتیبانی 24 ساعته</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-times"></i>
+                            <span>اینترنت اختصاصی</span>
+                        </li>
+                    </ul>
+
+                    <div class="price">
+                        <div class="price-value">۴۹,۰۰۰</div>
+                        <div class="price-period">تومان / ماه</div>
+                    </div>
+
+                    <button class="btn buy-btn" data-plan-id="1" data-plan-name="طرح پایه" data-price="49000">
+                        خرید اشتراک
+                    </button>
+                </div>
+            </div>
+
+            <!-- پلن محبوب -->
+            <div class="card plan2 animated popular-plan">
+                <div class="badge">پیشنهاد ویژه</div>
+                <div class="card-header">
+                    <h3 class="card-title">طرح ویژه</h3>
+                    <p class="card-subtitle">پرفروش‌ترین پلن آلبالو</p>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>پهنای بانذ نامحدود</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>سرعت تا 300 مگابیت</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>60 لوکیشن جهانی</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>پشتیبانی VIP</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-times"></i>
+                            <span>اینترنت اختصاصی</span>
+                        </li>
+                    </ul>
+
+                    <div class="price">
+                        <div class="price-value">۸۵,۰۰۰</div>
+                        <div class="price-period">تومان / سه ماهه</div>
+                    </div>
+
+                    <button class="btn buy-btn" data-plan-id="2" data-plan-name="طرح ویژه" data-price="85000">
+                        خرید اشتراک
+                    </button>
+                </div>
+            </div>
+
+            <!-- پلن پریمیوم -->
+            <div class="card plan3 animated">
+                <div class="card-header">
+                    <h3 class="card-title">طرح پریمیوم</h3>
+                    <p class="card-subtitle">برای کاربران حرفه‌ای</p>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>پهنای بانذ نامحدود</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>سرعت تا 1 گیگابیت</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>120 لوکیشن جهانی</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>پشتیبانی اختصاصی</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>اینترنت اختصاصی</span>
+                        </li>
+                    </ul>
+
+                    <div class="price">
+                        <div class="price-value">۱۴۹,۰۰۰</div>
+                        <div class="price-period">تومان / یکساله</div>
+                    </div>
+
+                    <button class="btn buy-btn" data-plan-id="3" data-plan-name="طرح پریمیوم" data-price="149000">
+                        خرید اشتراک
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="user-info">
-            <div class="user-avatar">
-                <i class="fas fa-user"></i>
+        <!-- اطلاعات حساب کاربری -->
+        <h2 class="section-title">
+            <i class="fas fa-user-shield"></i>
+            حساب کاربری شما
+        </h2>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">وضعیت اشتراک</h3>
+                <p class="card-subtitle">اطلاعات اشتراک فعلی شما</p>
             </div>
-            <div>
-                <div>محمد جعفری</div>
-                <div class="small">سطح: پریمیوم</div>
+            <div class="card-body">
+                <div class="detail-item">
+                    <div class="detail-label">وضعیت اشتراک:</div>
+                    <div class="detail-value" style="color: #27ae60;">فعال</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">اعتبار باقیمانده:</div>
+                    <div class="detail-value">32 روز</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">آخرین تمدید:</div>
+                    <div class="detail-value">۱۴۰۲/۰۵/۱۷</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">پلن فعلی:</div>
+                    <div class="detail-value">طرح ویژه</div>
+                </div>
             </div>
         </div>
+
+        <!-- دکمه دائمی پشتیبانی -->
+        <a href="https://t.me/albabovpn_support" class="support-btn">
+            <i class="fas fa-headset"></i>
+        </a>
+
+        <!-- فوتر سایت -->
+        <footer>
+            <p>© ۱۴۰۲ - تمامی حقوق برای سرویس آلبالو وی پی ان محفوظ است</p>
+            <p>ارائه دهنده سرویس‌های امن و پرسرعت با سازگاری 99%</p>
+        </footer>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-text">
-                <h3>38 روز</h3>
-                <p>اعتبار باقیمانده</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="stat-text">
-                <h3>۲.۴ گیگابایت</h3>
-                <p>مصرف این ماه</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-text">
-                <h3>۹۸٪+</h3>
-                <p>رضایت کاربران</p>
-            </div>
-        </div>
-    </div>
-
-    <h2 style="margin: 25px 0; display: flex; align-items: center;">
-        <i class="fas fa-crown" style="margin-left: 15px; color: gold;"></i>
-        طرح‌های نقره‌ای و طلایی پروکسی لینک
-    </h2>
-
-    <!-- Plans -->
-    <div class="plans-container">
-        <!-- Plan 1 -->
-        <div class="plan-card">
-            <div class="plan-header">
-                <h3>طرح پایه</h3>
-                <p>برای استفاده روزمره</p>
-                <div class="plan-price">۴۹٬۰۰۰ <span class="period">تومان / ماه</span></div>
-            </div>
-
-            <div class="plan-features">
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>پهنای باند نامحدود</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>سرعت حداکثر 150 مگابیت</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>۳۰ لوکیشن جهانی</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>پشتیبانی 24 ساعته</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-times-circle"></i>
-                    <p>سرور اختصاصی</p>
-                </div>
-            </div>
-
-            <div class="plan-actions">
-                <button class="buy-btn" data-plan-id="1" data-plan-name="طرح پایه" data-price="49000">
-                    انتخاب و خرید
-                </button>
-            </div>
-        </div>
-
-        <!-- Popular Plan -->
-        <div class="plan-card">
-            <div class="popular-badge">پرفروش‌ترین</div>
-            <div class="plan-header">
-                <h3>طرح ویژه</h3>
-                <p>بهترین قیمت و کیفیت</p>
-                <div class="plan-price">۸۵٬۰۰۰ <span class="period">تومان / ماه</span></div>
-            </div>
-
-            <div class="plan-features">
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>پهنای باند نامحدود</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>سرعت حداکثر 250 مگابیت</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>۶۰ لوکیشن جهانی</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>پشتیبانی VIP</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-times-circle"></i>
-                    <p>سرور اختصاصی</p>
-                </div>
-            </div>
-
-            <div class="plan-actions">
-                <button class="buy-btn" data-plan-id="2" data-plan-name="طرح ویژه" data-price="85000">
-                    انتخاب و خرید
-                </button>
-            </div>
-        </div>
-
-        <!-- Premium Plan -->
-        <div class="plan-card">
-            <div class="plan-header">
-                <h3>طرح پریمیوم</h3>
-                <p>برای کاربران حرفه‌ای</p>
-                <div class="plan-price">۱۴۹٬۰۰۰ <span class="period">تومان / ماه</span></div>
-            </div>
-
-            <div class="plan-features">
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>پهنای باند نامحدود</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>سرعت حداکثر 1 گیگابیت</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>۱۲۰ لوکیشن جهانی</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>پشتیبانی آنی</p>
-                </div>
-                <div class="plan-feature">
-                    <i class="fas fa-check-circle"></i>
-                    <p>سرور اختصاصی</p>
-                </div>
-            </div>
-
-            <div class="plan-actions">
-                <button class="buy-btn" data-plan-id="3" data-plan-name="طرح پریمیوم" data-price="149000">
-                    انتخاب و خرید
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Payment Modal -->
+    <!-- مدال پرداخت -->
     <div class="modal-overlay" id="paymentModal">
         <div class="payment-modal">
             <div class="modal-header">
-                <h3>تکمیل فرآیند خرید</h3>
+                <h3>تکمیل خرید اشتراک</h3>
                 <button class="close-btn" id="closeModal">&times;</button>
             </div>
 
             <div class="bank-card">
-                <p>لطفاً مبلغ مورد نظر را به شماره کارت زیر واریز نمایید:</p>
-                <div class="card-number">۶۳۶۲ ۱۴۱۱ ۷۲۲۸ ۸۴۷۳</div>
-                <button class="copy-btn" id="copyCardBtn">
-                    <i class="fas fa-copy"></i> کپی شماره کارت
+                <div class="bank-card-title">لطفاً مبلغ مورد نظر را به شماره کارت زیر واریز نمایید</div>
+                <div class="card-number" id="cardNumber">6037 9917 8354 3456</div>
+                <div class="button-group">
+                    <button class="btn-copy" id="copyCardBtn">
+                        <i class="fas fa-copy"></i> کپی شماره کارت
+                    </button>
+                    <button class="btn-copy" id="saveCardBtn">
+                        <i class="fas fa-save"></i> ذخیره تصویر
+                    </button>
+                </div>
+            </div>
+
+            <div class="payment-details">
+                <div class="detail-item">
+                    <div class="detail-label">مبلغ قابل پرداخت:</div>
+                    <div class="detail-value" id="planAmount">149,000 تومان</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">طرح انتخابی:</div>
+                    <div class="detail-value" id="planName">طرح ویژه</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">شناسه سفارش:</div>
+                    <div class="detail-value">ORD-38594</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">تاریخ انقضا:</div>
+                    <div class="detail-value">۱۴۰۲/۰۶/۲۵</div>
+                </div>
+            </div>
+
+            <div class="receipt-upload">
+                <input type="file" id="receiptFile" accept="image/*">
+                <label for="receiptFile" class="file-label" id="fileLabel">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    گواهی پرداخت را اینجا آپلود کنید
+                    <span class="file-name" id="fileName">فرمت‌های قابل قبول: JPG, PNG, PDF</span>
+                </label>
+            </div>
+
+            <div class="actions">
+                <button class="modal-btn btn-cancel" id="cancelBtn">
+                    <i class="fas fa-times"></i> انصراف
                 </button>
-            </div>
-
-            <div class="card-detail">
-                <p>مبلغ قابل پرداخت: <span class="detail-value" id="planAmount">49,000 تومان</span></p>
-                <p>طرح انتخابی: <span class="detail-value" id="planName">طرح پایه</span></p>
-            </div>
-
-            <p>پس از پرداخت، از رسید خود عکس گرفته و در فرم زیر بارگذاری نمایید:</p>
-
-            <input type="file" id="receiptFile" class="file-input">
-            <label for="receiptFile" class="file-label" id="fileLabel">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>فایل رسید پرداخت را در اینجا رها کنید</p>
-                <span>یا کلیک نمایید</span>
-                <span class="file-name" id="fileName">هیچ فایلی انتخاب نشده است</span>
-            </label>
-
-            <div class="modal-actions">
-                <button class="modal-btn secondary-btn" id="cancelBtn">انصراف</button>
-                <button class="modal-btn primary-btn" id="submitBtn">
-                    <span class="loader"></span> ارسال اطلاعات
+                <button class="modal-btn btn-submit" id="submitBtn" disabled>
+                    <i class="fas fa-paper-plane"></i> تایید و ارسال
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast" id="successToast">
+    <!-- توست‌های اطلاع‌رسانی -->
+    <div class="toast toast-success" id="successToast">
         <i class="fas fa-check-circle"></i>
-        <span>با موفقیت انجام شد!</span>
+        <span>خرید با موفقیت تکمیل و اکانت شما فعال شد!</span>
     </div>
 
-    <div class="toast" id="errorToast">
+    <div class="toast toast-error" id="errorToast">
         <i class="fas fa-exclamation-circle"></i>
-        <span>خطا! دوباره تلاش کنید.</span>
+        <span>خطا در پردازش درخواست لطفا دوباره تلاش کنید</span>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const modal = document.getElementById('paymentModal');
-            const paymentButtons = document.querySelectorAll('.buy-btn');
-            const closeModalBtn = document.getElementById('closeModal');
+            // عناصر مهم صفحه
+            const buyButtons = document.querySelectorAll('.buy-btn');
+            const paymentModal = document.getElementById('paymentModal');
+            const closeModal = document.getElementById('closeModal');
             const cancelBtn = document.getElementById('cancelBtn');
             const copyCardBtn = document.getElementById('copyCardBtn');
-            const fileInput = document.getElementById('receiptFile');
-            const fileLabel = document.getElementById('fileLabel');
-            const fileName = document.getElementById('fileName');
-            const planAmount = document.getElementById('planAmount');
+            const cardNumber = document.getElementById('cardNumber');
             const planName = document.getElementById('planName');
+            const planAmount = document.getElementById('planAmount');
+            const fileInput = document.getElementById('receiptFile');
+            const fileName = document.getElementById('fileName');
             const submitBtn = document.getElementById('submitBtn');
             const successToast = document.getElementById('successToast');
             const errorToast = document.getElementById('errorToast');
-            const loader = document.querySelector('.loader');
 
-            // Material dropdown glasses
-            paymentButtons.forEach(button => {
+            // نمایش مدال در هنگام کلیک روی دکمه خرید
+            buyButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const planId = this.dataset.planId;
-                    const planTitle = this.dataset.planName;
-                    const planPrice = this.dataset.price;
+                    const planId = button.dataset.planId;
+                    const name = button.dataset.planName;
+                    const price = parseInt(button.dataset.price).toLocaleString();
 
-                    planAmount.textContent = `${parseInt(planPrice).toLocaleString('fa-IR')} تومان`;
-                    planName.textContent = planTitle;
+                    planName.textContent = name;
+                    planAmount.textContent = `${price} تومان`;
 
-                    // Show modal
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-
-                    // Simulate order creation
-                    console.log(`Creating order for plan ID: ${planId}`);
+                    paymentModal.classList.add('active');
                 });
             });
 
-            // Close modal
-            function closeModal() {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                fileInput.value = '';
-                fileName.textContent = 'هیچ فایلی انتخاب نشده است';
+            // بستن مدال
+            function closePaymentModal() {
+                paymentModal.classList.remove('active');
             }
 
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
+            closeModal.addEventListener('click', closePaymentModal);
+            cancelBtn.addEventListener('click', closePaymentModal);
 
-            // Copy card number
+            // کپی شماره کارت
             copyCardBtn.addEventListener('click', function() {
-                const cardNumber = '۶۳۶۲ ۱۴۱۱ ۷۲۲۸ ۸۴۷۳';
-                navigator.clipboard.writeText(cardNumber);
+                navigator.clipboard.writeText(cardNumber.textContent);
 
+                // تغییر ظاهر دکمه برای نشان دادن موفقیت
                 copyCardBtn.innerHTML = '<i class="fas fa-check"></i> کپی شد!';
                 setTimeout(() => {
                     copyCardBtn.innerHTML = '<i class="fas fa-copy"></i> کپی شماره کارت';
                 }, 2000);
             });
 
-            // File input handler
+            // مدیریت آپلود فایل
             fileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
+                if(this.files && this.files[0]) {
                     fileName.textContent = this.files[0].name;
-                    fileLabel.style.borderColor = '#48bb78';
+                    submitBtn.disabled = false;
                 } else {
-                    fileName.textContent = 'هیچ فایلی انتخاب نشده است';
-                    fileLabel.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    fileName.textContent = 'فرمت‌های قابل قبول: JPG, PNG, PDF';
+                    submitBtn.disabled = true;
                 }
             });
 
-            // Drag and drop for file input
-            fileLabel.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.transform = 'scale(1.03)';
-                this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-            });
-
-            fileLabel.addEventListener('dragleave', function() {
-                this.style.transform = 'scale(1)';
-                this.style.backgroundColor = '';
-            });
-
-            fileLabel.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.transform = 'scale(1)';
-                this.style.backgroundColor = '';
-
-                if (e.dataTransfer.files.length > 0) {
-                    fileInput.files = e.dataTransfer.files;
-                    fileName.textContent = e.dataTransfer.files[0].name;
-                    this.style.borderColor = '#48bb78';
-                }
-            });
-
-            // Submit Button Handler
+            // دندانه‌دار کردن دکمه "تایید و ارسال"
             submitBtn.addEventListener('click', function() {
-                if (fileInput.files.length === 0) {
-                    showToast(errorToast, 'لطفاً فایل رسید را انتخاب کنید');
-                    return;
-                }
-
-                // Show loading
+                // شبیه‌سازی اقدامات ارسال به سرور
+                submitBtn.innerHTML = '<div class="spinner"></div> در حال پردازش...';
                 submitBtn.disabled = true;
-                loader.style.display = 'inline-block';
 
-                // Simulate form submission
+                // شبیه‌سازی تأخیر سرور
                 setTimeout(() => {
-                    // Simulate successful payment
-                    successProcess();
-                }, 2000);
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تایید و ارسال';
+                    paymentModal.classList.remove('active');
+
+                    // نمایش توست موفقیت
+                    showToast(successToast);
+
+                    // بازنشانی فرم
+                    fileInput.value = '';
+                    fileName.textContent = 'فرمت‌های قابل قبول: JPG, PNG, PDF';
+                    submitBtn.disabled = true;
+                }, 3000);
             });
 
-            function successProcess() {
-                // Hide loader
-                submitBtn.disabled = false;
-                loader.style.display = 'none';
-
-                // Show success
-                showToast(successToast);
-
-                // Close modal
+            // تابع نمایش توست
+            function showToast(toast) {
+                toast.classList.add('active');
                 setTimeout(() => {
-                    closeModal();
-                }, 1500);
+                    toast.classList.remove('active');
+                }, 5000);
             }
 
-            function showToast(toastElement) {
-                toastElement.classList.add('active');
+            // مدیریت کشیدن و رها کردن فایل
+            const fileLabel = document.getElementById('fileLabel');
 
-                // Hide toast after 3 seconds
-                setTimeout(() => {
-                    toastElement.classList.remove('active');
-                }, 3000);
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, preventDefaults);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, highlight);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, unhighlight);
+            });
+
+            function highlight() {
+                fileLabel.style.borderColor = '#3498db';
+                fileLabel.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+            }
+
+            function unhighlight() {
+                fileLabel.style.borderColor = '';
+                fileLabel.style.backgroundColor = '';
+            }
+
+            fileLabel.addEventListener('drop', handleDrop);
+
+            function handleDrop(e) {
+                const files = e.dataTransfer.files;
+                if(files.length) {
+                    fileInput.files = files;
+                    fileName.textContent = files[0].name;
+                    submitBtn.disabled = false;
+                }
             }
         });
     </script>
