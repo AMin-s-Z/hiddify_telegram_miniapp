@@ -19,6 +19,7 @@ Including another URLconf
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 from accounts.views import (
     home, dashboard, telegram_auth_view,
     api_plans, api_create_order, api_upload_receipt, api_order_status, telegram_webhook
@@ -29,6 +30,9 @@ urlpatterns = [
     path("", home, name="home"),
     path("dashboard/", dashboard, name="dashboard"),
     path("auth/telegram/", telegram_auth_view, name="telegram_auth"),
+
+    # Redirect legacy Django login to home (Telegram auth)
+    path("accounts/login/", RedirectView.as_view(url="/", permanent=False)),
 
     path("api/plans/", api_plans, name="api_plans"),
     path("api/orders/create/", api_create_order, name="api_create_order"),
