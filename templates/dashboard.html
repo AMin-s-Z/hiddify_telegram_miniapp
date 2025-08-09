@@ -6,14 +6,16 @@
   <title>خرید پلن VPN</title>
   <style>
     :root {
-      --bg: #0f0c29; /* love gradient */
+      --bg: #0f0c29;
       --bg2: #302b63;
       --bg3: #24243e;
       --card: rgba(255,255,255,0.08);
-      --accent: #ff6ec7; /* romantic pink */
-      --accent2: #8a2be2;
+      --accent: #4f46e5;
+      --accent2: #06b6d4;
       --text: #f5f7ff;
       --muted: #cfd2ff;
+      --badge: #f59e0b;
+      --badge2: #10b981;
     }
     body {
       margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Vazirmatn", sans-serif;
@@ -26,7 +28,9 @@
 
     .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
     .card { background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(8px); position: relative; overflow: hidden; }
-    .card::after { content: ""; position: absolute; inset: -2px; background: radial-gradient(600px 200px at top right, rgba(255,110,199,0.25), transparent); pointer-events:none }
+    .badge { position: absolute; top: 12px; left: 12px; font-size: 12px; padding: 4px 8px; border-radius: 999px; background: var(--badge); color: #1b1b1b; font-weight: 800; }
+    .badge.best { background: var(--badge2); }
+    .card::after { content: ""; position: absolute; inset: -2px; background: radial-gradient(600px 200px at top right, rgba(79,70,229,0.25), transparent); pointer-events:none }
     .price { font-size: 22px; font-weight: 800; color: #fff; }
     .meta { color: var(--muted); font-size: 14px; margin-top: 6px; }
     .btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: 0; padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 700; }
@@ -50,18 +54,21 @@
 </head>
 <body>
   {% load humanize %}
+  {% load currency %}
   <div class="container">
-    <h1>پلن‌های VIP عاشقانه ❤️</h1>
-    <div class="subtitle">سرعت بالا، اتصال پایدار، طراحی رمانتیک برای شما</div>
+    <h1>لیست پلن‌های یک‌ماهه</h1>
+    <div class="subtitle">کیفیت پایدار، قیمت منصفانه، نصب سریع</div>
 
     <div class="plans">
       {% for p in plans %}
       <div class="card">
+        {% if p.data_gb == 50 %}<div class="badge">پیشنهاد ویژه</div>{% endif %}
+        {% if p.data_gb == 100 %}<div class="badge best">به‌صرفه‌ترین</div>{% endif %}
         <h2>{{ p.name }}</h2>
         <div class="meta">مدت: {{ p.duration_days }} روز • حجم: {% if p.data_gb %}{{ p.data_gb }} گیگ{% else %}نامحدود{% endif %}</div>
         <p class="muted">{{ p.description }}</p>
         <div class="row" style="justify-content: space-between; margin-top: 8px;">
-          <div class="price">{{ p.price_irr|intcomma }} ریال</div>
+          <div class="price">{{ p.price_irr|toman|intcomma }} تومان</div>
           <button class="btn buy-btn" data-plan-id="{{ p.id }}" data-plan-name="{{ p.name|escape }}" data-price="{{ p.price_irr }}">خرید</button>
         </div>
       </div>
@@ -128,19 +135,19 @@
   </div>
 
   <script>
-    const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '٬') + ' ریال';
+    const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '٬') + ' تومان';
     let currentOrderId = null;
 
     document.querySelectorAll('.buy-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const planId = parseInt(btn.dataset.planId);
         const name = btn.dataset.planName;
-        const amount = parseInt(btn.dataset.price);
-        startBuy(planId, name, amount);
+        const amountIrr = parseInt(btn.dataset.price);
+        startBuy(planId, name, amountIrr);
       });
     });
 
-    async function startBuy(planId, name, amount) {
+    async function startBuy(planId, name, amountIrr) {
       try {
         const res = await fetch('/api/orders/create/', {
           method: 'POST',
@@ -153,7 +160,7 @@
         currentOrderId = data.order_id;
         document.getElementById('order_id').value = currentOrderId;
         document.getElementById('m_title').textContent = 'پرداخت ' + name;
-        document.getElementById('m_amount').textContent = fmt(data.amount_irr);
+        document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
         showModal();
       } catch (e) {
         alert('خطا در ایجاد سفارش: ' + (e.message || e));

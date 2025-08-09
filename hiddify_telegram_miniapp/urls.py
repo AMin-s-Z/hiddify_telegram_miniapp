@@ -20,14 +20,17 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+
+from accounts import admin
 from accounts.views import (
     home, dashboard, telegram_auth_view,
     api_plans, api_create_order, api_upload_receipt, api_order_status, telegram_webhook
 )
-
+from django.contrib import admin
 urlpatterns = [
     #    path("admin/", admin.site.urls),
     path("", home, name="home"),
+    path("admin/", admin.site.urls),
     path("dashboard/", dashboard, name="dashboard"),
     path("auth/telegram/", telegram_auth_view, name="telegram_auth"),
 
