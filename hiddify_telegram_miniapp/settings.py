@@ -57,7 +57,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'database',          # نام دیتابیسی که ساختید
-        'USER': 'admin',           # نام کاربری که ساختید
+        'USER': 'admin',            # نام کاربری که ساختید
         'PASSWORD': 'admin1234',      # رمز عبوری که تعیین کردید
         'HOST': 'localhost',              # معمولاً همین localhost است
         'PORT': '5432',                   # پورت پیش‌فرض PostgreSQL
