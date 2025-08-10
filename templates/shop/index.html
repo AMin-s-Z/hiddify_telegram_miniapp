@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>خرید پلن VPN</title>
+  <title>خرید اشتراک VPN</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,27 +16,40 @@
   <!-- اسکریپت تلگرام WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+  <!-- لایبرری انیمیشن -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
   <style>
     :root {
-      /* New Color Palette */
+      /* پالت رنگ اصلی */
       --bs-body-bg: #0d1117;
       --bs-body-color: #e6edf3;
       --bs-secondary-bg: #161b22;
       --bs-tertiary-bg: #21262d;
-      --bs-primary: #238636; /* A successful green */
+      --bs-primary: #238636;
       --bs-primary-rgb: 35, 134, 54;
       --bs-accent-color: #30a8f2;
       --bs-border-color: rgba(240, 246, 252, 0.1);
       --bs-body-font-family: 'Vazirmatn', sans-serif;
+
+      /* رنگ‌های اضافی */
+      --gradient-primary: linear-gradient(45deg, #238636, #2ea0a0);
+      --shadow-primary: 0 10px 25px -5px rgba(35, 134, 54, 0.3);
+      --shadow-accent: 0 10px 25px -5px rgba(48, 168, 242, 0.3);
+      --glow-primary: 0 0 15px rgba(35, 134, 54, 0.5);
+      --glow-accent: 0 0 15px rgba(48, 168, 242, 0.5);
     }
 
     body {
       font-family: var(--bs-body-font-family);
-      padding-bottom: 90px; /* For bottom nav */
+      padding-bottom: 90px;
       background-color: var(--bs-body-bg);
+      background-image:
+        radial-gradient(circle at 25% 10%, rgba(35, 134, 54, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 75% 75%, rgba(48, 168, 242, 0.05) 0%, transparent 40%);
     }
 
-    /* Section transition */
+    /* انیمیشن تغییر بخش */
     main > section {
       transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
       transform: translateY(0);
@@ -47,39 +60,99 @@
       transform: translateY(10px);
     }
 
-    /* Card Styling */
+    /* استایل کارت */
     .card {
       background-color: var(--bs-secondary-bg);
       border: 1px solid var(--bs-border-color);
-      border-radius: 12px;
-      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-      border-top: 3px solid transparent;
-      border-image: linear-gradient(to right, var(--bs-primary), var(--bs-accent-color)) 1;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease-out;
+      position: relative;
+      backdrop-filter: blur(5px);
     }
 
-    /* Main Button Styling */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-primary);
+    }
+
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 1px;
+      background: linear-gradient(45deg, #238636, transparent, #30a8f2);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* استایل دکمه اصلی */
     .btn-primary {
-      background-image: linear-gradient(45deg, var(--bs-primary) 0%, #2ea0a0 100%);
+      background-image: var(--gradient-primary);
       border: none;
       font-weight: 500;
       padding: 0.6rem 1.5rem;
-      border-radius: 8px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn-primary:hover {
-      transform: scale(1.05);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
       box-shadow: 0 4px 15px rgba(var(--bs-primary-rgb), 0.3);
     }
 
-    /* Animation for cards on load */
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(45deg);
+      transition: transform 0.6s;
+      z-index: 1;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-primary);
+    }
+
+    .btn-primary:hover::before {
+      transform: translateX(100%) rotate(45deg);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* انیمیشن برای کارت‌ها */
     @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
       }
       to {
         opacity: 1;
@@ -88,75 +161,130 @@
     }
     .col {
       animation: fadeInUp 0.5s ease-out forwards;
-      opacity: 0; /* Start hidden */
-      animation-delay: calc(var(--i) * 0.1s); /* Staggered animation delay */
+      opacity: 0;
+      animation-delay: calc(var(--i) * 0.1s);
     }
 
-    /* Bottom Navigation */
+    /* نوار پایین */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 0.5rem 0;
-      background: rgba(22, 27, 34, 0.8); /* Semi-transparent bg */
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      padding: 0.8rem 0;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       border-top: 1px solid var(--bs-border-color);
       z-index: 1030;
+      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
     }
+
     .bottom-nav .nav-link {
       color: #8b949e;
-      transition: color .2s ease, transform .2s ease;
+      transition: all .25s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 5px;
       font-size: 0.8rem;
-    }
-    .bottom-nav .nav-link .bi {
-      font-size: 1.4rem;
-    }
-    .bottom-nav .nav-link.active {
-      color: var(--bs-accent-color);
-      transform: scale(1.1);
+      position: relative;
     }
 
-    /* Modal Styling */
+    .bottom-nav .nav-link .bi {
+      font-size: 1.5rem;
+    }
+
+    .bottom-nav .nav-link.active {
+      color: var(--bs-accent-color);
+      transform: translateY(-5px);
+    }
+
+    .bottom-nav .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 3px;
+      background: var(--bs-accent-color);
+      border-radius: 3px;
+      box-shadow: var(--glow-accent);
+    }
+
+    /* استایل مودال */
     .modal-content {
       background: var(--bs-tertiary-bg);
-      border-radius: 12px;
+      border-radius: 16px;
       border: 1px solid var(--bs-border-color);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
     }
+
+    .modal-header {
+      border-bottom-color: var(--bs-border-color);
+    }
+
     .btn-copy {
       cursor: pointer;
     }
 
-    /* History List Styling */
+    /* استایل لیست تاریخچه */
     .list-group-item {
       background-color: var(--bs-secondary-bg) !important;
       color: var(--bs-body-color) !important;
-      border-radius: 8px !important;
-      margin-bottom: 10px;
+      border-radius: 12px !important;
+      margin-bottom: 12px;
       border: 1px solid var(--bs-border-color) !important;
       padding: 1rem 1.25rem;
+      transition: all 0.2s ease;
     }
+
+    .list-group-item:hover {
+      transform: translateX(-5px);
+      border-color: rgba(48, 168, 242, 0.3) !important;
+    }
+
     .status-badge {
       font-size: 0.8rem;
-      padding: 0.3em 0.6em;
-      border-radius: 20px;
+      padding: 0.4em 0.8em;
+      border-radius: 30px;
       font-weight: 500;
     }
-    .status-approved { background-color: rgba(var(--bs-primary-rgb), 0.2); color: var(--bs-primary); }
-    .status-submitted { background-color: rgba(255, 165, 0, 0.2); color: orange; }
-    .status-rejected { background-color: rgba(220, 53, 69, 0.2); color: #dc3545; }
-    .status-pending { background-color: rgba(108, 117, 125, 0.2); color: #6c757d; }
+
+    .status-approved {
+      background-color: rgba(var(--bs-primary-rgb), 0.2);
+      color: var(--bs-primary);
+      box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.15);
+    }
+
+    .status-submitted {
+      background-color: rgba(255, 165, 0, 0.2);
+      color: orange;
+      box-shadow: 0 2px 8px rgba(255, 165, 0, 0.15);
+    }
+
+    .status-rejected {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15);
+    }
+
+    .status-pending {
+      background-color: rgba(108, 117, 125, 0.2);
+      color: #6c757d;
+      box-shadow: 0 2px 8px rgba(108, 117, 125, 0.15);
+    }
 
     .form-control {
         background-color: var(--bs-tertiary-bg);
         border-color: var(--bs-border-color);
         color: var(--bs-body-color);
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
     }
+
     .form-control:focus {
         background-color: var(--bs-tertiary-bg);
         border-color: var(--bs-accent-color);
@@ -164,44 +292,60 @@
         box-shadow: 0 0 0 0.25rem rgba(48, 168, 242, 0.25);
     }
 
-    /* User Info Section */
+    /* Placeholder custom color */
+    .form-control::placeholder {
+        color: rgba(230, 237, 243, 0.5);
+    }
+
+    /* بخش اطلاعات کاربر */
     .user-info {
         display: flex;
         align-items: center;
-        padding: 10px 15px;
-        margin-bottom: 20px;
-        background-color: var(--bs-secondary-bg);
-        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 25px;
+        background: linear-gradient(to right, rgba(22, 27, 34, 0.7), rgba(33, 38, 45, 0.7));
+        border-radius: 16px;
         border: 1px solid var(--bs-border-color);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .user-info:hover {
+        border-color: rgba(48, 168, 242, 0.3);
+        box-shadow: var(--shadow-accent);
     }
 
     .user-avatar {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
-        margin-left: 10px;
+        margin-left: 15px;
         object-fit: cover;
+        border: 2px solid var(--bs-accent-color);
+        box-shadow: var(--glow-accent);
     }
 
     .user-name {
-        font-weight: 500;
-        margin-bottom: 0;
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 1.1rem;
     }
 
     .user-id {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         color: #8b949e;
         margin-bottom: 0;
     }
 
-    /* Loading overlay */
+    /* لودینگ اورلی */
     .loading-overlay {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(0, 0, 0, 0.7);
+        background-color: rgba(13, 17, 23, 0.85);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -209,6 +353,7 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
+        backdrop-filter: blur(5px);
     }
 
     .loading-overlay.active {
@@ -217,485 +362,676 @@
     }
 
     .loading-spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: var(--bs-accent-color);
-        animation: spin 1s ease-in-out infinite;
+        width: 60px;
+        height: 60px;
+        position: relative;
     }
 
-    @keyframes spin {
-        to { transform: rotate(360deg); }
+    .loading-spinner::before,
+    .loading-spinner::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        animation: pulse 2s linear infinite;
+    }
+
+    .loading-spinner::before {
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(#238636, #30a8f2);
+        animation-delay: 0.5s;
+    }
+
+    .loading-spinner::after {
+        width: 75%;
+        height: 75%;
+        background-color: var(--bs-body-bg);
+        top: 12.5%;
+        left: 12.5%;
+        animation-delay: 0s;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.85); opacity: 1; }
+        50% { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(0.85); opacity: 1; }
+    }
+
+    /* استایل تست */
+    .toast-container {
+        z-index: 1100;
+    }
+
+    .toast {
+        background: rgba(33, 38, 45, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .toast-header {
+        background: transparent;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--bs-body-color);
+    }
+
+    /* Custom badge for price */
+    .price-badge {
+        background: linear-gradient(45deg, #238636, #30a8f2);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-weight: 600;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(48, 168, 242, 0.25);
+    }
+
+    /* Feature list styling */
+    .feature-list {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+
+    .feature-list li {
+        padding: 8px 0;
+        position: relative;
+        padding-right: 25px;
+        color: #a3acb9;
+    }
+
+    .feature-list li:before {
+        content: '\F270';
+        font-family: bootstrap-icons;
+        position: absolute;
+        right: 0;
+        color: var(--bs-primary);
+    }
+
+    /* Button outline style */
+    .btn-outline-secondary {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #a3acb9;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--bs-body-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--bs-tertiary-bg);
+        border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--bs-accent-color);
+    }
+
+    /* Section headings */
+    .section-title {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+    }
+
+    .subtitle {
+        color: #8b949e;
+        max-width: 600px;
+        margin: 0 auto 3rem;
+    }
+
+    /* Card header accent */
+    .card-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        z-index: 1;
+    }
+
+    .card-title:after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        z-index: -1;
     }
   </style>
 </head>
 <body>
     {% csrf_token %}
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-  </div>
 
-  <main class="container-fluid mt-4">
-    {% if user.is_authenticated %}
-    <div class="user-info">
-      {% if user.telegram_photo_url %}
-      <img src="{{ user.telegram_photo_url }}" alt="{{ user.telegram_first_name }}" class="user-avatar">
-      {% else %}
-      <div class="user-avatar d-flex align-items-center justify-content-center bg-primary">
-        <i class="bi bi-person-fill text-white"></i>
-      </div>
-      {% endif %}
-      <div>
-        <p class="user-name">{{ user.telegram_first_name }} {{ user.telegram_last_name }}</p>
-        <p class="user-id">@{{ user.telegram_username }}</p>
-      </div>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
     </div>
-    {% endif %}
 
-    <section id="buy-section" class="active">
-      <div class="text-center mb-5">
-        <h1 class="fw-bold">خرید سرویس</h1>
-        <p class="lead" style="color: #8b949e;">کیفیت پایدار، قیمت منصفانه، نصب سریع</p>
-      </div>
-
-      <div class="row row-cols-1 row-cols-md-2 g-4">
-        {% for p in plans %}
-        <div class="col" style="--i: {{ forloop.counter0 }};">
-          <div class="card text-center h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title fw-bold fs-4">{{ p.name }}</h5>
-              <p class="card-text" style="color: #8b949e;">
-                <i class="bi bi-calendar-check"></i> مدت: {{ p.duration_days }} روز •
-                <i class="bi bi-hdd-stack"></i> حجم: {% if p.data_gb %}{{ p.data_gb }} گیگابایت{% else %}نامحدود{% endif %}
-              </p>
-              <p class="card-text mt-3 mb-4 flex-grow-1">{{ p.description }}</p>
-              <div class="d-flex justify-content-between align-items-center mt-auto">
-                <span class="h5 fw-bold">{{ p.price_irr|floatformat:0|intcomma }} <small class="fw-light">تومان</small></span>
-                <button class="btn btn-primary buy-btn" data-plan-id="{{ p.id }}" data-plan-name="{{ p.name|escape }}" data-price="{{ p.price_irr }}">
-                  <i class="bi bi-cart3"></i> خرید
-                </button>
-              </div>
+    <main class="container-fluid mt-4">
+        <!-- User Info Section -->
+        {% if user.is_authenticated %}
+        <div class="user-info animate__animated animate__fadeIn">
+            {% if user.telegram_photo_url %}
+            <img src="{{ user.telegram_photo_url }}" alt="{{ user.telegram_first_name }}" class="user-avatar">
+            {% else %}
+            <div class="user-avatar d-flex align-items-center justify-content-center bg-primary">
+                <i class="bi bi-person-fill text-white"></i>
             </div>
-          </div>
-        </div>
-        {% empty %}
-        <p class="text-center" style="color: #8b949e;">متاسفانه در حال حاضر پلن فعالی برای فروش وجود ندارد.</p>
-        {% endfor %}
-      </div>
-    </section>
-
-    <section id="history-section">
-      <div class="text-center mb-5">
-        <h1 class="fw-bold">سوابق شما</h1>
-        <p class="lead" style="color: #8b949e;">اکانت‌ها و سفارش‌های قبلی</p>
-      </div>
-
-      <div class="mb-5">
-        <h4 class="mb-3"><i class="bi bi-person-check-fill text-primary"></i> اکانت‌های فعال من</h4>
-        <div id="user-accounts-list" class="list-group">
-          {% for a in user_accounts %}
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1 fw-bold">{{ a.username }}</h5>
-                <small><i class="bi bi-calendar-x"></i> انقضا: {{ a.expires_at|date:'Y-m-d' }}</small>
-              </div>
-              <p class="mb-0 mt-2 font-monospace">{{ a.server_address }}</p>
+            {% endif %}
+            <div>
+                <p class="user-name">{{ user.telegram_first_name }} {{ user.telegram_last_name }}</p>
+                <p class="user-id">@{{ user.telegram_username }}</p>
             </div>
-          {% empty %}
-            <p class="text-center" style="color: #8b949e;">هنوز اکانتی برای شما فعال نشده است.</p>
-          {% endfor %}
         </div>
-      </div>
+        {% endif %}
 
-      <div>
-        <h4 class="mb-3"><i class="bi bi-receipt-cutoff text-primary"></i> آخرین سفارش‌ها</h4>
-        <div class="list-group">
-          {% for o in user_orders %}
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-              <div class="d-flex w-100 justify-content-between align-items-center">
-                <h5 class="mb-1">سفارش #{{ o.id }} <small class="text-white-50">- {{ o.plan.name }}</small></h5>
-                <span class="status-badge status-{{ o.status }}">{{ o.get_status_display }}</span>
-              </div>
+        <!-- Buy Section -->
+        <section id="buy-section" class="active">
+            <div class="text-center mb-5">
+                <h1 class="section-title animate__animated animate__fadeInDown">خرید اشتراک VPN</h1>
+                <p class="lead subtitle animate__animated animate__fadeIn animate__delay-1s">بهترین سرویس VPN با سرعت بالا، امنیت عالی و پشتیبانی 24 ساعته</p>
             </div>
-          {% empty %}
-            <p class="text-center" style="color: #8b949e;">تاکنون سفارشی ثبت نکرده‌اید.</p>
-          {% endfor %}
-        </div>
-      </div>
-    </section>
-  </main>
 
-  <nav class="bottom-nav">
-    <div class="d-flex justify-content-around w-100">
-      <a href="#" class="nav-link active" id="nav-buy" data-section="buy-section">
-        <i class="bi bi-bag-heart-fill"></i>
-        <div>خرید</div>
-      </a>
-      <a href="#" class="nav-link" id="nav-history" data-section="history-section">
-        <i class="bi bi-clock-history"></i>
-        <div>سوابق</div>
-      </a>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for p in plans %}
+                <div class="col" style="--i: {{ forloop.counter0 }};">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column p-4">
+                            <h5 class="card-title fw-bold fs-4">{{ p.name }}</h5>
+
+                            <ul class="feature-list">
+                                <li><i class="bi bi-calendar-check me-2"></i> مدت زمان: {{ p.duration_days }} روز</li>
+                                <li><i class="bi bi-hdd-stack me-2"></i> حجم: {% if p.data_gb %}{{ p.data_gb }} گیگابایت{% else %}نامحدود{% endif %}</li>
+                                <li><i class="bi bi-globe me-2"></i> دسترسی به تمام سرورها</li>
+                                <li><i class="bi bi-shield-check me-2"></i> امنیت بالا و حریم خصوصی</li>
+                            </ul>
+
+                            <p class="card-text mt-2 mb-4 flex-grow-1">{{ p.description }}</p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <div class="price-badge">{{ p.price_irr|floatformat:0|intcomma }} <small class="fw-light">تومان</small></div>
+                                <button class="btn btn-primary buy-btn" data-plan-id="{{ p.id }}" data-plan-name="{{ p.name|escape }}" data-price="{{ p.price_irr }}">
+                                    <i class="bi bi-cart3 me-1"></i> خرید اشتراک
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-secondary text-center" role="alert">
+                        <i class="bi bi-exclamation-circle fs-4 d-block mb-2"></i>
+                        متاسفانه در حال حاضر پلن فعالی برای فروش وجود ندارد.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history-section">
+            <div class="text-center mb-5">
+                <h1 class="section-title">سوابق شما</h1>
+                <p class="lead subtitle">اکانت‌ها و سفارش‌های قبلی شما</p>
+            </div>
+
+            <div class="mb-5">
+                <h4 class="mb-3"><i class="bi bi-person-check-fill text-primary me-2"></i> اکانت‌های فعال من</h4>
+                <div id="user-accounts-list" class="list-group">
+                    {% for a in user_accounts %}
+                        <div class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1 fw-bold">{{ a.username }}</h5>
+                                <small><i class="bi bi-calendar-x me-1"></i> انقضا: {{ a.expires_at|date:'Y-m-d' }}</small>
+                            </div>
+                            <p class="mb-0 mt-2 font-monospace">{{ a.server_address }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="text-center p-4 bg-secondary bg-opacity-10 rounded-3">
+                            <i class="bi bi-person-x fs-1 text-secondary mb-3"></i>
+                            <p class="text-secondary">هنوز اکانتی برای شما فعال نشده است.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <h4 class="mb-3"><i class="bi bi-receipt-cutoff text-primary me-2"></i> آخرین سفارش‌ها</h4>
+                <div class="list-group">
+                    {% for o in user_orders %}
+                        <div class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <h5 class="mb-1">سفارش #{{ o.id }} <small class="text-white-50">- {{ o.plan.name }}</small></h5>
+                                <span class="status-badge status-{{ o.status }}">{{ o.get_status_display }}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center p-4 bg-secondary bg-opacity-10 rounded-3">
+                            <i class="bi bi-cart-x fs-1 text-secondary mb-3"></i>
+                            <p class="text-secondary">تاکنون سفارشی ثبت نکرده‌اید.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav animate__animated animate__fadeInUp">
+        <div class="d-flex justify-content-around w-100">
+            <a href="#" class="nav-link active" id="nav-buy" data-section="buy-section">
+                <i class="bi bi-bag-heart-fill"></i>
+                <div>خرید</div>
+            </a>
+            <a href="#" class="nav-link" id="nav-history" data-section="history-section">
+                <i class="bi bi-clock-history"></i>
+                <div>سوابق</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="buyModal" tabindex="-1" aria-labelledby="buyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="m_title">پرداخت کارت به کارت</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        لطفاً مبلغ مشخص شده را به شماره کارت زیر واریز کرده و از رسید پرداختی خود عکس گرفته و در فرم زیر بارگذاری کنید.
+                    </div>
+
+                    <div class="mb-4 p-3 bg-secondary bg-opacity-10 rounded-3">
+                        <label for="card" class="form-label fw-bold">شماره کارت:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace" id="card" value="{{ bank_card_number }}" readonly>
+                            <span class="input-group-text btn-copy" id="copy-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="کپی کردن شماره کارت" onclick="copyCard()">
+                                <i class="bi bi-clipboard" id="copy-icon"></i>
+                            </span>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <span class="fw-bold">مبلغ قابل پرداخت:</span>
+                            <div id="m_amount" class="fs-4 text-warning mt-2"></div>
+                        </div>
+                    </div>
+
+                    <form id="receiptForm" class="mt-4">
+                        <input type="hidden" name="order_id" id="order_id" />
+                        <div class="mb-3">
+                            <label for="receipt" class="form-label fw-bold">فایل رسید پرداخت:</label>
+                            <input class="form-control" type="file" name="receipt" id="receipt" accept="image/*,application/pdf" required>
+                            <div class="form-text text-white-50">تصویر یا PDF رسید پرداخت خود را آپلود کنید.</div>
+                        </div>
+                        <div class="d-flex justify-content-between gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary" onclick="checkStatus()">
+                                <i class="bi bi-arrow-repeat me-1"></i> بررسی وضعیت
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="submitReceiptBtn">
+                                <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
+                                <i class="bi bi-upload me-1"></i> ارسال رسید
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </nav>
 
-  <div class="modal fade" id="buyModal" tabindex="-1" aria-labelledby="buyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="m_title">پرداخت کارت به کارت</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bi bi-info-circle-fill me-2" id="toast-icon"></i>
+                <strong class="me-auto" id="toast-title">پیام سیستم</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-body">
+                متن پیام در اینجا قرار می‌گیرد.
+            </div>
         </div>
-        <div class="modal-body">
-          <p style="color: #8b949e;">لطفاً مبلغ مشخص شده را به شماره کارت زیر واریز کرده و از رسید پرداختی خود عکس گرفته و در فرم زیر بارگذاری کنید.</p>
-          <hr class="border-secondary"/>
-          <div class="mb-3">
-            <label for="card" class="form-label">شماره کارت:</label>
-            <div class="input-group">
-              <input type="text" class="form-control font-monospace" id="card" value="{{ bank_card_number }}" readonly>
-              <span class="input-group-text btn-copy" id="copy-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="کپی کردن شماره کارت" onclick="copyCard()">
-                  <i class="bi bi-clipboard" id="copy-icon"></i>
-              </span>
-            </div>
-          </div>
-          <div class="mb-3">مبلغ قابل پرداخت: <b id="m_amount" class="fs-5 text-warning"></b></div>
-          <hr class="border-secondary"/>
-          <form id="receiptForm">
-            <input type="hidden" name="order_id" id="order_id" />
-            <div class="mb-3">
-              <label for="receipt" class="form-label">فایل رسید پرداخت:</label>
-              <input class="form-control" type="file" name="receipt" id="receipt" accept="image/*,application/pdf" required>
-            </div>
-            <div class="d-flex justify-content-end gap-2 mt-4">
-              <button type="button" class="btn btn-outline-secondary" onclick="checkStatus()">بررسی وضعیت</button>
-              <button type="submit" class="btn btn-primary" id="submitReceiptBtn">
-                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                ارسال رسید
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
-    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        <i class="bi bi-info-circle-fill me-2" id="toast-icon"></i>
-        <strong class="me-auto" id="toast-title">پیام سیستم</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body" id="toast-body">
-        متن پیام در اینجا قرار می‌گیرد.
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-      // در templates/shop/index.html
-// تغییر این بخش در تابع startBuy:
-
-async function startBuy(planId, name, amountIrr) {
-  try {
-    loadingOverlay.classList.add('active');
-
-    // دریافت توکن CSRF از کوکی
-    function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-
-    const res = await fetch('/api/orders/create/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRFToken': csrftoken  // اضافه کردن توکن CSRF
-      },
-      credentials: 'include',
-      body: JSON.stringify({ plan_id: planId })
-    });
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // نمایش لودر در ابتدا
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      loadingOverlay.classList.add('active');
-
-      // Initialize Bootstrap components
-      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-      });
-
-      const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
-      const toastEl = document.getElementById('liveToast');
-      const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
-
-      // --- Helper Functions ---
-      const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' تومان';
-      let currentOrderId = null;
-
-      function showToast(message, type = 'info') {
-        const toastIcon = document.getElementById('toast-icon');
-        const toastTitle = document.getElementById('toast-title');
-
-        // Reset classes
-        toastIcon.className = "bi me-2";
-
-        switch (type) {
-            case 'success':
-                toastIcon.classList.add('bi-check-circle-fill', 'text-success');
-                toastTitle.textContent = 'موفقیت';
-                break;
-            case 'error':
-                toastIcon.classList.add('bi-exclamation-triangle-fill', 'text-danger');
-                toastTitle.textContent = 'خطا';
-                break;
-            default:
-                toastIcon.classList.add('bi-info-circle-fill', 'text-primary');
-                toastTitle.textContent = 'اطلاعیه';
-                break;
-        }
-        document.getElementById('toast-body').innerHTML = message;
-        bsToast.show();
-      }
-
-      // --- Tab Switching Logic ---
-      const navLinks = document.querySelectorAll('.bottom-nav .nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetSectionId = link.dataset.section;
-
-          // Deactivate all
-          document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
-          navLinks.forEach(l => l.classList.remove('active'));
-
-          // Activate target
-          document.getElementById(targetSectionId).classList.add('active');
-          link.classList.add('active');
-        });
-      });
-
-      // --- Buy Process Logic ---
-      document.querySelectorAll('.buy-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const planId = parseInt(btn.dataset.planId);
-          const name = btn.dataset.planName;
-          const amountIrr = parseInt(btn.dataset.price);
-          startBuy(planId, name, amountIrr);
-        });
-      });
-
-      async function startBuy(planId, name, amountIrr) {
-        try {
-          loadingOverlay.classList.add('active');
-
-          const res = await fetch('/api/orders/create/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ plan_id: planId })
-          });
-          const data = await res.json();
-
-          loadingOverlay.classList.remove('active');
-
-          if (!res.ok) {
-            throw new Error(data.detail || data.message || 'خطا در ایجاد سفارش');
-          }
-          currentOrderId = data.order_id;
-          document.getElementById('order_id').value = currentOrderId;
-          document.getElementById('m_title').textContent = 'پرداخت پلن ' + name;
-          document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
-          buyModal.show();
-        } catch (e) {
-          loadingOverlay.classList.remove('active');
-          showToast('خطا در ایجاد سفارش: ' + e.message, 'error');
-        }
-      }
-
-      // --- Modal and Form Logic ---
-      window.copyCard = function() {
-        const cardInput = document.getElementById('card');
-        navigator.clipboard.writeText(cardInput.value).then(() => {
-          const icon = document.getElementById('copy-icon');
-          const tooltip = bootstrap.Tooltip.getInstance(document.getElementById('copy-btn'));
-          icon.classList.replace('bi-clipboard', 'bi-check-lg');
-          tooltip.setContent({ '.tooltip-inner': 'کپی شد!' });
-          tooltip.show();
-          setTimeout(() => {
-            icon.classList.replace('bi-check-lg', 'bi-clipboard');
-            tooltip.setContent({ '.tooltip-inner': 'کپی کردن شماره کارت' });
-            tooltip.hide();
-          }, 2000);
-        });
-      }
-
-      document.getElementById('receiptForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const submitBtn = document.getElementById('submitReceiptBtn');
-        const spinner = submitBtn.querySelector('.spinner-border');
-
-        const fd = new FormData(form);
-
-        submitBtn.disabled = true;
-        spinner.classList.remove('d-none');
+        // Loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
         loadingOverlay.classList.add('active');
 
-        try {
-          const res = await fetch('/api/orders/upload_receipt/', {
-            method: 'POST',
-            body: fd,
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' },
-          });
-          const data = await res.json();
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
 
-          loadingOverlay.classList.remove('active');
+        const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
+        const toastEl = document.getElementById('liveToast');
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
 
-          if (!res.ok) {
-            throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
-          }
-          showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
-          // buyModal.hide(); // Optional: close modal on success
-        } catch (err) {
-          loadingOverlay.classList.remove('active');
-          showToast('خطا: ' + err.message, 'error');
-        } finally {
-            submitBtn.disabled = false;
-            spinner.classList.add('d-none');
-        }
-      });
-
-      window.checkStatus = async function() {
-        if (!currentOrderId) {
-            showToast('ابتدا باید یک سفارش ایجاد کنید.', 'info');
-            return;
-        }
-
-        showToast('در حال بررسی وضعیت سفارش...', 'info');
-        loadingOverlay.classList.add('active');
-
-        try {
-          const res = await fetch(`/api/orders/status/${currentOrderId}/`, {
-              credentials: 'include',
-              headers: { 'Accept': 'application/json' },
-          });
-          const data = await res.json();
-
-          loadingOverlay.classList.remove('active');
-
-          if (!res.ok) throw new Error(data.detail || 'خطا در دریافت وضعیت');
-
-          const st = data.order.status;
-          if (st === 'approved' && data.order.vpn_account) {
-            const v = data.order.vpn_account;
-            const accountInfo = `
-              <div class="text-start">
-                <strong class="d-block mb-2">اکانت شما با موفقیت فعال شد! ✅</strong>
-                <div>نام کاربری: <b class="font-monospace">${v.username}</b></div>
-                <div>رمز عبور: <b class="font-monospace">${v.password}</b></div>
-                <div>آدرس سرور: <b class="font-monospace">${v.server_address}</b></div>
-                <small class="d-block mt-2 text-white-50">این اطلاعات به لیست اکانت‌های شما در تب سوابق نیز اضافه شد.</small>
-              </div>`;
-            showToast(accountInfo, 'success');
-            buyModal.hide();
-            // Optionally, refresh the history tab content dynamically
-            setTimeout(() => window.location.reload(), 5000); // Simple reload to show new data
-          } else if (st === 'rejected') {
-            showToast('سفارش شما رد شده است. لطفاً با پشتیبانی تماس بگیرید.', 'error');
-          } else if (st === 'submitted') {
-            showToast('رسید شما ارسال شده و در انتظار تایید توسط ادمین می‌باشد.', 'info');
-          } else { // pending
-            showToast('سفارش شما همچنان در انتظار پرداخت و ارسال رسید است.', 'info');
-          }
-        } catch (err) {
-          loadingOverlay.classList.remove('active');
-          showToast('خطا در بررسی وضعیت: ' + err.message, 'error');
-        }
-      }
-
-      // بررسی اینکه آیا در تلگرام WebApp هستیم
-      if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-
-        // فعال کردن حالت تمام صفحه
-        tg.expand();
-
-        // تنظیم رنگ‌ها بر اساس تم تلگرام
-        if (tg.colorScheme === 'dark') {
-          document.documentElement.style.setProperty('--bs-body-bg', '#0d1117');
-          document.documentElement.style.setProperty('--bs-body-color', '#e6edf3');
-          document.documentElement.style.setProperty('--bs-secondary-bg', '#161b22');
-          document.documentElement.style.setProperty('--bs-tertiary-bg', '#21262d');
-        } else {
-          document.documentElement.style.setProperty('--bs-body-bg', '#f5f5f5');
-          document.documentElement.style.setProperty('--bs-body-color', '#333333');
-          document.documentElement.style.setProperty('--bs-secondary-bg', '#ffffff');
-          document.documentElement.style.setProperty('--bs-tertiary-bg', '#f0f0f0');
-          document.documentElement.style.setProperty('--bs-border-color', 'rgba(0, 0, 0, 0.1)');
-        }
-
-        // دریافت داده‌های ارسالی از تلگرام
-        const initData = tg.initData;
-        const user = tg.initDataUnsafe.user;
-
-        if (user && initData && !{{ user.is_authenticated|yesno:"true,false" }}) {
-          // ارسال به سرور برای احراز هویت
-          fetch('/auth/telegram/webapp/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              initData: initData,
-              user: user
-            })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              console.log('کاربر با موفقیت وارد شد');
-              if (data.redirect) {
-                window.location.href = data.redirect;
-              } else {
-                window.location.reload();
-              }
-            } else {
-              console.error('خطا در ورود:', data.error);
-              showToast('خطا در ورود: ' + data.error, 'error');
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
             }
-          })
-          .catch(error => {
-            console.error('خطا در ارتباط با سرور:', error);
-            showToast('خطا در ارتباط با سرور', 'error');
-          })
-          .finally(() => {
-            loadingOverlay.classList.remove('active');
-          });
-        } else {
-          // اگر کاربر قبلاً احراز هویت شده، لودر را مخفی کنید
-          loadingOverlay.classList.remove('active');
+            return cookieValue;
         }
-      } else {
-        // اگر در تلگرام نیستیم، لودر را مخفی کنید
-        loadingOverlay.classList.remove('active');
-      }
+
+        // Format price numbers
+        const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' تومان';
+        let currentOrderId = null;
+
+        // Show toast notifications
+        function showToast(message, type = 'info') {
+            const toastIcon = document.getElementById('toast-icon');
+            const toastTitle = document.getElementById('toast-title');
+
+            // Reset classes
+            toastIcon.className = "bi me-2";
+
+            switch (type) {
+                case 'success':
+                    toastIcon.classList.add('bi-check-circle-fill', 'text-success');
+                    toastTitle.textContent = 'موفقیت';
+                    break;
+                case 'error':
+                    toastIcon.classList.add('bi-exclamation-triangle-fill', 'text-danger');
+                    toastTitle.textContent = 'خطا';
+                    break;
+                default:
+                    toastIcon.classList.add('bi-info-circle-fill', 'text-primary');
+                    toastTitle.textContent = 'اطلاعیه';
+                    break;
+            }
+            document.getElementById('toast-body').innerHTML = message;
+            bsToast.show();
+        }
+
+        // Tab switching logic
+        const navLinks = document.querySelectorAll('.bottom-nav .nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSectionId = link.dataset.section;
+
+                // Deactivate all
+                document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
+                navLinks.forEach(l => l.classList.remove('active'));
+
+                // Activate target
+                document.getElementById(targetSectionId).classList.add('active');
+                link.classList.add('active');
+            });
+        });
+
+        // Buy process
+        document.querySelectorAll('.buy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const planId = parseInt(btn.dataset.planId);
+                const name = btn.dataset.planName;
+                const amountIrr = parseInt(btn.dataset.price);
+                startBuy(planId, name, amountIrr);
+            });
+        });
+
+        async function startBuy(planId, name, amountIrr) {
+            try {
+                loadingOverlay.classList.add('active');
+                const csrftoken = getCookie('csrftoken');
+
+                const res = await fetch('/api/orders/create/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ plan_id: planId })
+                });
+
+                const data = await res.json();
+                loadingOverlay.classList.remove('active');
+
+                if (!res.ok) {
+                    throw new Error(data.detail || data.message || 'خطا در ایجاد سفارش');
+                }
+
+                currentOrderId = data.order_id;
+                document.getElementById('order_id').value = currentOrderId;
+                document.getElementById('m_title').textContent = 'پرداخت پلن ' + name;
+                document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
+                buyModal.show();
+            } catch (e) {
+                loadingOverlay.classList.remove('active');
+                showToast('خطا در ایجاد سفارش: ' + e.message, 'error');
+            }
+        }
+
+        // Copy card number
+        window.copyCard = function() {
+            const cardInput = document.getElementById('card');
+            navigator.clipboard.writeText(cardInput.value).then(() => {
+                const icon = document.getElementById('copy-icon');
+                const tooltip = bootstrap.Tooltip.getInstance(document.getElementById('copy-btn'));
+                icon.classList.replace('bi-clipboard', 'bi-check-lg');
+                tooltip.setContent({ '.tooltip-inner': 'کپی شد!' });
+                tooltip.show();
+
+                setTimeout(() => {
+                    icon.classList.replace('bi-check-lg', 'bi-clipboard');
+                    tooltip.setContent({ '.tooltip-inner': 'کپی کردن شماره کارت' });
+                    tooltip.hide();
+                }, 2000);
+            });
+        }
+
+        // Receipt form submission
+        document.getElementById('receiptForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = document.getElementById('submitReceiptBtn');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            const csrftoken = getCookie('csrftoken');
+
+            const fd = new FormData(form);
+
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const res = await fetch('/api/orders/upload_receipt/', {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                });
+
+                const data = await res.json();
+                loadingOverlay.classList.remove('active');
+
+                if (!res.ok) {
+                    throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
+                }
+
+                showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
+                buyModal.hide();
+            } catch (err) {
+                loadingOverlay.classList.remove('active');
+                showToast('خطا: ' + err.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        });
+
+        // Check order status
+        window.checkStatus = async function() {
+            if (!currentOrderId) {
+                showToast('ابتدا باید یک سفارش ایجاد کنید.', 'info');
+                return;
+            }
+
+            showToast('در حال بررسی وضعیت سفارش...', 'info');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const csrftoken = getCookie('csrftoken');
+                const res = await fetch(`/api/orders/status/${currentOrderId}/`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                });
+
+                const data = await res.json();
+                loadingOverlay.classList.remove('active');
+
+                if (!res.ok) throw new Error(data.detail || 'خطا در دریافت وضعیت');
+
+                const st = data.order.status;
+                if (st === 'approved' && data.order.vpn_account) {
+                    const v = data.order.vpn_account;
+                    const accountInfo = `
+                        <div class="text-start">
+                            <div class="alert alert-success mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                اکانت شما با موفقیت فعال شد!
+                            </div>
+                            <div class="p-3 bg-dark bg-opacity-50 rounded-3 mb-3">
+                                <div class="mb-2"><span class="fw-bold">نام کاربری:</span> <code class="ms-2 fs-6">${v.username}</code></div>
+                                <div class="mb-2"><span class="fw-bold">رمز عبور:</span> <code class="ms-2 fs-6">${v.password}</code></div>
+                                <div><span class="fw-bold">آدرس سرور:</span> <code class="ms-2 fs-6">${v.server_address}</code></div>
+                            </div>
+                            <small class="d-block mt-2 text-white-50">این اطلاعات به لیست اکانت‌های شما در تب سوابق نیز اضافه شد.</small>
+                        </div>`;
+                    showToast(accountInfo, 'success');
+                    buyModal.hide();
+                    setTimeout(() => window.location.reload(), 5000);
+                } else if (st === 'rejected') {
+                    showToast('<div class="alert alert-danger mb-0"><i class="bi bi-x-circle-fill me-2"></i> سفارش شما رد شده است. لطفاً با پشتیبانی تماس بگیرید.</div>', 'error');
+                } else if (st === 'submitted') {
+                    showToast('<div class="alert alert-warning mb-0"><i class="bi bi-hourglass-split me-2"></i> رسید شما ارسال شده و در انتظار تایید توسط ادمین می‌باشد.</div>', 'info');
+                } else { // pending
+                    showToast('<div class="alert alert-secondary mb-0"><i class="bi bi-clock-history me-2"></i> سفارش شما همچنان در انتظار پرداخت و ارسال رسید است.</div>', 'info');
+                }
+            } catch (err) {
+                loadingOverlay.classList.remove('active');
+                showToast('خطا در بررسی وضعیت: ' + err.message, 'error');
+            }
+        }
+
+        // Telegram WebApp integration
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+
+            // Enable fullscreen mode
+            tg.expand();
+
+            // Set colors based on Telegram theme
+            if (tg.colorScheme === 'dark') {
+                document.documentElement.style.setProperty('--bs-body-bg', '#0d1117');
+                document.documentElement.style.setProperty('--bs-body-color', '#e6edf3');
+                document.documentElement.style.setProperty('--bs-secondary-bg', '#161b22');
+                document.documentElement.style.setProperty('--bs-tertiary-bg', '#21262d');
+            } else {
+                document.documentElement.style.setProperty('--bs-body-bg', '#f5f5f5');
+                document.documentElement.style.setProperty('--bs-body-color', '#333333');
+                document.documentElement.style.setProperty('--bs-secondary-bg', '#ffffff');
+                document.documentElement.style.setProperty('--bs-tertiary-bg', '#f0f0f0');
+                document.documentElement.style.setProperty('--bs-border-color', 'rgba(0, 0, 0, 0.1)');
+            }
+
+            // Get data from Telegram
+            const initData = tg.initData;
+            const user = tg.initDataUnsafe.user;
+
+            if (user && initData && !{{ user.is_authenticated|yesno:"true,false" }}) {
+                // Send to server for authentication
+                fetch('/auth/telegram/webapp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        initData: initData,
+                        user: user
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('User logged in successfully');
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        console.error('Login error:', data.error);
+                        showToast('خطا در ورود: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Server connection error:', error);
+                    showToast('خطا در ارتباط با سرور', 'error');
+                })
+                .finally(() => {
+                    loadingOverlay.classList.remove('active');
+                });
+            } else {
+                // User already authenticated, hide loader
+                loadingOverlay.classList.remove('active');
+            }
+        } else {
+            // Not in Telegram, hide loader
+            loadingOverlay.classList.remove('active');
+        }
     });
-  </script>
+    </script>
 </body>
 </html>
