@@ -56,7 +56,7 @@ WSGI_APPLICATION = 'hiddify_telegram_miniapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.expanduser('~'), 'my_database.sqlite3'),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
