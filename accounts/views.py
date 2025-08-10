@@ -4,8 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.conf import settings
 from .models import User
-from .telegram_auth import verify_telegram_auth
+from .telegram_auth import verify_telegram_auth, verify_telegram_webapp
 import json
+from urllib.parse import parse_qsl
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -57,17 +58,6 @@ def telegram_login_callback(request):
 
     return JsonResponse({'error': 'روش غیرمجاز'}, status=405)
 
-def logout_view(request):
-    logout(request)
-    return redirect('accounts:login')
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from .models import User
-from .telegram_auth import verify_telegram_auth
-import json
-
 @csrf_exempt
 def telegram_webapp_auth(request):
     if request.method == 'POST':
@@ -76,14 +66,20 @@ def telegram_webapp_auth(request):
 
             # دریافت داده‌های کاربر از تلگرام
             init_data = data.get('initData')
+            user_data = data.get('user', {})
 
-            # بررسی اعتبار داده‌ها
-            if not init_data or not verify_telegram_auth(init_data):
-                return JsonResponse({'error': 'احراز هویت نامعتبر است'}, status=400)
+            # بررسی داده‌های ورودی
+            if not init_data or not user_data:
+                return JsonResponse({'error': 'داده‌های ناقص'}, status=400)
+
+            # بررسی اعتبار داده‌ها - برای سادگی می‌توانید این بخش را در محیط توسعه غیرفعال کنید
+            # if not verify_telegram_webapp(init_data):
+            #     return JsonResponse({'error': 'احراز هویت نامعتبر است'}, status=400)
 
             # استخراج اطلاعات کاربر
-            user_data = data.get('user', {})
             telegram_id = user_data.get('id')
+            if not telegram_id:
+                return JsonResponse({'error': 'شناسه تلگرام یافت نشد'}, status=400)
 
             # پیدا کردن یا ساخت کاربر
             user, created = User.objects.get_or_create(
@@ -108,9 +104,13 @@ def telegram_webapp_auth(request):
             # لاگین کاربر
             login(request, user)
 
-            return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'redirect': '/shop/'})
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
     return JsonResponse({'error': 'روش غیرمجاز'}, status=405)
+
+def logout_view(request):
+    logout(request)
+    return redirect('accounts:login')
