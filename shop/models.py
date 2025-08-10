@@ -1,24 +1,17 @@
+import os
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
 import string
 import random
 
-class Plan(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    price_irr = models.IntegerField()
-    duration_days = models.IntegerField()
-    data_gb = models.IntegerField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.name} - {self.price_irr:,} ریال"
-
-    class Meta:
-        ordering = ['price_irr']
+def receipt_upload_path(instance, filename):
+    """تولید مسیر منحصر به فرد برای ذخیره رسید"""
+    # گرفتن پسوند فایل
+    ext = filename.split('.')[-1]
+    # ایجاد نام منحصر به فرد
+    filename = f"receipt_{instance.user.id}_{instance.id}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.{ext}"
+    return os.path.join('receipts', filename)
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -29,37 +22,21 @@ class Order(models.Model):
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+    plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     amount_irr = models.IntegerField()
-    receipt_image = models.ImageField(upload_to='receipts/', null=True, blank=True)
+    receipt_image = models.ImageField(
+        upload_to=receipt_upload_path,  # استفاده از تابع سفارشی
+        null=True,
+        blank=True,
+        max_length=500  # افزایش طول مسیر
+    )
     admin_note = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"سفارش #{self.id} - {self.user.telegram_username} - {self.status}"
+        return f"سفارش #{self.id} - {self.user} - {self.status}"
 
     class Meta:
         ordering = ['-created_at']
-
-class VPNAccount(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='vpn_accounts')
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='vpn_account')
-    username = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
-    server_address = models.CharField(max_length=255)
-    expires_at = models.DateTimeField()
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"اکانت VPN: {self.username}"
-
-    def generate_credentials(self):
-        """ایجاد نام کاربری و رمز عبور منحصر به فرد"""
-        self.username = f"user_{self.user.id}_{self.order.id}_{random.randint(1000, 9999)}"
-        self.password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
-        self.server_address = "vpn.example.com:443"
-        self.expires_at = timezone.now() + timezone.timedelta(days=self.order.plan.duration_days)
-        self.save()

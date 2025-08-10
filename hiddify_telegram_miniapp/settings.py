@@ -80,8 +80,20 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Media files (Uploaded files)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# اطمینان از وجود پوشه media
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
+
+# اطمینان از وجود پوشه receipts
+RECEIPTS_DIR = os.path.join(MEDIA_ROOT, 'receipts')
+if not os.path.exists(RECEIPTS_DIR):
+    os.makedirs(RECEIPTS_DIR)
+    # تنظیم دسترسی برای پوشه جدید
+    os.chmod(RECEIPTS_DIR, 0o777)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
