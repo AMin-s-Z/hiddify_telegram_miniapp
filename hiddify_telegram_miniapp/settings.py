@@ -55,11 +55,14 @@ WSGI_APPLICATION = 'hiddify_telegram_miniapp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'database',          # نام دیتابیسی که ساختید
+        'USER': 'admin',           # نام کاربری که ساختید
+        'PASSWORD': 'admin1234',      # رمز عبوری که تعیین کردید
+        'HOST': 'localhost',              # معمولاً همین localhost است
+        'PORT': '5432',                   # پورت پیش‌فرض PostgreSQL
     }
 }
-
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
