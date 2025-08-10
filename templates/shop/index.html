@@ -723,315 +723,315 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Loading overlay
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        loadingOverlay.classList.add('active');
+<script>
+    // Loading overlay
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    loadingOverlay.classList.add('active');
 
-        // Initialize tooltips
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+    });
 
-        const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
-        const toastEl = document.getElementById('liveToast');
-        const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
+    const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
+    const toastEl = document.getElementById('liveToast');
+    const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
 
-        // Helper function to get CSRF token
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
             }
-            return cookieValue;
         }
+        return cookieValue;
+    }
 
-        // Format price numbers
-        const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' تومان';
-        let currentOrderId = null;
+    // Format price numbers
+    const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' تومان';
+    let currentOrderId = null;
 
-        // Show toast notifications
-        function showToast(message, type = 'info') {
-            const toastIcon = document.getElementById('toast-icon');
-            const toastTitle = document.getElementById('toast-title');
+    // Show toast notifications
+    function showToast(message, type = 'info') {
+        const toastIcon = document.getElementById('toast-icon');
+        const toastTitle = document.getElementById('toast-title');
 
-            // Reset classes
-            toastIcon.className = "bi me-2";
+        // Reset classes
+        toastIcon.className = "bi me-2";
 
-            switch (type) {
-                case 'success':
-                    toastIcon.classList.add('bi-check-circle-fill', 'text-success');
-                    toastTitle.textContent = 'موفقیت';
-                    break;
-                case 'error':
-                    toastIcon.classList.add('bi-exclamation-triangle-fill', 'text-danger');
-                    toastTitle.textContent = 'خطا';
-                    break;
-                default:
-                    toastIcon.classList.add('bi-info-circle-fill', 'text-primary');
-                    toastTitle.textContent = 'اطلاعیه';
-                    break;
-            }
-            document.getElementById('toast-body').innerHTML = message;
-            bsToast.show();
+        switch (type) {
+            case 'success':
+                toastIcon.classList.add('bi-check-circle-fill', 'text-success');
+                toastTitle.textContent = 'موفقیت';
+                break;
+            case 'error':
+                toastIcon.classList.add('bi-exclamation-triangle-fill', 'text-danger');
+                toastTitle.textContent = 'خطا';
+                break;
+            default:
+                toastIcon.classList.add('bi-info-circle-fill', 'text-primary');
+                toastTitle.textContent = 'اطلاعیه';
+                break;
         }
+        document.getElementById('toast-body').innerHTML = message;
+        bsToast.show();
+    }
 
-        // Tab switching logic
-        const navLinks = document.querySelectorAll('.bottom-nav .nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetSectionId = link.dataset.section;
-
-                // Deactivate all
-                document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
-                navLinks.forEach(l => l.classList.remove('active'));
-
-                // Activate target
-                document.getElementById(targetSectionId).classList.add('active');
-                link.classList.add('active');
-            });
-        });
-
-        // Buy process
-        document.querySelectorAll('.buy-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const planId = parseInt(btn.dataset.planId);
-                const name = btn.dataset.planName;
-                const amountIrr = parseInt(btn.dataset.price);
-                startBuy(planId, name, amountIrr);
-            });
-        });
-
-        async function startBuy(planId, name, amountIrr) {
-            try {
-                loadingOverlay.classList.add('active');
-                const csrftoken = getCookie('csrftoken');
-
-                const res = await fetch('/api/orders/create/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ plan_id: planId })
-                });
-
-                const data = await res.json();
-                loadingOverlay.classList.remove('active');
-
-                if (!res.ok) {
-                    throw new Error(data.detail || data.message || 'خطا در ایجاد سفارش');
-                }
-
-                currentOrderId = data.order_id;
-                document.getElementById('order_id').value = currentOrderId;
-                document.getElementById('m_title').textContent = 'پرداخت پلن ' + name;
-                document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
-                buyModal.show();
-            } catch (e) {
-                loadingOverlay.classList.remove('active');
-                showToast('خطا در ایجاد سفارش: ' + e.message, 'error');
-            }
-        }
-
-        // Copy card number
-        window.copyCard = function() {
-            const cardInput = document.getElementById('card');
-            navigator.clipboard.writeText(cardInput.value).then(() => {
-                const icon = document.getElementById('copy-icon');
-                const tooltip = bootstrap.Tooltip.getInstance(document.getElementById('copy-btn'));
-                icon.classList.replace('bi-clipboard', 'bi-check-lg');
-                tooltip.setContent({ '.tooltip-inner': 'کپی شد!' });
-                tooltip.show();
-
-                setTimeout(() => {
-                    icon.classList.replace('bi-check-lg', 'bi-clipboard');
-                    tooltip.setContent({ '.tooltip-inner': 'کپی کردن شماره کارت' });
-                    tooltip.hide();
-                }, 2000);
-            });
-        }
-
-        // Receipt form submission
-        document.getElementById('receiptForm').addEventListener('submit', async (e) => {
+    // Tab switching logic
+    const navLinks = document.querySelectorAll('.bottom-nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
             e.preventDefault();
-            const form = e.target;
-            const submitBtn = document.getElementById('submitReceiptBtn');
-            const spinner = submitBtn.querySelector('.spinner-border');
+            const targetSectionId = link.dataset.section;
+
+            // Deactivate all
+            document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
+            navLinks.forEach(l => l.classList.remove('active'));
+
+            // Activate target
+            document.getElementById(targetSectionId).classList.add('active');
+            link.classList.add('active');
+        });
+    });
+
+    // Buy process
+    document.querySelectorAll('.buy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const planId = parseInt(this.dataset.planId);
+            const name = this.dataset.planName;
+            const amountIrr = parseInt(this.dataset.price);
+            startBuy(planId, name, amountIrr);
+        });
+    });
+
+    async function startBuy(planId, name, amountIrr) {
+        try {
+            loadingOverlay.classList.add('active');
             const csrftoken = getCookie('csrftoken');
 
-            const fd = new FormData(form);
+            const res = await fetch('/api/orders/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                credentials: 'include',
+                body: JSON.stringify({ plan_id: planId })
+            });
 
-            submitBtn.disabled = true;
-            spinner.classList.remove('d-none');
-            loadingOverlay.classList.add('active');
-
-            try {
-                const res = await fetch('/api/orders/upload_receipt/', {
-                    method: 'POST',
-                    body: fd,
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                });
-
-                const data = await res.json();
-                loadingOverlay.classList.remove('active');
-
-                if (!res.ok) {
-                    throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
-                }
-
-                showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
-                buyModal.hide();
-            } catch (err) {
-                loadingOverlay.classList.remove('active');
-                showToast('خطا: ' + err.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                spinner.classList.add('d-none');
-            }
-        });
-
-        // Check order status
-        window.checkStatus = async function() {
-            if (!currentOrderId) {
-                showToast('ابتدا باید یک سفارش ایجاد کنید.', 'info');
-                return;
-            }
-
-            showToast('در حال بررسی وضعیت سفارش...', 'info');
-            loadingOverlay.classList.add('active');
-
-            try {
-                const csrftoken = getCookie('csrftoken');
-                const res = await fetch(`/api/orders/status/${currentOrderId}/`, {
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                });
-
-                const data = await res.json();
-                loadingOverlay.classList.remove('active');
-
-                if (!res.ok) throw new Error(data.detail || 'خطا در دریافت وضعیت');
-
-                const st = data.order.status;
-                if (st === 'approved' && data.order.vpn_account) {
-                    const v = data.order.vpn_account;
-                    const accountInfo = `
-                        <div class="text-start">
-                            <div class="alert alert-success mb-3">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                اکانت شما با موفقیت فعال شد!
-                            </div>
-                            <div class="p-3 bg-dark bg-opacity-50 rounded-3 mb-3">
-                                <div class="mb-2"><span class="fw-bold">نام کاربری:</span> <code class="ms-2 fs-6">${v.username}</code></div>
-                                <div class="mb-2"><span class="fw-bold">رمز عبور:</span> <code class="ms-2 fs-6">${v.password}</code></div>
-                                <div><span class="fw-bold">آدرس سرور:</span> <code class="ms-2 fs-6">${v.server_address}</code></div>
-                            </div>
-                            <small class="d-block mt-2 text-white-50">این اطلاعات به لیست اکانت‌های شما در تب سوابق نیز اضافه شد.</small>
-                        </div>`;
-                    showToast(accountInfo, 'success');
-                    buyModal.hide();
-                    setTimeout(() => window.location.reload(), 5000);
-                } else if (st === 'rejected') {
-                    showToast('<div class="alert alert-danger mb-0"><i class="bi bi-x-circle-fill me-2"></i> سفارش شما رد شده است. لطفاً با پشتیبانی تماس بگیرید.</div>', 'error');
-                } else if (st === 'submitted') {
-                    showToast('<div class="alert alert-warning mb-0"><i class="bi bi-hourglass-split me-2"></i> رسید شما ارسال شده و در انتظار تایید توسط ادمین می‌باشد.</div>', 'info');
-                } else { // pending
-                    showToast('<div class="alert alert-secondary mb-0"><i class="bi bi-clock-history me-2"></i> سفارش شما همچنان در انتظار پرداخت و ارسال رسید است.</div>', 'info');
-                }
-            } catch (err) {
-                loadingOverlay.classList.remove('active');
-                showToast('خطا در بررسی وضعیت: ' + err.message, 'error');
-            }
-        }
-
-        // Telegram WebApp integration
-        if (window.Telegram && window.Telegram.WebApp) {
-            const tg = window.Telegram.WebApp;
-
-            // Enable fullscreen mode
-            tg.expand();
-
-            // Set colors based on Telegram theme
-            if (tg.colorScheme === 'dark') {
-                document.documentElement.style.setProperty('--bs-body-bg', '#0d1117');
-                document.documentElement.style.setProperty('--bs-body-color', '#e6edf3');
-                document.documentElement.style.setProperty('--bs-secondary-bg', '#161b22');
-                document.documentElement.style.setProperty('--bs-tertiary-bg', '#21262d');
-            } else {
-                document.documentElement.style.setProperty('--bs-body-bg', '#f5f5f5');
-                document.documentElement.style.setProperty('--bs-body-color', '#333333');
-                document.documentElement.style.setProperty('--bs-secondary-bg', '#ffffff');
-                document.documentElement.style.setProperty('--bs-tertiary-bg', '#f0f0f0');
-                document.documentElement.style.setProperty('--bs-border-color', 'rgba(0, 0, 0, 0.1)');
-            }
-
-            // Get data from Telegram
-            const initData = tg.initData;
-            const user = tg.initDataUnsafe.user;
-
-            if (user && initData && !{{ user.is_authenticated|yesno:"true,false" }}) {
-                // Send to server for authentication
-                fetch('/auth/telegram/webapp/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({
-                        initData: initData,
-                        user: user
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('User logged in successfully');
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        } else {
-                            window.location.reload();
-                        }
-                    } else {
-                        console.error('Login error:', data.error);
-                        showToast('خطا در ورود: ' + data.error, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Server connection error:', error);
-                    showToast('خطا در ارتباط با سرور', 'error');
-                })
-                .finally(() => {
-                    loadingOverlay.classList.remove('active');
-                });
-            } else {
-                // User already authenticated, hide loader
-                loadingOverlay.classList.remove('active');
-            }
-        } else {
-            // Not in Telegram, hide loader
+            const data = await res.json();
             loadingOverlay.classList.remove('active');
+
+            if (!res.ok) {
+                throw new Error(data.detail || data.message || 'خطا در ایجاد سفارش');
+            }
+
+            currentOrderId = data.order_id;
+            document.getElementById('order_id').value = currentOrderId;
+            document.getElementById('m_title').textContent = 'پرداخت پلن ' + name;
+            document.getElementById('m_amount').textContent = fmt(Math.floor(data.amount_irr / 10));
+            buyModal.show();
+        } catch (e) {
+            loadingOverlay.classList.remove('active');
+            showToast('خطا در ایجاد سفارش: ' + e.message, 'error');
+        }
+    }
+
+    // Copy card number
+    window.copyCard = function() {
+        const cardInput = document.getElementById('card');
+        navigator.clipboard.writeText(cardInput.value).then(() => {
+            const icon = document.getElementById('copy-icon');
+            const tooltip = bootstrap.Tooltip.getInstance(document.getElementById('copy-btn'));
+            icon.classList.replace('bi-clipboard', 'bi-check-lg');
+            tooltip.setContent({ '.tooltip-inner': 'کپی شد!' });
+            tooltip.show();
+
+            setTimeout(() => {
+                icon.classList.replace('bi-check-lg', 'bi-clipboard');
+                tooltip.setContent({ '.tooltip-inner': 'کپی کردن شماره کارت' });
+                tooltip.hide();
+            }, 2000);
+        });
+    }
+
+    // Receipt form submission
+    document.getElementById('receiptForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = document.getElementById('submitReceiptBtn');
+        const spinner = submitBtn.querySelector('.spinner-border');
+        const csrftoken = getCookie('csrftoken');
+
+        const fd = new FormData(form);
+
+        submitBtn.disabled = true;
+        spinner.classList.remove('d-none');
+        loadingOverlay.classList.add('active');
+
+        try {
+            const res = await fetch('/api/orders/upload_receipt/', {
+                method: 'POST',
+                body: fd,
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+            });
+
+            const data = await res.json();
+            loadingOverlay.classList.remove('active');
+
+            if (!res.ok) {
+                throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
+            }
+
+            showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
+            buyModal.hide();
+        } catch (err) {
+            loadingOverlay.classList.remove('active');
+            showToast('خطا: ' + err.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            spinner.classList.add('d-none');
         }
     });
-    </script>
+
+    // Check order status
+    window.checkStatus = async function() {
+        if (!currentOrderId) {
+            showToast('ابتدا باید یک سفارش ایجاد کنید.', 'info');
+            return;
+        }
+
+        showToast('در حال بررسی وضعیت سفارش...', 'info');
+        loadingOverlay.classList.add('active');
+
+        try {
+            const csrftoken = getCookie('csrftoken');
+            const res = await fetch(`/api/orders/status/${currentOrderId}/`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+            });
+
+            const data = await res.json();
+            loadingOverlay.classList.remove('active');
+
+            if (!res.ok) throw new Error(data.detail || 'خطا در دریافت وضعیت');
+
+            const st = data.order.status;
+            if (st === 'approved' && data.order.vpn_account) {
+                const v = data.order.vpn_account;
+                const accountInfo = `
+                    <div class="text-start">
+                        <div class="alert alert-success mb-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            اکانت شما با موفقیت فعال شد!
+                        </div>
+                        <div class="p-3 bg-dark bg-opacity-50 rounded-3 mb-3">
+                            <div class="mb-2"><span class="fw-bold">نام کاربری:</span> <code class="ms-2 fs-6">${v.username}</code></div>
+                            <div class="mb-2"><span class="fw-bold">رمز عبور:</span> <code class="ms-2 fs-6">${v.password}</code></div>
+                            <div><span class="fw-bold">آدرس سرور:</span> <code class="ms-2 fs-6">${v.server_address}</code></div>
+                        </div>
+                        <small class="d-block mt-2 text-white-50">این اطلاعات به لیست اکانت‌های شما در تب سوابق نیز اضافه شد.</small>
+                    </div>`;
+                showToast(accountInfo, 'success');
+                buyModal.hide();
+                setTimeout(() => window.location.reload(), 5000);
+            } else if (st === 'rejected') {
+                showToast('<div class="alert alert-danger mb-0"><i class="bi bi-x-circle-fill me-2"></i> سفارش شما رد شده است. لطفاً با پشتیبانی تماس بگیرید.</div>', 'error');
+            } else if (st === 'submitted') {
+                showToast('<div class="alert alert-warning mb-0"><i class="bi bi-hourglass-split me-2"></i> رسید شما ارسال شده و در انتظار تایید توسط ادمین می‌باشد.</div>', 'info');
+            } else { // pending
+                showToast('<div class="alert alert-secondary mb-0"><i class="bi bi-clock-history me-2"></i> سفارش شما همچنان در انتظار پرداخت و ارسال رسید است.</div>', 'info');
+            }
+        } catch (err) {
+            loadingOverlay.classList.remove('active');
+            showToast('خطا در بررسی وضعیت: ' + err.message, 'error');
+        }
+    }
+
+    // Telegram WebApp integration
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+
+        // Enable fullscreen mode
+        tg.expand();
+
+        // Set colors based on Telegram theme
+        if (tg.colorScheme === 'dark') {
+            document.documentElement.style.setProperty('--bs-body-bg', '#0d1117');
+            document.documentElement.style.setProperty('--bs-body-color', '#e6edf3');
+            document.documentElement.style.setProperty('--bs-secondary-bg', '#161b22');
+            document.documentElement.style.setProperty('--bs-tertiary-bg', '#21262d');
+        } else {
+            document.documentElement.style.setProperty('--bs-body-bg', '#f5f5f5');
+            document.documentElement.style.setProperty('--bs-body-color', '#333333');
+            document.documentElement.style.setProperty('--bs-secondary-bg', '#ffffff');
+            document.documentElement.style.setProperty('--bs-tertiary-bg', '#f0f0f0');
+            document.documentElement.style.setProperty('--bs-border-color', 'rgba(0, 0, 0, 0.1)');
+        }
+
+        // Get data from Telegram
+        const initData = tg.initData;
+        const user = tg.initDataUnsafe.user;
+
+        if (user && initData && !{{ user.is_authenticated|yesno:"true,false" }}) {
+            // Send to server for authentication
+            fetch('/auth/telegram/webapp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    initData: initData,
+                    user: user
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('User logged in successfully');
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    console.error('Login error:', data.error);
+                    showToast('خطا در ورود: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Server connection error:', error);
+                showToast('خطا در ارتباط با سرور', 'error');
+            })
+            .finally(() => {
+                loadingOverlay.classList.remove('active');
+            });
+        } else {
+            // User already authenticated, hide loader
+            loadingOverlay.classList.remove('active');
+        }
+    } else {
+        // Not in Telegram, hide loader
+        loadingOverlay.classList.remove('active');
+    }
+</script>
 </body>
 </html>
