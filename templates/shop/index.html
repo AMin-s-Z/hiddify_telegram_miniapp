@@ -485,6 +485,43 @@
         }
       }
     });
+    document.addEventListener('DOMContentLoaded', function() {
+    // بررسی اینکه آیا در تلگرام WebApp هستیم
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+
+        // دریافت داده‌های ارسالی از تلگرام
+        const initData = tg.initData;
+        const user = tg.initDataUnsafe.user;
+
+        if (user && initData) {
+            // ارسال به سرور برای احراز هویت
+            fetch('/auth/telegram/webapp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    initData: initData,
+                    user: user
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('کاربر با موفقیت وارد شد');
+                    // در اینجا می‌توانید به صفحه اصلی هدایت کنید یا اعلان نمایش دهید
+                } else {
+                    console.error('خطا در ورود:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('خطا در ارتباط با سرور:', error);
+            });
+        }
+    }
+});
   </script>
+
 </body>
 </html>
