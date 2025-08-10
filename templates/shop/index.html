@@ -722,18 +722,16 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Loading overlay
     const loadingOverlay = document.getElementById('loadingOverlay');
-    loadingOverlay.classList.add('active');
 
-    // Initialize tooltips
-    document.addEventListener('DOMContentLoaded', function() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+    // Initialize Bootstrap components
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
     const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
@@ -803,18 +801,10 @@
         });
     });
 
-    // Buy process
-    document.querySelectorAll('.buy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const planId = parseInt(this.dataset.planId);
-            const name = this.dataset.planName;
-            const amountIrr = parseInt(this.dataset.price);
-            startBuy(planId, name, amountIrr);
-        });
-    });
-
+    // Start buy function
     async function startBuy(planId, name, amountIrr) {
         try {
+            console.log('Starting buy process for plan:', planId, name, amountIrr);
             loadingOverlay.classList.add('active');
             const csrftoken = getCookie('csrftoken');
 
@@ -844,8 +834,25 @@
         } catch (e) {
             loadingOverlay.classList.remove('active');
             showToast('خطا در ایجاد سفارش: ' + e.message, 'error');
+            console.error('Error in startBuy:', e);
         }
     }
+
+    // Buy button click handler
+    const buyButtons = document.querySelectorAll('.buy-btn');
+    console.log('Found buy buttons:', buyButtons.length);
+
+    buyButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Buy button clicked');
+            const planId = parseInt(this.dataset.planId);
+            const name = this.dataset.planName;
+            const amountIrr = parseInt(this.dataset.price);
+            console.log('Plan details:', { planId, name, amountIrr });
+            startBuy(planId, name, amountIrr);
+        });
+    });
 
     // Copy card number
     window.copyCard = function() {
@@ -862,51 +869,56 @@
                 tooltip.setContent({ '.tooltip-inner': 'کپی کردن شماره کارت' });
                 tooltip.hide();
             }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            showToast('خطا در کپی کردن', 'error');
         });
     }
 
     // Receipt form submission
-    document.getElementById('receiptForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const submitBtn = document.getElementById('submitReceiptBtn');
-        const spinner = submitBtn.querySelector('.spinner-border');
-        const csrftoken = getCookie('csrftoken');
+    const receiptForm = document.getElementById('receiptForm');
+    if (receiptForm) {
+        receiptForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitReceiptBtn');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            const csrftoken = getCookie('csrftoken');
 
-        const fd = new FormData(form);
+            const fd = new FormData(receiptForm);
 
-        submitBtn.disabled = true;
-        spinner.classList.remove('d-none');
-        loadingOverlay.classList.add('active');
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            loadingOverlay.classList.add('active');
 
-        try {
-            const res = await fetch('/api/orders/upload_receipt/', {
-                method: 'POST',
-                body: fd,
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-            });
+            try {
+                const res = await fetch('/api/orders/upload_receipt/', {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                });
 
-            const data = await res.json();
-            loadingOverlay.classList.remove('active');
+                const data = await res.json();
+                loadingOverlay.classList.remove('active');
 
-            if (!res.ok) {
-                throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
+                if (!res.ok) {
+                    throw new Error(data.detail || data.message || 'خطا در ارسال رسید');
+                }
+
+                showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
+                buyModal.hide();
+            } catch (err) {
+                loadingOverlay.classList.remove('active');
+                showToast('خطا: ' + err.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('d-none');
             }
-
-            showToast(data.message || 'رسید شما با موفقیت ارسال شد و در انتظار تایید است.', 'success');
-            buyModal.hide();
-        } catch (err) {
-            loadingOverlay.classList.remove('active');
-            showToast('خطا: ' + err.message, 'error');
-        } finally {
-            submitBtn.disabled = false;
-            spinner.classList.add('d-none');
-        }
-    });
+        });
+    }
 
     // Check order status
     window.checkStatus = async function() {
@@ -1032,6 +1044,7 @@
         // Not in Telegram, hide loader
         loadingOverlay.classList.remove('active');
     }
+});
 </script>
 </body>
 </html>
