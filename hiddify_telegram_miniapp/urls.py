@@ -1,48 +1,13 @@
-"""
-URL configuration for hiddify_telegram_miniapp project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
-# from django.contrib import admin
-from django.urls import path
+from django.contrib import admin
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import RedirectView
 
-from accounts import admin
-from accounts.views import (
-    home, dashboard, telegram_auth_view,
-    api_plans, api_create_order, api_upload_receipt, api_order_status, telegram_webhook
-)
-from django.contrib import admin
 urlpatterns = [
-    #    path("admin/", admin.site.urls),
-    path("", home, name="home"),
-    path("admin/", admin.site.urls),
-    path("dashboard/", dashboard, name="dashboard"),
-    path("auth/telegram/", telegram_auth_view, name="telegram_auth"),
-
-    # Redirect legacy Django login to home (Telegram auth)
-    path("accounts/login/", RedirectView.as_view(url="/", permanent=False)),
-
-    path("api/plans/", api_plans, name="api_plans"),
-    path("api/orders/create/", api_create_order, name="api_create_order"),
-    path("api/orders/upload_receipt/", api_upload_receipt, name="api_upload_receipt"),
-    path("api/orders/status/<int:order_id>/", api_order_status, name="api_order_status"),
-
-    path("telegram/webhook/", telegram_webhook, name="telegram_webhook"),
+    path('admin/', admin.site.urls),
+    path('', include('accounts.urls')),
+    path('shop/', include('shop.urls')),
+    path('api/', include('api.urls')),
 ]
 
 if settings.DEBUG:
