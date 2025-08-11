@@ -106,7 +106,7 @@ ADMIN_TELEGRAM_ID = config('ADMIN_TELEGRAM_ID')
 # Bank Settings
 BANK_CARD_NUMBER = config('BANK_CARD_NUMBER')
 
-LOGIN_URL = config('shop')
+LOGIN_URL = "shop"
 
 # برای آپلود فایل
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
