@@ -100,7 +100,7 @@ TELEGRAM_BOT_USERNAME = config('TELEGRAM_BOT_USERNAME')
 ADMIN_TELEGRAM_ID = config('ADMIN_TELEGRAM_ID')
 
 # Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'shop.User'
 
 
 
