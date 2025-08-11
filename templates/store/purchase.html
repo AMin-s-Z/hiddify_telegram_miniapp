@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>My Purchases</h1>
+<ul>
+    {% for purchase in purchases %}
+    <li>{{ purchase.plan.name }} - {{ purchase.purchase_date }} - Confirmed: {{ purchase.confirmed }}
+        {% if purchase.confirmed %}
+            <br>VPN Config: {{ purchase.vpn_config }}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

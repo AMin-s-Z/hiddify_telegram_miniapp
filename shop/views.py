@@ -1,162 +1,79 @@
-import hashlib
-import hmac
-import json
-import time
 from django.shortcuts import render, redirect, get_object_or_404
-from django.conf import settings
-from django.http import HttpResponseBadRequest
-from django.urls import reverse
-from .models import TelegramUser, VPNPlan, Order
-from .telegram_bot import send_receipt_to_admin
-
-def plan_list_view(request):
-    user = None
-    if request.session.get('user_id'):
-        user = TelegramUser.objects.get(pk=request.session.get('user_id'))
-
-    plans = VPNPlan.objects.all()
-    context = {
-        'plans': plans,
-        'user': user,
-        'telegram_bot_username': settings.TELEGRAM_BOT_USERNAME,
-        'redirect_url': request.build_absolute_uri(reverse('telegram_login_callback')),
-    }
-    return render(request, 'store/plan_list.html', context)
-
-def telegram_login_callback(request):
-    data_check_string = []
-    for key, value in sorted(request.GET.items()):
-        if key != 'hash':
-            data_check_string.append(f'{key}={value}')
-
-    data_check_string = '\n'.join(data_check_string)
-
-    secret_key = hashlib.sha256(settings.TELEGRAM_BOT_TOKEN.encode()).digest()
-    calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-
-    if calculated_hash != request.GET.get('hash'):
-        return HttpResponseBadRequest("Authentication failed.")
-
-    auth_date = int(request.GET.get('auth_date'))
-    if time.time() - auth_date > 3600: # 1 hour
-        return HttpResponseBadRequest("Data is outdated.")
-
-    user_data = json.loads(json.dumps(request.GET))
-    user_id = user_data.get('id')
-
-    user, created = TelegramUser.objects.update_or_create(
-        telegram_id=user_id,
-        defaults={
-            'first_name': user_data.get('first_name'),
-            'last_name': user_data.get('last_name', ''),
-            'username': user_data.get('username', ''),
-        }
-    )
-
-    request.session['user_id'] = user.telegram_id
-    return redirect('plan_list')
-
-def logout_view(request):
-    if 'user_id' in request.session:
-        del request.session['user_id']
-    return redirect('plan_list')
-
-def purchase_history_view(request):
-    if not request.session.get('user_id'):
-        return redirect('plan_list')
-
-    user = get_object_or_404(TelegramUser, pk=request.session.get('user_id'))
-    orders = user.orders.all().order_by('-created_at')
-
-    return render(request, 'store/purchase_history.html', {'orders': orders, 'user': user})
-
-def buy_plan_view(request, plan_id):
-    if not request.session.get('user_id'):
-        return redirect('plan_list')
-
-    user = get_object_or_404(TelegramUser, pk=request.session.get('user_id'))
-    plan = get_object_or_404(VPNPlan, pk=plan_id)
-
-    if request.method == 'POST':
-        receipt_file = request.FILES.get('receipt')
-        if receipt_file:
-            order = Order.objects.create(
-                user=user,
-                plan=plan,
-                status='verifying',
-                receipt=receipt_file
-            )
-            # ارسال رسید برای ادمین
-            send_receipt_to_admin(order)
-            return redirect('purchase_history')
-
-    # اطلاعات کارت به کارت شما
-    card_info = {
-        'card_number': '6037-9977-1234-5678',
-        'card_holder': 'اسم شما'
-    }
-
-    context = {
-        'plan': plan,
-        'user': user,
-        'card_info': card_info,
-    }
-    return render(request, 'store/buy_plan.html', context)
-
-# ... import های قبلی
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-import telegram
+import hashlib
+import requests  # For Telegram API
+from .models import Plan, Purchase
+from django.conf import settings
 
-# تابع پردازش آپدیت که از ویو فراخوانی می‌شود
-def process_telegram_update(update_data):
-    update = telegram.Update.de_json(update_data, telegram.Bot(settings.TELEGRAM_BOT_TOKEN))
+# Telegram Login View (handles callback from Telegram widget)
+def telegram_login(request):
+    # This is a simplified version. In production, validate properly.
+    # See https://core.telegram.org/widgets/login for details.
+    data = request.GET
+    bot_token = settings.TELEGRAM_BOT_TOKEN  # Use your bot token
+    hash_val = data.get('hash')
+    auth_data = {k: v for k, v in data.items() if k != 'hash'}
+    data_check_string = '\n'.join([f"{k}={auth_data[k]}" for k in sorted(auth_data)])
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+    calculated_hash = hashlib.sha256(data_check_string.encode()).hexdigest()
+    h = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
 
-    # اگر آپدیت از نوع کلیک روی دکمه بود
-    if update.callback_query:
-        query = update.callback_query
+    if h == hash_val:
+        # Valid, create or get user
+        telegram_id = data['id']
+        username = data.get('username', f"tg_{telegram_id}")
+        user, created = User.objects.get_or_create(username=username, defaults={'first_name': data.get('first_name', '')})
+        login(request, user)
+        return redirect('home')
+    else:
+        return JsonResponse({'error': 'Invalid login'})
 
-        # بررسی امنیتی: فقط ادمین
-        if query.from_user.id != int(settings.ADMIN_TELEGRAM_ID):
-            return
+@login_required
+def home(request):
+    plans = Plan.objects.all()
+    return render(request, 'home.html', {'plans': plans})
 
-        action, order_id = query.data.split('_')
-        order_id = int(order_id)
+@login_required
+def purchase_plan(request, plan_id):
+    plan = get_object_or_404(Plan, id=plan_id)
+    if request.method == 'POST':
+        receipt = request.FILES.get('receipt')
+        purchase = Purchase.objects.create(user=request.user, plan=plan, receipt_image=receipt)
+        # Send notification to owner via Telegram Bot
+        send_telegram_notification(purchase)
+        return redirect('purchases')
+    return render(request, 'purchase.html', {'plan': plan})
 
-        try:
-            order = Order.objects.get(id=order_id)
-            # بقیه منطق تایید و رد کردن سفارش که قبلا نوشتیم
-            # ... (کد مشابه داخل handle_callback_query)
+@login_required
+def purchases(request):
+    purchases = Purchase.objects.filter(user=request.user)
+    return render(request, 'purchases.html', {'purchases': purchases})
 
-            new_status_text = ""
-            user_message = ""
+# Function to confirm purchase (called from admin or separate view)
+# For simplicity, assume owner confirms via admin panel, then this triggers VPN creation
+def confirm_purchase(request, purchase_id):
+    if request.user.is_superuser:  # Only owner can confirm
+        purchase = get_object_or_404(Purchase, id=purchase_id)
+        purchase.confirmed = True
+        purchase.vpn_config = create_vpn_config(purchase)  # Stub function
+        purchase.save()
+        # Send config to user via Telegram? Or display in app.
+        return redirect('admin:vpn_sales_purchase_changelist')
+    return redirect('home')
 
-            if action == "approve":
-                order.status = 'completed'
-                order.save()
-                new_status_text = f"✅ سفارش {order.id} تایید شد."
-                user_message = "سفارش شما تایید شد. متن خاص شما: ..."
-            elif action == "reject":
-                order.status = 'failed'
-                order.save()
-                new_status_text = f"❌ سفارش {order.id} رد شد."
-                user_message = "سفارش شما رد شد. با پشتیبانی تماس بگیرید."
+def create_vpn_config(purchase):
+    # Stub: Later implement actual VPN creation, e.g., using OpenVPN API or script
+    return "Your VPN config: server=example.com, port=1194, etc."  # Placeholder
 
-            # ویرایش پیام ادمین
-            bot = telegram.Bot(settings.TELEGRAM_BOT_TOKEN)
-            bot.edit_message_caption(chat_id=query.message.chat_id, message_id=query.message.message_id, caption=query.message.caption + f"\n\n---\nوضعیت: {new_status_text}")
-            # ارسال پیام به کاربر
-            bot.send_message(chat_id=order.user.telegram_id, text=user_message)
-
-        except Order.DoesNotExist:
-            print(f"Order with id {order_id} not found.")
-
-# ویو اصلی برای دریافت وب‌هوک
-@csrf_exempt # برای اینکه تلگرام بتواند به این URL دسترسی داشته باشد
-def telegram_webhook_view(request):
-    if request.method == "POST":
-        update_data = json.loads(request.body.decode('utf-8'))
-        process_telegram_update(update_data)
-        return JsonResponse({"ok": "POST request processed"})
-    return JsonResponse({"ok": "GET request received"})
+def send_telegram_notification(purchase):
+    bot_token = settings.TELEGRAM_BOT_TOKEN
+    chat_id = settings.TELEGRAM_OWNER_CHAT_ID
+    message = f"New purchase: {purchase.user.username} bought {purchase.plan.name}. Receipt: {purchase.receipt_image.url if purchase.receipt_image else 'No receipt'}"
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={message}"
+    requests.get(url)
+    if purchase.receipt_image:
+        # Send photo if receipt
+        photo_url = f"https://api.telegram.org/bot{bot_token}/sendPhoto?chat_id={chat_id}"
+        requests.post(photo_url, files={'photo': open(purchase.receipt_image.path, 'rb')})
