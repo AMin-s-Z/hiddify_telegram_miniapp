@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'vpn_sales_project.wsgi.application'
+WSGI_APPLICATION = 'shop.wsgi.application'
 
 
 # Database
