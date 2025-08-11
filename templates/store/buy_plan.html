@@ -1,0 +1,32 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+    <h2>خرید پلن: {{ plan.name }}</h2>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>مراحل خرید</h4>
+            <ol>
+                <li>مبلغ <strong>{{ plan.price | floatformat:0 }} تومان</strong> را به کارت زیر واریز کنید:</li>
+                <ul>
+                    <li>شماره کارت: <code>{{ card_info.card_number }}</code></li>
+                    <li>صاحب کارت: {{ card_info.card_holder }}</li>
+                </ul>
+                <li>از رسید پرداخت خود اسکرین‌شات یا عکس بگیرید.</li>
+                <li>عکس رسید را در فرم مقابل آپلود کرده و دکمه "ارسال رسید" را بزنید.</li>
+                <li>منتظر بمانید تا پرداخت شما تایید شود. وضعیت را در <a href="{% url 'purchase_history' %}">صفحه خریدهای من</a> می‌توانید پیگیری کنید.</li>
+            </ol>
+        </div>
+        <div class="col-md-6">
+            <h4>فرم ارسال رسید</h4>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="receipt" class="form-label">فایل رسید پرداخت</label>
+                    <input type="file" class="form-control" id="receipt" name="receipt" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-success">ارسال رسید و ثبت خرید</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -17,10 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'rest_framework',
-    'accounts',
     'shop',
-    'api',
-
 ]
 
 MIDDLEWARE = [
@@ -46,7 +43,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'shop.context_processors.bank_card_number',
+
             ],
         },
     },

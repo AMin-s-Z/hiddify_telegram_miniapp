@@ -1,0 +1,49 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+    <h2>تاریخچه خریدهای شما</h2>
+    <hr>
+    {% if orders %}
+        <div class="list-group">
+            {% for order in orders %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ order.plan.name }}</h5>
+                        <small>{{ order.created_at|date:"Y-m-d H:i" }}</small>
+                    </div>
+                    <p class="mb-1">
+                        مبلغ: {{ order.plan.price|floatformat:0 }} تومان |
+                        وضعیت:
+                        {% if order.status == 'completed' %}
+                            <span class="badge bg-success">{{ order.get_status_display }}</span>
+                        {% elif order.status == 'failed' %}
+                            <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+                        {% endif %}
+                    </p>
+
+                    {% if order.receipt %}
+                        <small><a href="{{ order.receipt.url }}" target="_blank">مشاهده رسید</a></small>
+                    {% endif %}
+
+                    {# بخش نمایش متن خاص #}
+                    {% if order.status == 'completed' %}
+                    <div class="alert alert-success mt-3" role="alert">
+                        <h4 class="alert-heading">خرید شما با موفقیت تایید شد!</h4>
+                        <p>این متن خاصی است که پس از تایید خرید به شما نمایش داده می‌شود. در اینجا می‌توانید اطلاعات کانفیگ VPN یا هر راهنمایی دیگری را قرار دهید.</p>
+                        <hr>
+                        <p class="mb-0">کد کانفیگ شما: vless://....</p>
+                    </div>
+                    {% elif order.status == 'failed' %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        <p class="mb-0">متاسفانه پرداخت شما تایید نشد. لطفاً با پشتیبانی در تلگرام تماس بگیرید.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>شما تاکنون خریدی نداشته‌اید.</p>
+    {% endif %}
+{% endblock %}
