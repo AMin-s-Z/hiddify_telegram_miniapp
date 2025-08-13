@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}پلن‌های VPN{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">انتخاب پلن VPN</h2>
+
+<div class="row">
+    {% for plan in plans %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4>{{ plan.name }}</h4>
+            </div>
+            <div class="card-body">
+                <h3 class="text-center text-primary mb-3">
+                    {{ plan.price|floatformat:0 }} <small>تومان</small>
+                </h3>
+                <p class="text-center text-muted mb-3">
+                    <i class="bi bi-clock"></i> {{ plan.get_duration_days_display }}
+                </p>
+                <p>{{ plan.description }}</p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{% url 'purchase_plan' plan.id %}" class="btn btn-primary w-100">
+                    <i class="bi bi-cart-plus"></i> خرید
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

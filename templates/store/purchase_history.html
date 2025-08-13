@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}خریدهای من{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">تاریخچه خریدها</h2>
+
+{% if purchases %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>پلن</th>
+                <th>قیمت</th>
+                <th>وضعیت</th>
+                <th>تاریخ خرید</th>
+                <th>تاریخ انقضا</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in purchases %}
+            <tr>
+                <td>{{ purchase.plan.name }}</td>
+                <td>{{ purchase.plan.price|floatformat:0 }} تومان</td>
+                <td>
+                    {% if purchase.status == 'pending' %}
+                        <span class="badge bg-warning">در انتظار پرداخت</span>
+                    {% elif purchase.status == 'waiting_approval' %}
+                        <span class="badge bg-info">در انتظار تایید</span>
+                    {% elif purchase.status == 'approved' %}
+                        <span class="badge bg-success">تایید شده</span>
+                    {% elif purchase.status == 'rejected' %}
+                        <span class="badge bg-danger">رد شده</span>
+                    {% elif purchase.status == 'expired' %}
+                        <span class="badge bg-secondary">منقضی شده</span>
+                    {% endif %}
+                </td>
+                <td>{{ purchase.created_at|date:"Y/m/d H:i" }}</td>
+                <td>
+                    {% if purchase.expires_at %}
+                        {{ purchase.expires_at|date:"Y/m/d" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if purchase.status == 'pending' %}
+                        <a href="{% url 'payment' purchase.id %}" class="btn btn-sm btn-primary">
+                            پرداخت
+                        </a>
+                    {% elif purchase.status == 'approved' and purchase.vpn_config %}
+                        <a href="{% url 'download_config' purchase.id %}" class="btn btn-sm btn-success">
+                            <i class="bi bi-download"></i> دانلود کانفیگ
+                        </a>
+                    {% endif %}
+                    
+                    {% if purchase.admin_note %}
+                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#note-{{ purchase.id }}">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                        
+                        <!-- Modal -->
+                        <div class="modal fade" id="note-{{ purchase.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">یادداشت ادمین</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {{ purchase.admin_note }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle fs-1"></i>
+    <p class="mt-3">شما هنوز خریدی انجام نداده‌اید.</p>
+    <a href="{% url 'plans' %}" class="btn btn-primary">مشاهده پلن‌ها</a>
+</div>
+{% endif %}
+{% endblock %}

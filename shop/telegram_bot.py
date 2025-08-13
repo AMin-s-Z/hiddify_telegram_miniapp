@@ -1,39 +1,74 @@
 import telegram
+from telegram import Bot
 from django.conf import settings
+import asyncio
 
-def send_receipt_to_admin(order):
-    try:
-        bot = telegram.Bot(token=settings.TELEGRAM_BOT_TOKEN)
+async def send_payment_notification_async(purchase):
+    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
+    admin_chat_id = settings.TELEGRAM_ADMIN_CHAT_ID
 
-        user = order.user
-        plan = order.plan
+    message = f"""
+🔔 پرداخت جدید دریافت شد!
 
-        caption = (
-            f"✅ سفارش جدید ثبت شد!\n\n"
-            f"کاربر: {user.first_name} (ID: {user.telegram_id})\n"
-            f"پلن: {plan.name}\n"
-            f"مبلغ: {plan.price} تومان\n"
-            f"شماره سفارش: {order.id}\n\n"
-            f"لطفا رسید را بررسی و اقدام کنید:"
+👤 کاربر: {purchase.user.telegram_username or purchase.user.username}
+📱 آیدی تلگرام: {purchase.user.telegram_id}
+📦 پلن: {purchase.plan.name}
+💰 مبلغ: {purchase.plan.price:,} تومان
+🆔 شناسه تراکنش: {purchase.transaction_id}
+📅 زمان: {purchase.created_at.strftime('%Y-%m-%d %H:%M')}
+
+برای تایید یا رد، به پنل ادمین مراجعه کنید.
+    """
+
+    if purchase.payment_receipt:
+        await bot.send_photo(
+            chat_id=admin_chat_id,
+            photo=purchase.payment_receipt.file,
+            caption=message
         )
+    else:
+        await bot.send_message(chat_id=admin_chat_id, text=message)
 
-        # ساخت دکمه‌های شیشه‌ای (Inline Keyboard)
-        # ما آیدی سفارش را در callback_data قرار می‌دهیم تا بدانیم کدام سفارش باید آپدیت شود
-        keyboard = [
-            [
-                telegram.InlineKeyboardButton("✅ تایید خرید", callback_data=f"approve_{order.id}"),
-                telegram.InlineKeyboardButton("❌ رد کردن", callback_data=f"reject_{order.id}"),
-            ]
-        ]
-        reply_markup = telegram.InlineKeyboardMarkup(keyboard)
+def send_payment_notification(purchase):
+    asyncio.run(send_payment_notification_async(purchase))
 
-        # ارسال عکس رسید به همراه کپشن و دکمه‌ها
-        with open(order.receipt.path, 'rb') as photo_file:
-            bot.send_photo(
-                chat_id=settings.ADMIN_TELEGRAM_ID,
-                photo=photo_file,
-                caption=caption,
-                reply_markup=reply_markup
-            )
-    except Exception as e:
-        print(f"Error sending telegram notification: {e}")
+async def send_approval_notification_async(purchase):
+    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
+
+    message = f"""
+✅ پرداخت شما تایید شد!
+
+📦 پلن: {purchase.plan.name}
+🕐 مدت اعتبار: {purchase.plan.get_duration_days_display()}
+📅 تاریخ انقضا: {purchase.expires_at.strftime('%Y-%m-%d')}
+
+کانفیگ VPN شما در پنل کاربری قابل دریافت است.
+    """
+
+    try:
+        await bot.send_message(chat_id=purchase.user.telegram_id, text=message)
+    except:
+        pass
+
+def send_approval_notification(purchase):
+    asyncio.run(send_approval_notification_async(purchase))
+
+async def send_rejection_notification_async(purchase):
+    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
+
+    message = f"""
+❌ پرداخت شما رد شد!
+
+📦 پلن: {purchase.plan.name}
+📝 دلیل: {purchase.admin_note or 'رسید پرداخت معتبر نیست'}
+
+لطفا مجددا با رسید معتبر اقدام کنید.
+    """
+
+    try:
+        await bot.send_message(chat_id=purchase.user.telegram_id, text=message)
+    except:
+        pass
+
+def send_rejection_notification(purchase):
+    asyncio.run(send_rejection_notification_async(purchase))
