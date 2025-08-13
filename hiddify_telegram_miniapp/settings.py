@@ -9,6 +9,11 @@ SECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['*']
+DB_NAME = "database"
+DB_USER = "admin"
+DB_PASSWORD = "admin1234"
+DB_HOST = "localhost"
+DB_PORT = "5432"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,10 +58,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hiddify_telegram_miniapp.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
