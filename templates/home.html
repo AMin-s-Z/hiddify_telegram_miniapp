@@ -10,16 +10,16 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    if ({{ user.is_authenticated|yesno:"true,false" }}) { window.location.href = "{% url 'core:plan_list' %}"; return; }
+    if ({{ user.is_authenticated|yesno:"true,false" }}) { window.location.href = "{% url 'plan_list' %}"; return; }
     const tg = window.Telegram.WebApp;
     tg.ready();
     if (tg.initData) {
-        fetch("{% url 'core:telegram_seamless_auth' %}", {
+        fetch("{% url 'telegram_seamless_auth' %}", {
             method: 'POST',
             headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
             body: JSON.stringify({ 'init_data': tg.initData })
         }).then(response => response.json()).then(data => {
-            if (data.success) { window.location.href = "{% url 'core:plan_list' %}"; } 
+            if (data.success) { window.location.href = "{% url 'plan_list' %}"; }
             else { document.getElementById('status-message').innerHTML = `<p class="text-danger">Error: ${data.error || 'Invalid'}</p>`; }
         }).catch(error => { document.getElementById('status-message').innerHTML = '<p class="text-danger">Server Error</p>'; });
     } else { document.getElementById('status-message').innerHTML = '<p class="text-danger fw-bold">Please open this page inside Telegram.</p>'; }
