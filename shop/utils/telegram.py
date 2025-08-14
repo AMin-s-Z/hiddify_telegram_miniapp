@@ -12,7 +12,7 @@ def send_telegram_message(chat_id, text):
 
 def notify_admin_on_purchase(purchase):
     user_info = purchase.user.telegram_profile.username or purchase.user.telegram_profile.telegram_id
-    admin_url = settings.SITE_URL + reverse('admin:core_purchase_change', args=[purchase.id])
+    admin_url = settings.SITE_URL + reverse('admin:shop_purchase_change', args=[purchase.id])
     caption = f"🧾 *خرید جدید*\n👤 *کاربر:* @{user_info}\n📦 *پلن:* {purchase.plan.name}\n🔗 [لینک مدیریت]({admin_url})"
     api_url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendPhoto"
     payload = {'chat_id': settings.TELEGRAM_ADMIN_CHAT_ID, 'caption': caption, 'parse_mode': 'Markdown'}
