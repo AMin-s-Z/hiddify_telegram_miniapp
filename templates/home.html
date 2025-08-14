@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is already authenticated
     {% if user.is_authenticated %}
         console.log('User already authenticated, redirecting...');
-        window.location.href = "{% url 'plan_list' %}";
+        window.location.href = "{% url 'shop:plan_list' %}";
         return;
     {% endif %}
 
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Send authentication request
-    fetch("{% url 'telegram_seamless_auth' %}", {
+    fetch("{% url 'shop:telegram_seamless_auth' %}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('status-message').innerHTML =
                 '<p class="text-success">Authentication successful! Redirecting...</p>';
             setTimeout(() => {
-                window.location.href = "{% url 'plan_list' %}";
+                window.location.href = "{% url 'shop:plan_list' %}";
             }, 500);
         } else {
             const errorMsg = result.data.error || 'Authentication failed';
@@ -111,3 +111,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

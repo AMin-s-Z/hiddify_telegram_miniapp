@@ -9,7 +9,7 @@
         <div class="card-body d-flex flex-column">
             <h1 class="card-title pricing-card-title">{{ plan.price|floatformat:"0" }} <small class="text-muted fw-light">Toman</small></h1>
             <ul class="list-unstyled mt-3 mb-4"><li>{{ plan.duration }} days validity</li><li>{{ plan.description|linebreaksbr }}</li></ul>
-            <a href="{% url 'purchase_create' plan.id %}" class="w-100 btn btn-lg btn-primary mt-auto">Purchase</a>
+            <a href="{% url 'shop:purchase_create' plan.id %}" class="w-100 btn btn-lg btn-primary mt-auto">Purchase</a>
         </div>
     </div></div>
     {% empty %}
