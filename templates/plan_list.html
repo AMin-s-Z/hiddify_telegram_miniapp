@@ -1,19 +1,133 @@
 {% extends "base.html" %}
-{% block title %}Select a Plan{% endblock %}
+{% block title %}انتخاب پلن{% endblock %}
 {% block content %}
-<h2 class="mb-4 text-center">Available Plans</h2>
+<div class="text-center mb-5">
+    <h2 class="fw-bold mb-2">پلن‌های موجود</h2>
+    <p class="text-muted">پلن مورد نظر خود را انتخاب کنید</p>
+</div>
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for plan in plans %}
-    <div class="col"><div class="card h-100 text-center shadow-sm">
-        <div class="card-header"><h4 class="my-0 fw-normal">{{ plan.name }}</h4></div>
-        <div class="card-body d-flex flex-column">
-            <h1 class="card-title pricing-card-title">{{ plan.price|floatformat:"0" }} <small class="text-muted fw-light">Toman</small></h1>
-            <ul class="list-unstyled mt-3 mb-4"><li>{{ plan.duration }} days validity</li><li>{{ plan.description|linebreaksbr }}</li></ul>
-            <a href="{% url 'shop:purchase_create' plan.id %}" class="w-100 btn btn-lg btn-primary mt-auto">Purchase</a>
+    <div class="col">
+        <div class="card h-100 text-center shadow-sm position-relative overflow-hidden">
+            {% if forloop.first %}
+            <div class="ribbon ribbon-top-right"><span>پیشنهاد ویژه</span></div>
+            {% endif %}
+            <div class="card-header">
+                <h4 class="my-0 fw-normal">{{ plan.name }}</h4>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h1 class="card-title pricing-card-title mb-3">
+                    {{ plan.price|floatformat:"0" }} <small class="text-muted fw-light">تومان</small>
+                </h1>
+                <div class="features-list mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-calendar-alt text-primary"></i>
+                        <span>{{ plan.duration }} روز اعتبار</span>
+                    </div>
+                    {% if plan.description %}
+                    <div class="feature-item mt-2">
+                        <i class="fas fa-info-circle text-primary"></i>
+                        <span>{{ plan.description|linebreaksbr }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'shop:purchase_create' plan.id %}" class="w-100 btn btn-lg btn-primary mt-auto">
+                    <i class="fas fa-shopping-cart me-2"></i>خرید
+                </a>
+            </div>
         </div>
-    </div></div>
+    </div>
     {% empty %}
-    <div class="col-12"><div class="alert alert-warning text-center">No plans are currently available.</div></div>
+    <div class="col-12">
+        <div class="alert alert-warning text-center py-4">
+            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+            <p class="mb-0">در حال حاضر هیچ پلنی موجود نیست.</p>
+        </div>
+    </div>
     {% endfor %}
 </div>
+
+<div class="row mt-5">
+    <div class="col-md-8 mx-auto">
+        <div class="card bg-light border-0">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-question-circle me-2 text-primary"></i>سوالات متداول</h5>
+                <div class="accordion mt-3" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                بعد از خرید چقدر طول می‌کشد تا سرویس فعال شود؟
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                معمولاً بعد از تأیید پرداخت، سرویس شما در کمتر از 15 دقیقه فعال می‌شود.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                آیا امکان تمدید سرویس وجود دارد؟
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                بله، می‌توانید قبل از اتمام اعتبار، سرویس خود را تمدید کنید.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .feature-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    /* Ribbon for featured plan */
+    .ribbon {
+        width: 150px;
+        height: 150px;
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .ribbon span {
+        position: absolute;
+        display: block;
+        width: 225px;
+        padding: 8px 0;
+        background-color: #ff5e62;
+        box-shadow: 0 5px 10px rgba(0,0,0,.1);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-align: center;
+        right: -25px;
+        top: 30px;
+        transform: rotate(45deg);
+    }
+
+    .ribbon-top-right {
+        top: -10px;
+        right: -10px;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(78, 84, 200, 0.1);
+        color: var(--primary-color);
+    }
+</style>
 {% endblock %}

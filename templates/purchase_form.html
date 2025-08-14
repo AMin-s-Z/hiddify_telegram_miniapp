@@ -1,26 +1,237 @@
 {% extends "base.html" %}
-{% block title %}Complete Purchase{% endblock %}
+{% block title %}تکمیل خرید{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-8">
-    <h2 class="mb-4">Complete Purchase: {{ plan.name }}</h2>
-    <div class="alert alert-info">
-        <h4 class="alert-heading">Step 1: Bank Transfer</h4>
-        <p>Please transfer <strong>{{ plan.price|floatformat:"0" }} Toman</strong> to:</p><hr>
-        <p class="mb-0"><strong>Card Number:</strong> <code>{{ ADMIN_BANK_CARD }}</code></p>
-        <p><strong>Account Holder:</strong> {{ ADMIN_BANK_NAME }}</p>
-    </div>
-    <div class="card shadow-sm"><div class="card-body">
-        <h4 class="card-title">Step 2: Upload Receipt</h4>
-        <p>After the transfer, upload the receipt picture below.</p>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ form.receipt_image.id_for_label }}" class="form-label">{{ form.receipt_image.label }}</label>
-                {{ form.receipt_image }}
-                {% if form.receipt_image.errors %}<div class="invalid-feedback d-block">{% for error in form.receipt_image.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="mb-4">
+            <a href="{% url 'shop:plan_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-right me-1"></i> بازگشت به لیست پلن‌ها
+            </a>
+        </div>
+
+        <h2 class="mb-4 fw-bold">تکمیل خرید: {{ plan.name }}</h2>
+
+        <div class="card bg-gradient-blue mb-4 shadow">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-icon me-3">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title mb-0">اطلاعات سفارش</h5>
+                        <p class="card-text mb-0 mt-2">
+                            <strong>نام پلن:</strong> {{ plan.name }}
+                        </p>
+                        <p class="card-text mb-0">
+                            <strong>مدت زمان:</strong> {{ plan.duration }} روز
+                        </p>
+                        <p class="card-text mb-0">
+                            <strong>قیمت:</strong> <span class="fw-bold">{{ plan.price|floatformat:"0" }} تومان</span>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-success w-100">Submit Receipt</button>
-        </form>
-    </div></div>
-</div></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4 mb-md-0">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-money-bill-wave me-2"></i>مرحله ۱: انتقال وجه
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p>لطفاً مبلغ <strong>{{ plan.price|floatformat:"0" }} تومان</strong> را به شماره کارت زیر واریز کنید:</p>
+                        <div class="bank-info">
+                            <div class="card-number">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <code class="fs-5">{{ ADMIN_BANK_CARD }}</code>
+                                    <button class="btn btn-sm btn-outline-primary copy-btn" data-copy="{{ ADMIN_BANK_CARD }}">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="mt-2 mb-0"><strong>به نام:</strong> {{ ADMIN_BANK_NAME }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-upload me-2"></i>مرحله ۲: آپلود رسید
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p>پس از انتقال وجه، تصویر رسید را آپلود کنید:</p>
+                        <form method="post" enctype="multipart/form-data" class="receipt-form">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ form.receipt_image.id_for_label }}" class="form-label">{{ form.receipt_image.label }}</label>
+
+                                <div class="upload-area mb-3">
+                                    <input type="file" class="form-control visually-hidden" id="{{ form.receipt_image.id_for_label }}" name="{{ form.receipt_image.html_name }}" accept="image/*" onchange="previewImage(this);">
+                                    <label for="{{ form.receipt_image.id_for_label }}" class="upload-label">
+                                        <div class="upload-preview" id="imagePreview">
+                                            <i class="fas fa-image fa-3x mb-2"></i>
+                                            <p>برای انتخاب تصویر کلیک کنید یا فایل را اینجا رها کنید</p>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                {% if form.receipt_image.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.receipt_image.errors %}
+                                    <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-check-circle me-2"></i>ارسال رسید
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-blue {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+    }
+
+    .rounded-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        font-size: 24px;
+    }
+
+    .bank-info {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+
+    .card-number {
+        font-size: 18px;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .copy-btn:focus {
+        box-shadow: none;
+    }
+
+    .upload-area {
+        border: 2px dashed #ced4da;
+        border-radius: 5px;
+        position: relative;
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .upload-area:hover {
+        border-color: var(--primary-color);
+    }
+
+    .upload-label {
+        display: block;
+        cursor: pointer;
+        width: 100%;
+        margin: 0;
+    }
+
+    .upload-preview {
+        padding: 30px 20px;
+        color: #6c757d;
+    }
+
+    #imagePreview img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 5px;
+    }
+</style>
+
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('imagePreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Receipt Preview">`;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Copy to clipboard functionality
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const textToCopy = this.getAttribute('data-copy');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Change button text/icon temporarily
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                    }, 2000);
+                });
+            });
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+        const fileInput = document.getElementById('{{ form.receipt_image.id_for_label }}');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            uploadArea.classList.add('border-primary');
+        }
+
+        function unhighlight() {
+            uploadArea.classList.remove('border-primary');
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            previewImage(fileInput);
+        }
+    });
+</script>
 {% endblock %}

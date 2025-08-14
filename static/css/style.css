@@ -1,2 +1,134 @@
-body { background-color: #f4f7f6; }
-.vpn-config-box { background-color: #e9ecef; border: 1px solid #dee2e6; border-radius: .375rem; padding: 1rem; font-family: 'Courier New', Courier, monospace; direction: ltr; text-align: left; white-space: pre-wrap; word-break: break-all; }
+/* styles.css */
+:root {
+    --primary-color: #4e54c8;
+    --secondary-color: #8f94fb;
+    --dark-color: #1a1a2e;
+    --light-color: #f5f5f5;
+    --success-color: #0a8f5c;
+    --warning-color: #f7b731;
+    --danger-color: #fc5c65;
+}
+
+body {
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(to bottom, #f5f7fa, #e4e8f0);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    font-weight: bold;
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.btn {
+    border-radius: 30px;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    border: none;
+    box-shadow: 0 4px 15px rgba(78, 84, 200, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(78, 84, 200, 0.4);
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.vpn-config-box {
+    background-color: #2d3748;
+    color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.vpn-config-box pre {
+    margin: 0;
+    color: #a0aec0;
+}
+
+@media (max-width: 767.98px) {
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body.dark-mode {
+        background: linear-gradient(to bottom, #1a1a2e, #16213e);
+        color: #e4e8f0;
+    }
+
+    body.dark-mode .card {
+        background-color: #242635;
+        color: #e4e8f0;
+    }
+
+    body.dark-mode .card-header {
+        background-color: #2d325a;
+    }
+
+    body.dark-mode .alert-info {
+        background-color: #2a4365;
+        color: #e4e8f0;
+        border-color: #2c5282;
+    }
+
+    body.dark-mode .alert-warning {
+        background-color: #744210;
+        color: #e4e8f0;
+        border-color: #975a16;
+    }
+
+    body.dark-mode .alert-danger {
+        background-color: #742a2a;
+        color: #e4e8f0;
+        border-color: #9b2c2c;
+    }
+
+    body.dark-mode .text-muted {
+        color: #a0aec0 !important;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card, .alert {
+    animation: fadeIn 0.5s ease-out forwards;
+}

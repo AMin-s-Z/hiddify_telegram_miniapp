@@ -6,7 +6,7 @@ from pathlib import Path
 # ---
 # Django Settings
 SECRET_KEY = "aa314c0bafe03f4f5408d8a77c53e413"
-DEBUG = True
+DEBUG = False
 
 # PostgreSQL Database Settings
 DB_NAME = "database"
@@ -91,7 +91,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -100,4 +100,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'shop:home'
 LOGOUT_REDIRECT_URL = 'shop:home'
 
-STATIC_ROOT = BASE_DIR / "staticfiles"  # <-- ADD THIS LINE
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / "staticfiles" # CORRECT: "staticfiles" is a different folderHIS LINE

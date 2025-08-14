@@ -1,24 +1,229 @@
 {% extends "base.html" %}
-
-{% block title %}Purchase Details{% endblock %}
-
+{% block title %}جزئیات خرید{% endblock %}
 {% block content %}
-<h2 class="mb-4">Purchase Details</h2>
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title">{{ purchase.plan.name }}</h5>
-        <p class="card-text"><small class="text-muted">Purchase Date: {{ purchase.purchase_date|date:"Y/m/d H:i" }}</small></p>
-        
-        {% if purchase.status == 'approved' and purchase.vpn_config %}
-        <hr>
-        <h6>Your VPN Configuration:</h6>
-        <p>You can now use the following configuration to connect.</p>
-        <div class="vpn-config-box">
-            <pre><code>{{ purchase.vpn_config }}</code></pre>
+<div class="mb-4">
+    <a href="{% url 'shop:purchase_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-right me-1"></i> بازگشت به تاریخچه خرید
+    </a>
+</div>
+
+<h2 class="mb-4 fw-bold">جزئیات خرید</h2>
+
+<div class="card shadow-sm purchase-detail-card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ purchase.plan.name }}</h5>
+            <div>
+                {% if purchase.status == 'approved' %}
+                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>تأیید شده</span>
+                {% elif purchase.status == 'pending' %}
+                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>در انتظار تأیید</span>
+                {% elif purchase.status == 'rejected' %}
+                <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>رد شده</span>
+                {% endif %}
+            </div>
         </div>
-        {% else %}
-        <p class="text-muted">Your purchase is still being processed.</p>
+    </div>
+    <div class="card-body">
+        <div class="purchase-info mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <label class="info-label"><i class="fas fa-calendar-alt me-2"></i>تاریخ خرید:</label>
+                        <div class="info-value">{{ purchase.purchase_date|date:"Y/m/d H:i" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <label class="info-label"><i class="fas fa-money-bill-wave me-2"></i>قیمت:</label>
+                        <div class="info-value">{{ purchase.plan.price|floatformat:"0" }} تومان</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <label class="info-label"><i class="fas fa-hourglass-half me-2"></i>مدت زمان:</label>
+                        <div class="info-value">{{ purchase.plan.duration }} روز</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <label class="info-label"><i class="fas fa-receipt me-2"></i>شناسه سفارش:</label>
+                        <div class="info-value">{{ purchase.id }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if purchase.status == 'approved' and purchase.vpn_config %}
+        <div class="config-section">
+            <div class="section-header">
+                <h5 class="mb-3"><i class="fas fa-shield-alt me-2 text-success"></i>کانفیگ VPN شما</h5>
+                <div class="config-actions mb-3">
+                    <button class="btn btn-outline-primary copy-config" data-config="{{ purchase.vpn_config }}">
+                        <i class="fas fa-copy me-1"></i>کپی کانفیگ
+                    </button>
+                    <button class="btn btn-outline-success open-qr" data-config="{{ purchase.vpn_config }}">
+                        <i class="fas fa-qrcode me-1"></i>نمایش QR کد
+                    </button>
+                </div>
+            </div>
+            <div class="vpn-config-box">
+                <pre><code>{{ purchase.vpn_config }}</code></pre>
+            </div>
+
+            <div class="mt-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i>راهنمای استفاده</h6>
+                        <ol class="mb-0 ps-3">
+                            <li>کانفیگ بالا را کپی کنید.</li>
+                            <li>برنامه V2Ray را روی دستگاه خود باز کنید.</li>
+                            <li>گزینه "Import from Clipboard" را انتخاب کنید.</li>
+                            <li>بر روی دکمه اتصال کلیک کنید.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% elif purchase.status == 'pending' %}
+        <div class="alert alert-info">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading">در انتظار تأیید</h5>
+                    <p class="mb-0">سفارش شما در حال بررسی است و به زودی پس از تأیید پرداخت، کانفیگ VPN برای شما فعال خواهد شد.</p>
+                </div>
+            </div>
+        </div>
+        {% elif purchase.status == 'rejected' %}
+        <div class="alert alert-danger">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading">سفارش رد شده</h5>
+                    <p class="mb-0">متأسفانه سفارش شما تأیید نشده است. لطفاً با پشتیبانی تماس بگیرید یا سفارش جدیدی ثبت کنید.</p>
+                </div>
+            </div>
+        </div>
         {% endif %}
     </div>
 </div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">QR کد کانفیگ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qrcode-container"></div>
+                <p class="mt-3 mb-0">برای اسکن، دوربین گوشی خود را روی QR کد بگیرید.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .purchase-detail-card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .info-group {
+        margin-bottom: 15px;
+    }
+
+    .info-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .info-value {
+        font-weight: 500;
+    }
+
+    .section-header {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+
+    .config-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .vpn-config-box {
+        background-color: #2d3748;
+        color: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 10px;
+        overflow-x: auto;
+    }
+
+    .vpn-config-box pre {
+        margin: 0;
+        color: #a0aec0;
+    }
+
+    #qrcode-container {
+        display: inline-block;
+        padding: 10px;
+        background-color: white;
+        border-radius: 5px;
+        margin: 0 auto;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Copy configuration to clipboard
+        const copyBtn = document.querySelector('.copy-config');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                const configText = this.getAttribute('data-config');
+                navigator.clipboard.writeText(configText).then(() => {
+                    // Change button text temporarily
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check me-1"></i>کپی شد';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+        }
+
+        // Generate QR code
+        const qrBtn = document.querySelector('.open-qr');
+        if (qrBtn) {
+            const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+
+            qrBtn.addEventListener('click', function() {
+                const configText = this.getAttribute('data-config');
+                const qrContainer = document.getElementById('qrcode-container');
+                qrContainer.innerHTML = '';
+
+                // Generate QR code
+                const qr = qrcode(0, 'L');
+                qr.addData(configText);
+                qr.make();
+                qrContainer.innerHTML = qr.createImgTag(5);
+
+                // Show modal
+                qrModal.show();
+            });
+        }
+    });
+</script>
 {% endblock %}
