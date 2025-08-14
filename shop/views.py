@@ -15,8 +15,9 @@ from .utils.telegram import notify_admin_on_purchase
 
 logger = logging.getLogger(__name__)
 
+
 def home_view(request):
-    return redirect('core:plan_list') if request.user.is_authenticated else render(request, 'home.html')
+    return redirect('shop:plan_list') if request.user.is_authenticated else render(request, 'home.html')
 
 @login_required
 def plan_list_view(request):
@@ -33,7 +34,7 @@ def purchase_create_view(request, plan_id):
             purchase.plan = plan
             purchase.save()
             notify_admin_on_purchase(purchase)
-            return redirect('core:purchase_list')
+            return redirect('shop:purchase_list')
     else:
         form = PurchaseForm()
     return render(request, 'purchase_form.html', {'form': form, 'plan': plan})
@@ -46,7 +47,7 @@ def purchase_list_view(request):
 @require_POST
 def logout_view(request):
     logout(request)
-    return redirect('core:home')
+    return redirect('shop:home')
 
 def validate_init_data(init_data_str: str, bot_token: str) -> tuple[bool, dict]:
     try:
