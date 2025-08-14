@@ -1,11 +1,16 @@
 from django.urls import path
 from . import views
 
+app_name = 'core'
+
 urlpatterns = [
-    path('', views.plans_list, name='home'),
-    path('plans/', views.plans_list, name='plans'),
-    path('purchase/<int:plan_id>/', views.purchase_plan, name='purchase_plan'),
-    path('payment/<int:purchase_id>/', views.payment, name='payment'),
-    path('history/', views.purchase_history, name='purchase_history'),
-    path('download/<int:purchase_id>/', views.download_vpn_config, name='download_config'),
+    # مسیرهای قبلی
+    path('', views.home_view, name='home'),
+    path('plans/', views.plan_list_view, name='plan_list'),
+    path('purchase/<int:plan_id>/', views.purchase_create_view, name='purchase_create'),
+    path('purchases/', views.purchase_list_view, name='purchase_list'),
+    path('logout/', views.logout_view, name='logout'),
+
+    # مسیر جدید برای لاگین خودکار و یکپارچه
+    path('auth/telegram-seamless/', views.telegram_seamless_auth_view, name='telegram_seamless_auth'),
 ]
