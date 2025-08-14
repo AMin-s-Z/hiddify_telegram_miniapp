@@ -1,274 +1,254 @@
 {% extends "base.html" %}
-{% block title %}خریدهای من{% endblock %}
-{% block header_title %}خریدهای من{% endblock %}
-{% block nav_purchases_active %}active{% endblock %}
+{% block title %}تاریخچه خرید | VPN Store{% endblock %}
+{% block nav_history_active %}active{% endblock %}
 
 {% block content %}
-<div class="tg-section tg-fade-in">
-    {% for purchase in purchases %}
-    <div class="tg-card purchase-card mb-3">
-        <div class="purchase-header p-3 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <div class="purchase-icon me-3">
-                    <i class="fas fa-shield-alt"></i>
+<div class="container-fluid px-3 py-2">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-history text-primary me-2"></i>
+            تاریخچه خریدها
+        </h1>
+        <button class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-filter me-1"></i>
+            فیلتر
+        </button>
+    </div>
+
+    <!-- Stats Overview -->
+    {% if purchases %}
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-primary bg-gradient text-white rounded-3 p-3">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
                 </div>
-                <div>
-                    <h3 class="purchase-name mb-1">{{ purchase.plan.name }}</h3>
-                    <div class="tg-text-muted small">{{ purchase.purchase_date|date:"Y/m/d H:i" }}</div>
+                <div class="stat-content">
+                    <h3 class="mb-1">{{ purchases|length }}</h3>
+                    <p class="mb-0 small">تعداد کل خریدها</p>
                 </div>
             </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-success bg-gradient text-white rounded-3 p-3">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="mb-1">{{ approved_count|default:0 }}</h3>
+                    <p class="mb-0 small">تعداد خریدهای موفق</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-warning bg-gradient text-white rounded-3 p-3">
+                <div class="stat-icon">
+                    <i class="fas fa-clock fa-2x opacity-75"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="mb-1">{{ pending_count|default:0 }}</h3>
+                    <p class="mb-0 small">در حال بررسی</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
-            <div class="purchase-status">
-                {% if purchase.status == 'approved' %}
-                <span class="tg-badge tg-badge-success">تأیید شده</span>
-                {% elif purchase.status == 'pending' %}
-                <span class="tg-badge tg-badge-warning">در انتظار تأیید</span>
+    <!-- Purchase List -->
+    {% for purchase in purchases %}
+    <div class="purchase-card mb-3 fade-in" style="animation-delay: {{ forloop.counter0 * 0.1 }}s;">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="card-top d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="fas fa-shield-alt text-primary me-2"></i>
+                            {{ purchase.plan.name }}
+                        </h5>
+                        <p class="text-muted mb-0 small">خرید شماره #{{ purchase.id }} · {{ purchase.purchase_date|date:"Y/m/d H:i" }}</p>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div>
+                        {% if purchase.status == 'approved' %}
+                        <span class="badge bg-success rounded-pill">
+                            <i class="fas fa-check-circle me-1"></i> تأیید شده
+                        </span>
+                        {% elif purchase.status == 'pending' %}
+                        <span class="badge bg-warning rounded-pill">
+                            <i class="fas fa-clock me-1"></i> در انتظار تأیید
+                        </span>
+                        {% elif purchase.status == 'rejected' %}
+                        <span class="badge bg-danger rounded-pill">
+                            <i class="fas fa-times-circle me-1"></i> رد شده
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Plan Details -->
+                <div class="p-3 bg-light rounded-3 mb-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <p class="mb-0 small">{{ purchase.plan.description|truncatewords:15 }}</p>
+                        </div>
+                        <div class="col-md-4 text-start">
+                            <p class="mb-0">
+                                <span class="text-muted small">تاریخ انقضا:</span>
+                                <span class="fw-bold small">{{ purchase.expiry_date|date:"Y/m/d" }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VPN Config (if approved) -->
+                {% if purchase.status == 'approved' and purchase.vpn_config %}
+                <div class="config-preview mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0 text-secondary">
+                            <i class="fas fa-keyboard me-2"></i> کانفیگ VPN
+                        </h6>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="copyConfig('{{ purchase.vpn_config }}', this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <a href="{% url 'shop:purchase_detail' purchase.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="config-box bg-light p-2 rounded small text-muted">
+                        <code>{{ purchase.vpn_config|truncate:50 }}</code>
+                    </div>
+                </div>
+                {% else %}
+                <!-- No Config -->
+                {% if purchase.status == 'pending' %}
+                <div class="waiting-info mb-3 text-center py-2">
+                    <div class="spinner-border text-primary spinner-sm" role="status">
+                        <span class="visually-hidden">در حال بررسی...</span>
+                    </div>
+                    <p class="small text-muted mt-2 mb-0">در انتظار تأیید پرداخت</p>
+                </div>
                 {% elif purchase.status == 'rejected' %}
-                <span class="tg-badge tg-badge-danger">رد شده</span>
+                <div class="error-info mb-3 text-center py-2 bg-danger bg-opacity-10 rounded">
+                    <i class="fas fa-exclamation-circle text-danger mb-2"></i>
+                    <p class="small text-danger mb-0">سفارش شما تأیید نشده است</p>
+                </div>
+                {% endif %}
                 {% endif %}
             </div>
         </div>
-
-        {% if purchase.status == 'approved' and purchase.vpn_config %}
-        <div class="purchase-config p-3 pt-0">
-            <div class="config-actions d-flex mb-2">
-                <button class="tg-button-small me-2 copy-config" data-config="{{ purchase.vpn_config }}">
-                    <i class="fas fa-copy me-1"></i>کپی کانفیگ
-                </button>
-                <button class="tg-button-small show-qr" data-config="{{ purchase.vpn_config }}">
-                    <i class="fas fa-qrcode me-1"></i>QR کد
-                </button>
-            </div>
-            <div class="tg-config-box">
-                <pre class="mb-0"><code>{{ purchase.vpn_config }}</code></pre>
-            </div>
-        </div>
-        {% elif purchase.status == 'pending' %}
-        <div class="purchase-pending p-3 pt-0">
-            <div class="pending-message tg-text-muted">
-                <i class="fas fa-clock me-2"></i>
-                سفارش شما در حال بررسی است و به زودی تأیید خواهد شد.
-            </div>
-        </div>
-        {% elif purchase.status == 'rejected' %}
-        <div class="purchase-rejected p-3 pt-0">
-            <div class="rejected-message text-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                متأسفانه سفارش شما تأیید نشد. لطفاً با پشتیبانی تماس بگیرید.
-            </div>
-        </div>
-        {% endif %}
     </div>
     {% empty %}
-    <div class="empty-state text-center p-4">
-        <div class="empty-icon mb-3">
-            <i class="fas fa-shopping-cart fa-3x tg-text-muted"></i>
-        </div>
-        <h4>هنوز خریدی انجام نداده‌اید</h4>
-        <p class="tg-text-muted mb-4">برای استفاده از سرویس VPN، ابتدا یک پلن خریداری کنید.</p>
-        <a href="{% url 'shop:plan_list' %}" class="tg-button">مشاهده پلن‌ها</a>
+    <div class="empty-state text-center py-5">
+        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted mb-3">هیچ خریدی یافت نشد</h4>
+        <p class="text-muted mb-4">شما تاکنون هیچ خریدی انجام نداده‌اید. برای شروع، یک پلن VPN انتخاب کنید.</p>
+        <a href="{% url 'shop:plan_list' %}" class="btn btn-primary">
+            <i class="fas fa-shopping-cart me-2"></i>
+            مشاهده پلن‌ها
+        </a>
     </div>
     {% endfor %}
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
-<!-- QR Code Modal -->
-<div class="tg-modal" id="qrModal">
-    <div class="tg-modal-overlay"></div>
-    <div class="tg-modal-container">
-        <div class="tg-modal-header">
-            <h4 class="tg-modal-title">QR کد کانفیگ</h4>
-            <button class="tg-modal-close" id="closeModal">&times;</button>
-        </div>
-        <div class="tg-modal-body text-center">
-            <div id="qrcode-container" class="p-3 mb-3"></div>
-            <p class="tg-text-muted small mb-0">برای اسکن، دوربین گوشی خود را روی QR کد بگیرید.</p>
-        </div>
-    </div>
-</div>
+{% endblock %}
 
-<style>
-    .purchase-icon {
-        width: 40px;
-        height: 40px;
-        background-color: var(--tg-theme-button-color);
-        color: white;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-    }
-
-    .purchase-name {
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .tg-button-small {
-        background-color: var(--tg-theme-button-color);
-        color: var(--tg-theme-button-text-color);
-        border: none;
-        border-radius: 8px;
-        padding: 6px 12px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    .empty-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background-color: rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-    }
-
-    body.dark .empty-icon {
-        background-color: rgba(255,255,255,0.05);
-    }
-
-    /* Modal Styles */
-    .tg-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1000;
-    }
-
-    .tg-modal.active {
-        display: block;
-    }
-
-    .tg-modal-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0,0,0,0.5);
-        backdrop-filter: blur(5px);
-    }
-
-    .tg-modal-container {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 320px;
-        background-color: var(--tg-theme-bg-color);
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        animation: modal-in 0.3s ease-out forwards;
-    }
-
-    .tg-modal-header {
-        padding: 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-
-    body.dark .tg-modal-header {
-        border-color: rgba(255,255,255,0.1);
-    }
-
-    .tg-modal-title {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    .tg-modal-close {
-        background: none;
-        border: none;
-        font-size: 24px;
-        line-height: 1;
-        color: var(--tg-theme-hint-color);
-        cursor: pointer;
-    }
-
-    .tg-modal-body {
-        padding: 16px;
-    }
-
-    #qrcode-container {
-        display: inline-block;
-        background-color: white;
-        border-radius: 8px;
-    }
-
-    @keyframes modal-in {
-        from {
-            opacity: 0;
-            transform: translate(-50%, -60%);
-        }
-        to {
-            opacity: 1;
-            transform: translate(-50%, -50%);
-        }
-    }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+{% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Copy configuration
-        const copyBtns = document.querySelectorAll('.copy-config');
-        copyBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const configText = this.getAttribute('data-config');
-                navigator.clipboard.writeText(configText).then(() => {
-                    // Show success indicator
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check me-1"></i>کپی شد';
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                    }, 2000);
-                });
-            });
-        });
+// Copy configuration to clipboard
+function copyConfig(config, button) {
+    navigator.clipboard.writeText(config).then(function() {
+        // Show success feedback
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        showNotification('کانفیگ با موفقیت کپی شد!');
 
-        // QR Code functionality
-        const qrModal = document.getElementById('qrModal');
-        const qrContainer = document.getElementById('qrcode-container');
-        const closeModal = document.getElementById('closeModal');
-        const showQrBtns = document.querySelectorAll('.show-qr');
-
-        showQrBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const configText = this.getAttribute('data-config');
-                qrContainer.innerHTML = '';
-
-                // Generate QR code
-                const qr = qrcode(0, 'L');
-                qr.addData(configText);
-                qr.make();
-                qrContainer.innerHTML = qr.createImgTag(5);
-
-                // Show modal
-                qrModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-        });
-
-        closeModal.addEventListener('click', function() {
-            qrModal.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        qrModal.querySelector('.tg-modal-overlay').addEventListener('click', function() {
-            qrModal.classList.remove('active');
-            document.body.style.overflow = '';
-        });
+        // Reset button after delay
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-copy"></i>';
+        }, 2000);
+    }, function() {
+        showNotification('خطا در کپی کردن کانفیگ', 'error');
     });
+}
+
+// Show notification
+function showNotification(message, type = 'success') {
+    // Create toast notification
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// Create toast container if not exists
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    container.style.zIndex = '1055';
+    document.body.appendChild(container);
+    return container;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
 </script>
 {% endblock %}

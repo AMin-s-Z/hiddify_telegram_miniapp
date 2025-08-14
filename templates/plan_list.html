@@ -1,184 +1,146 @@
 {% extends "base.html" %}
-{% block title %}پلن‌های VPN{% endblock %}
-{% block header_title %}پلن‌های VPN{% endblock %}
-{% block nav_home_active %}active{% endblock %}
+{% block title %}پلن‌های VPN | VPN Store{% endblock %}
+{% block nav_plans_active %}active{% endblock %}
 
 {% block content %}
-<div class="tg-section tg-fade-in">
-    <p class="tg-text-muted text-center mb-4">لطفاً یکی از پلن‌های زیر را انتخاب کنید</p>
+<div class="container-fluid px-3 py-2">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-shield-alt text-primary me-2"></i>
+            پلن‌های VPN
+        </h1>
+        <div class="features-highlights">
+            <span class="badge bg-success me-1"><i class="fas fa-check-circle me-1"></i> تضمین آپتایم</span>
+            <span class="badge bg-info"><i class="fas fa-tachometer-alt me-1"></i> پرسرعت</span>
+        </div>
+    </div>
 
-    {% for plan in plans %}
-    <div class="tg-card plan-card mb-3 ripple" onclick="location.href='{% url 'shop:purchase_create' plan.id %}'">
-        <div class="d-flex align-items-center p-3">
-            <div class="plan-icon me-3">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <div class="plan-details flex-grow-1">
-                <h3 class="plan-name mb-1">{{ plan.name }}</h3>
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="plan-duration tg-text-muted">
-                        <i class="fas fa-calendar-alt me-1"></i> {{ plan.duration }} روز
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for plan in plans %}
+        <div class="col fade-in">
+            <div class="plan-card h-100">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">{{ plan.name }}</h4>
+                        {% if forloop.first %}
+                        <span class="badge bg-danger rounded-pill">پیشنهاد ویژه</span>
+                        {% endif %}
                     </div>
-                    <div class="plan-price">
-                        <span class="price-amount">{{ plan.price|floatformat:"0" }}</span>
-                        <span class="price-currency tg-text-muted">تومان</span>
+                </div>
+                <div class="card-body">
+                    <div class="plan-price-container mb-3">
+                        <div class="plan-price">{{ plan.price|floatformat:"0" }}</div>
+                        <div class="text-muted">تومان</div>
+                    </div>
+
+                    <ul class="list-unstyled features-list mb-4">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span><strong>{{ plan.duration }}</strong> روزهspan>
+                        </li>
+                        {% if plan.speed %}
+                        <li class="mb-2">
+                            <i class="fas fa-tachometer-alt text-primary me-2"></i>
+                            <span>سرعت <strong>{{ plan.speed }}</strong></span>
+                        </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            <i class="fas fa-server text-info me-2"></i>
+                            <span>دسترسی به <strong>{{ plan.server_count|default:100 }}+</strong> سرور</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-devices text-warning me-2"></i>
+                            <span>تعداد دستگاه‌ها: <strong>{{ plan.device_count|default:5 }}</strong></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-headset text-success me-2"></i>
+                            <span>پشتیبانی ۲۴ ساعته</span>
+                        </li>
+                    </ul>
+
+                    {% if plan.description %}
+                    <div class="plan-description mb-3">
+                        <p class="text-muted small">{{ plan.description|linebreaksbr }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent py-2">
+                    <a href="{% url 'shop:purchase_create' plan.id %}" class="btn btn-primary w-100">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        خرید پلن
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center rounded-3 py-4">
+                <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                <h4 class="alert-heading mb-3">هیچ پلنی موجود نیست</h4>
+                <p class="mb-0">متأسفانه در حال حاضر هیچ پلنی موجود نیست. لطفاً بعداً مراجعه کنید.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mt-5 fade-in">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-question-circle text-info me-2"></i>
+                        سوالات متداول
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item border rounded mb-2">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    <i class="fas fa-clock me-2 text-primary"></i>
+                                    بعد از خرید چقدر طول می‌کشد تا سرویس فعال شود؟
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>معمولاً پس از تأیید پرداخت (که معمولاً حداکثر ۲۴ ساعت طول می‌کشد)، سرویس VPN شما فعال می‌شود. در موارد استثنایی، ممکن است این زمان بیشتر شود.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-2">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    <i class="fas fa-sync-alt me-2 text-primary"></i>
+                                    آیا امکان تمدید سرویس وجود دارد؟
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>بله، شما می‌توانید قبل از پایان اعتبار سرویس خود، آن را با همان پلن یا پلن جدیدی تمدید کنید. برای تمدید به حساب کاربری خود مراجعه کرده و دکمه "تمدید" را بزنید.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    <i class="fas fa-plug me-2 text-primary"></i>
+                                    چگونه از کانفیگ VPN استفاده کنم؟
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>پس از خرید و فعال‌سازی سرویس، کانفیگ VPN در حساب کاربری شما در دسترس قرار می‌گیرد. راهنمای کامل استفاده به همراه نمونه‌های مختلف ارائه شده است. شما می‌توانید از طریق نرم‌افزارهای مختلف این کانفیگ‌ها را وارد کنید.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="plan-arrow">
-                <i class="fas fa-chevron-left tg-text-muted"></i>
-            </div>
-        </div>
-        {% if plan.description %}
-        <div class="plan-description px-3 pb-3 pt-0">
-            <div class="tg-text-muted small">{{ plan.description|linebreaksbr }}</div>
-        </div>
-        {% endif %}
-
-        {% if forloop.first %}
-        <div class="plan-badge">پیشنهاد ویژه</div>
-        {% endif %}
-    </div>
-    {% empty %}
-    <div class="tg-card text-center p-4">
-        <i class="fas fa-exclamation-circle fa-3x tg-text-muted mb-3"></i>
-        <p>در حال حاضر هیچ پلنی موجود نیست.</p>
-    </div>
-    {% endfor %}
-</div>
-
-<div class="tg-section mt-4">
-    <h3 class="tg-section-title">سوالات متداول</h3>
-
-    <div class="tg-card faq-card">
-        <div class="faq-item p-3" onclick="toggleFaq(this)">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="faq-question">بعد از خرید چقدر طول می‌کشد تا سرویس فعال شود؟</div>
-                <i class="fas fa-chevron-down tg-text-muted faq-toggle"></i>
-            </div>
-            <div class="faq-answer mt-2" style="display: none;">
-                معمولاً بعد از تأیید پرداخت، سرویس شما در کمتر از 15 دقیقه فعال می‌شود.
-            </div>
-        </div>
-
-        <div class="faq-item p-3" onclick="toggleFaq(this)">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="faq-question">آیا امکان تمدید سرویس وجود دارد؟</div>
-                <i class="fas fa-chevron-down tg-text-muted faq-toggle"></i>
-            </div>
-            <div class="faq-answer mt-2" style="display: none;">
-                بله، می‌توانید قبل از اتمام اعتبار، سرویس خود را تمدید کنید.
-            </div>
-        </div>
-
-        <div class="faq-item p-3" onclick="toggleFaq(this)">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="faq-question">چگونه از کانفیگ VPN استفاده کنم؟</div>
-                <i class="fas fa-chevron-down tg-text-muted faq-toggle"></i>
-            </div>
-            <div class="faq-answer mt-2" style="display: none;">
-                پس از خرید و تأیید پرداخت، کانفیگ VPN برای شما فعال می‌شود. کافیست آن را کپی کرده و در نرم‌افزار مورد نظر خود وارد کنید.
-            </div>
         </div>
     </div>
 </div>
-
-<style>
-    .plan-card {
-        position: relative;
-        transition: transform 0.2s;
-    }
-
-    .plan-card:active {
-        transform: scale(0.98);
-    }
-
-    .plan-icon {
-        width: 40px;
-        height: 40px;
-        background-color: var(--tg-theme-button-color);
-        color: white;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-    }
-
-    .plan-name {
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    .plan-duration {
-        font-size: 14px;
-    }
-
-    .price-amount {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--tg-theme-button-color);
-    }
-
-    .price-currency {
-        font-size: 12px;
-    }
-
-    .plan-badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: #ff3b30;
-        color: white;
-        font-size: 12px;
-        font-weight: 500;
-        padding: 4px 8px;
-        border-radius: 0 var(--tg-border-radius) 0 8px;
-    }
-
-    .faq-item {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        cursor: pointer;
-    }
-
-    body.dark .faq-item {
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .faq-item:last-child {
-        border-bottom: none;
-    }
-
-    .faq-question {
-        font-weight: 500;
-    }
-
-    .faq-answer {
-        font-size: 14px;
-        color: var(--tg-theme-hint-color);
-    }
-
-    .faq-toggle {
-        transition: transform 0.3s;
-    }
-
-    .faq-item.active .faq-toggle {
-        transform: rotate(180deg);
-    }
-</style>
-
-<script>
-    function toggleFaq(element) {
-        const answer = element.querySelector('.faq-answer');
-        const isActive = element.classList.contains('active');
-
-        if (isActive) {
-            element.classList.remove('active');
-            answer.style.display = 'none';
-        } else {
-            element.classList.add('active');
-            answer.style.display = 'block';
-        }
-    }
-</script>
 {% endblock %}
