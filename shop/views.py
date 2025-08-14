@@ -88,13 +88,58 @@ def validate_init_data(init_data, bot_token):
 @require_POST
 def telegram_seamless_auth_view(request):
     try:
+        # لاگ کردن درخواست دریافتی
+        logger.info(f"Received request body: {request.body}")
+
         payload = json.loads(request.body)
-        is_valid, user_data = validate_init_data(payload.get('init_data', ''), settings.TELEGRAM_BOT_TOKEN)
-        if not is_valid: return JsonResponse({'success': False, 'error': 'Validation failed'}, status=403)
-        user, _ = User.objects.get_or_create(username=f"tg_{user_data['id']}", defaults={'first_name': user_data.get('first_name', ''), 'last_name': user_data.get('last_name', '')})
-        TelegramProfile.objects.update_or_create(user=user, defaults={'telegram_id': user_data['id'], 'username': user_data.get('username'), 'first_name': user_data.get('first_name'), 'last_name': user_data.get('last_name'), 'photo_url': user_data.get('photo_url'), 'auth_date': make_aware(datetime.datetime.fromtimestamp(int(user_data['auth_date'])))})
-        login(request, user)
+        init_data = payload.get('init_data', '')
+
+        logger.info(f"Init data: {init_data}")
+
+        is_valid, user_data = validate_init_data(init_data, settings.TELEGRAM_BOT_TOKEN)
+
+        logger.info(f"Validation result: {is_valid}, User data: {user_data}")
+
+        if not is_valid:
+            return JsonResponse({'success': False, 'error': 'Validation failed'}, status=403)
+
+        # بررسی وجود user_data['id']
+        if 'id' not in user_data:
+            logger.error("No 'id' in user_data")
+            return JsonResponse({'success': False, 'error': 'Invalid user data'}, status=400)
+
+        user, created = User.objects.get_or_create(
+            username=f"tg_{user_data['id']}",
+            defaults={
+                'first_name': user_data.get('first_name', ''),
+                'last_name': user_data.get('last_name', '')
+            }
+        )
+
+        logger.info(f"User created/retrieved: {user.username}, Created: {created}")
+
+        TelegramProfile.objects.update_or_create(
+            user=user,
+            defaults={
+                'telegram_id': user_data['id'],
+                'username': user_data.get('username'),
+                'first_name': user_data.get('first_name'),
+                'last_name': user_data.get('last_name'),
+                'photo_url': user_data.get('photo_url'),
+                'auth_date': make_aware(datetime.datetime.fromtimestamp(int(user_data['auth_date'])))
+            }
+        )
+
+        # لاگین کاربر با backend مشخص
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+        logger.info(f"User logged in successfully: {user.username}")
+
         return JsonResponse({'success': True})
+
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}")
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     except Exception as e:
-        logger.error(f"Error in seamless auth: {e}")
-        return JsonResponse({'success': False, 'error': 'Server error'}, status=500)
+        logger.error(f"Error in seamless auth: {e}", exc_info=True)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

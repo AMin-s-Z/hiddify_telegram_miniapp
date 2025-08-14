@@ -13,6 +13,10 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
+                <div id="debug-info" class="mt-3 text-start" style="display: none;">
+                    <small class="text-muted">Debug Info:</small>
+                    <pre id="debug-content" class="bg-light p-2 rounded"></pre>
+                </div>
             </div>
         </div>
     </div>
@@ -24,50 +28,86 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is already authenticated
     {% if user.is_authenticated %}
-        window.location.href = "{% url 'plan_list' %}";
+        console.log('User already authenticated, redirecting...');
+        window.location.href = "{% url 'shop:plan_list' %}";
         return;
     {% endif %}
 
     // Initialize Telegram WebApp
+    if (!window.Telegram || !window.Telegram.WebApp) {
+        document.getElementById('status-message').innerHTML =
+            '<p class="text-danger fw-bold">Telegram WebApp not found. Make sure you\'re opening this in Telegram.</p>';
+        return;
+    }
+
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    console.log('Telegram WebApp:', tg);
-    console.log('Init data:', tg.initData);
+    // Show debug info
+    const debugInfo = {
+        initData: tg.initData,
+        initDataUnsafe: tg.initDataUnsafe,
+        version: tg.version,
+        platform: tg.platform
+    };
 
-    if (tg.initData) {
-        fetch("{% url 'telegram_seamless_auth' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 'init_data': tg.initData })
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response data:', data);
-            if (data.success) {
-                window.location.href = "{% url 'plan_list' %}";
-            } else {
-                document.getElementById('status-message').innerHTML =
-                    `<p class="text-danger">Error: ${data.error || 'Authentication failed'}</p>`;
-            }
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            document.getElementById('status-message').innerHTML =
-                '<p class="text-danger">Server connection error</p>';
-        });
-    } else {
+    console.log('Telegram WebApp Debug:', debugInfo);
+
+    // Show debug info on page
+    document.getElementById('debug-info').style.display = 'block';
+    document.getElementById('debug-content').textContent = JSON.stringify(debugInfo, null, 2);
+
+    if (!tg.initData) {
         document.getElementById('status-message').innerHTML =
-            '<p class="text-danger fw-bold">Please open this page inside Telegram.</p>';
+            '<p class="text-danger fw-bold">No init data found. Please open this page inside Telegram.</p>';
+        return;
     }
+
+    // Send authentication request
+    fetch("{% url 'shop:telegram_seamless_auth' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'init_data': tg.initData })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        return response.text().then(text => {
+            console.log('Response text:', text);
+
+            try {
+                const data = JSON.parse(text);
+                return { ok: response.ok, status: response.status, data: data };
+            } catch (e) {
+                console.error('Failed to parse JSON:', e);
+                throw new Error('Invalid JSON response: ' + text);
+            }
+        });
+    })
+    .then(result => {
+        console.log('Parsed result:', result);
+
+        if (result.ok && result.data.success) {
+            document.getElementById('status-message').innerHTML =
+                '<p class="text-success">Authentication successful! Redirecting...</p>';
+            setTimeout(() => {
+                window.location.href = "{% url 'shop:plan_list' %}";
+            }, 500);
+        } else {
+            const errorMsg = result.data.error || 'Authentication failed';
+            document.getElementById('status-message').innerHTML =
+                `<p class="text-danger">Error: ${errorMsg}</p>
+                 <p class="text-muted">Status: ${result.status}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        document.getElementById('status-message').innerHTML =
+            `<p class="text-danger">Connection error: ${error.message}</p>`;
+    });
 });
 </script>
 {% endblock %}
