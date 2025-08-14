@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Complete Purchase{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-8">
+    <h2 class="mb-4">Complete Purchase: {{ plan.name }}</h2>
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Step 1: Bank Transfer</h4>
+        <p>Please transfer <strong>{{ plan.price|floatformat:"0" }} Toman</strong> to:</p><hr>
+        <p class="mb-0"><strong>Card Number:</strong> <code>{{ ADMIN_BANK_CARD }}</code></p>
+        <p><strong>Account Holder:</strong> {{ ADMIN_BANK_NAME }}</p>
+    </div>
+    <div class="card shadow-sm"><div class="card-body">
+        <h4 class="card-title">Step 2: Upload Receipt</h4>
+        <p>After the transfer, upload the receipt picture below.</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ form.receipt_image.id_for_label }}" class="form-label">{{ form.receipt_image.label }}</label>
+                {{ form.receipt_image }}
+                {% if form.receipt_image.errors %}<div class="invalid-feedback d-block">{% for error in form.receipt_image.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-success w-100">Submit Receipt</button>
+        </form>
+    </div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Purchase History{% endblock %}
+{% block content %}
+<h2 class="mb-4">Your Purchase History</h2>
+{% for purchase in purchases %}
+<div class="card mb-3 shadow-sm"><div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ purchase.plan.name }}</h5>
+        <span>
+            {% if purchase.status == 'approved' %}<span class="badge bg-success">Approved</span>
+            {% elif purchase.status == 'pending' %}<span class="badge bg-warning text-dark">Pending</span>
+            {% elif purchase.status == 'rejected' %}<span class="badge bg-danger">Rejected</span>{% endif %}
+        </span>
+    </div>
+    <p class="card-text"><small class="text-muted">Date: {{ purchase.purchase_date|date:"Y/m/d H:i" }}</small></p>
+    {% if purchase.status == 'approved' and purchase.vpn_config %}<hr>
+    <h6>Your VPN Config:</h6>
+    <div class="vpn-config-box"><pre><code>{{ purchase.vpn_config }}</code></pre></div>
+    {% endif %}
+</div></div>
+{% empty %}
+<div class="alert alert-secondary text-center">You have not made any purchases yet.</div>
+{% endfor %}
+{% endblock %}
