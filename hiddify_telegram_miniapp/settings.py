@@ -1,13 +1,38 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
+# --- Configuration Section ---
+# Replace the placeholder values below with your actual credentials.
+# ---
+# Django Settings
+SECRET_KEY = "aa314c0bafe03f4f5408d8a77c53e413"
+DEBUG = True
+
+# PostgreSQL Database Settings
+DB_NAME = "database"
+DB_USER = "admin"
+DB_PASSWORD = "admin1234"
+DB_HOST = "localhost"
+DB_PORT = "5432"
+
+# Telegram Bot Settings
+TELEGRAM_BOT_TOKEN = "8382768243:AAHv8Jj_8Z0D25h-AqaFIfoC9Zj54gka_C4"
+BOT_USERNAME = "albaloovpnhidiffybot"  # without the @
+
+# Admin & Site Settings
+TELEGRAM_ADMIN_CHAT_ID = "6717722573"
+SITE_URL = "albaloo.site"
+
+# Bank Details for Payments
+ADMIN_BANK_CARD = "6037-9977-0000-1111"
+ADMIN_BANK_NAME = "نام صاحب حساب"
+# --- End of Configuration Section ---
+
+
+# --- Standard Django Settings ---
+# (Usually no need to change the code below)
+# ---
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env.example')
-
-SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
-
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -17,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pillow',
     'shop',
 ]
 
@@ -52,11 +78,11 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':"database",
-        'USER': "admin",
-        'PASSWORD': "admin1234",
-        'HOST': "localhost",
-        'PORT': "5432",
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
@@ -72,12 +98,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = 'core:home'
-LOGOUT_REDIRECT_URL = 'core:home'
-
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-BOT_USERNAME = os.getenv('BOT_USERNAME')
-TELEGRAM_ADMIN_CHAT_ID = os.getenv('TELEGRAM_ADMIN_CHAT_ID')
-SITE_URL = os.getenv('SITE_URL')
-ADMIN_BANK_CARD = os.getenv('ADMIN_BANK_CARD')
-ADMIN_BANK_NAME = os.getenv('ADMIN_BANK_NAME')
+LOGIN_URL = 'shop:home'
+LOGOUT_REDIRECT_URL = 'shop:home'
