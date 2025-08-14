@@ -1,133 +1,184 @@
 {% extends "base.html" %}
-{% block title %}انتخاب پلن{% endblock %}
-{% block content %}
-<div class="text-center mb-5">
-    <h2 class="fw-bold mb-2">پلن‌های موجود</h2>
-    <p class="text-muted">پلن مورد نظر خود را انتخاب کنید</p>
-</div>
+{% block title %}پلن‌های VPN{% endblock %}
+{% block header_title %}پلن‌های VPN{% endblock %}
+{% block nav_home_active %}active{% endblock %}
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
+{% block content %}
+<div class="tg-section tg-fade-in">
+    <p class="tg-text-muted text-center mb-4">لطفاً یکی از پلن‌های زیر را انتخاب کنید</p>
+
     {% for plan in plans %}
-    <div class="col">
-        <div class="card h-100 text-center shadow-sm position-relative overflow-hidden">
-            {% if forloop.first %}
-            <div class="ribbon ribbon-top-right"><span>پیشنهاد ویژه</span></div>
-            {% endif %}
-            <div class="card-header">
-                <h4 class="my-0 fw-normal">{{ plan.name }}</h4>
+    <div class="tg-card plan-card mb-3 ripple" onclick="location.href='{% url 'shop:purchase_create' plan.id %}'">
+        <div class="d-flex align-items-center p-3">
+            <div class="plan-icon me-3">
+                <i class="fas fa-shield-alt"></i>
             </div>
-            <div class="card-body d-flex flex-column">
-                <h1 class="card-title pricing-card-title mb-3">
-                    {{ plan.price|floatformat:"0" }} <small class="text-muted fw-light">تومان</small>
-                </h1>
-                <div class="features-list mb-4">
-                    <div class="feature-item">
-                        <i class="fas fa-calendar-alt text-primary"></i>
-                        <span>{{ plan.duration }} روز اعتبار</span>
+            <div class="plan-details flex-grow-1">
+                <h3 class="plan-name mb-1">{{ plan.name }}</h3>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="plan-duration tg-text-muted">
+                        <i class="fas fa-calendar-alt me-1"></i> {{ plan.duration }} روز
                     </div>
-                    {% if plan.description %}
-                    <div class="feature-item mt-2">
-                        <i class="fas fa-info-circle text-primary"></i>
-                        <span>{{ plan.description|linebreaksbr }}</span>
+                    <div class="plan-price">
+                        <span class="price-amount">{{ plan.price|floatformat:"0" }}</span>
+                        <span class="price-currency tg-text-muted">تومان</span>
                     </div>
-                    {% endif %}
                 </div>
-                <a href="{% url 'shop:purchase_create' plan.id %}" class="w-100 btn btn-lg btn-primary mt-auto">
-                    <i class="fas fa-shopping-cart me-2"></i>خرید
-                </a>
+            </div>
+            <div class="plan-arrow">
+                <i class="fas fa-chevron-left tg-text-muted"></i>
             </div>
         </div>
+        {% if plan.description %}
+        <div class="plan-description px-3 pb-3 pt-0">
+            <div class="tg-text-muted small">{{ plan.description|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+
+        {% if forloop.first %}
+        <div class="plan-badge">پیشنهاد ویژه</div>
+        {% endif %}
     </div>
     {% empty %}
-    <div class="col-12">
-        <div class="alert alert-warning text-center py-4">
-            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-            <p class="mb-0">در حال حاضر هیچ پلنی موجود نیست.</p>
-        </div>
+    <div class="tg-card text-center p-4">
+        <i class="fas fa-exclamation-circle fa-3x tg-text-muted mb-3"></i>
+        <p>در حال حاضر هیچ پلنی موجود نیست.</p>
     </div>
     {% endfor %}
 </div>
 
-<div class="row mt-5">
-    <div class="col-md-8 mx-auto">
-        <div class="card bg-light border-0">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-question-circle me-2 text-primary"></i>سوالات متداول</h5>
-                <div class="accordion mt-3" id="faqAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                بعد از خرید چقدر طول می‌کشد تا سرویس فعال شود؟
-                            </button>
-                        </h2>
-                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                معمولاً بعد از تأیید پرداخت، سرویس شما در کمتر از 15 دقیقه فعال می‌شود.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                آیا امکان تمدید سرویس وجود دارد؟
-                            </button>
-                        </h2>
-                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                بله، می‌توانید قبل از اتمام اعتبار، سرویس خود را تمدید کنید.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="tg-section mt-4">
+    <h3 class="tg-section-title">سوالات متداول</h3>
+
+    <div class="tg-card faq-card">
+        <div class="faq-item p-3" onclick="toggleFaq(this)">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="faq-question">بعد از خرید چقدر طول می‌کشد تا سرویس فعال شود؟</div>
+                <i class="fas fa-chevron-down tg-text-muted faq-toggle"></i>
+            </div>
+            <div class="faq-answer mt-2" style="display: none;">
+                معمولاً بعد از تأیید پرداخت، سرویس شما در کمتر از 15 دقیقه فعال می‌شود.
+            </div>
+        </div>
+
+        <div class="faq-item p-3" onclick="toggleFaq(this)">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="faq-question">آیا امکان تمدید سرویس وجود دارد؟</div>
+                <i class="fas fa-chevron-down tg-text-muted faq-toggle"></i>
+            </div>
+            <div class="faq-answer mt-2" style="display: none;">
+                بله، می‌توانید قبل از اتمام اعتبار، سرویس خود را تمدید کنید.
+            </div>
+        </div>
+
+        <div class="faq-item p-3" onclick="toggleFaq(this)">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="faq-question">چگونه از کانفیگ VPN استفاده کنم؟</div>
+                <i class="fas fa-chevron-down tg-text-muted faq-toggle"></i>
+            </div>
+            <div class="faq-answer mt-2" style="display: none;">
+                پس از خرید و تأیید پرداخت، کانفیگ VPN برای شما فعال می‌شود. کافیست آن را کپی کرده و در نرم‌افزار مورد نظر خود وارد کنید.
             </div>
         </div>
     </div>
 </div>
+
 <style>
-    .feature-item {
+    .plan-card {
+        position: relative;
+        transition: transform 0.2s;
+    }
+
+    .plan-card:active {
+        transform: scale(0.98);
+    }
+
+    .plan-icon {
+        width: 40px;
+        height: 40px;
+        background-color: var(--tg-theme-button-color);
+        color: white;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        margin-bottom: 8px;
+        font-size: 18px;
     }
 
-    /* Ribbon for featured plan */
-    .ribbon {
-        width: 150px;
-        height: 150px;
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        overflow: hidden;
-        z-index: 1;
+    .plan-name {
+        font-size: 16px;
+        font-weight: 600;
     }
 
-    .ribbon span {
-        position: absolute;
-        display: block;
-        width: 225px;
-        padding: 8px 0;
-        background-color: #ff5e62;
-        box-shadow: 0 5px 10px rgba(0,0,0,.1);
-        color: #fff;
-        font-size: 13px;
+    .plan-duration {
+        font-size: 14px;
+    }
+
+    .price-amount {
+        font-size: 16px;
         font-weight: 700;
-        text-transform: uppercase;
-        text-align: center;
-        right: -25px;
-        top: 30px;
-        transform: rotate(45deg);
+        color: var(--tg-theme-button-color);
     }
 
-    .ribbon-top-right {
-        top: -10px;
-        right: -10px;
+    .price-currency {
+        font-size: 12px;
     }
 
-    .accordion-button:not(.collapsed) {
-        background-color: rgba(78, 84, 200, 0.1);
-        color: var(--primary-color);
+    .plan-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #ff3b30;
+        color: white;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 0 var(--tg-border-radius) 0 8px;
+    }
+
+    .faq-item {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        cursor: pointer;
+    }
+
+    body.dark .faq-item {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+
+    .faq-question {
+        font-weight: 500;
+    }
+
+    .faq-answer {
+        font-size: 14px;
+        color: var(--tg-theme-hint-color);
+    }
+
+    .faq-toggle {
+        transition: transform 0.3s;
+    }
+
+    .faq-item.active .faq-toggle {
+        transform: rotate(180deg);
     }
 </style>
+
+<script>
+    function toggleFaq(element) {
+        const answer = element.querySelector('.faq-answer');
+        const isActive = element.classList.contains('active');
+
+        if (isActive) {
+            element.classList.remove('active');
+            answer.style.display = 'none';
+        } else {
+            element.classList.add('active');
+            answer.style.display = 'block';
+        }
+    }
+</script>
 {% endblock %}

@@ -1,35 +1,33 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}ورود به فروشگاه{% endblock %}
+{% block header_title %}فروشگاه VPN{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-body text-center py-5">
-                <img src="{% static 'img/vpn-logo.png' %}" alt="VPN Store" class="mb-4" style="max-width: 120px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6195/6195524.png'; this.onerror='';">
+<div class="tg-section tg-fade-in text-center py-4">
+    <div class="tg-section-icon mb-4">
+        <img src="{% static 'img/vpn-logo.png' %}" alt="VPN Store" class="img-fluid" style="max-width: 100px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6195/6195524.png'; this.onerror='';">
+    </div>
 
-                <h2 class="mb-4 fw-bold">به فروشگاه VPN خوش آمدید</h2>
+    <h2 class="mb-3">به فروشگاه VPN خوش آمدید</h2>
+    <p class="tg-text-muted mb-4">برای خرید اشتراک VPN ابتدا احراز هویت کنید</p>
 
-                <div id="status-message">
-                    <p class="text-muted mb-4">در حال احراز هویت از طریق تلگرام...</p>
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">در حال بارگذاری...</span>
-                    </div>
-                </div>
-
-                <div id="manual-login" class="mt-4" style="display: none;">
-                    <p class="text-muted mb-3">یا از طریق دکمه زیر وارد شوید:</p>
-                    <button id="telegram-login-btn" class="btn btn-primary w-100">
-                        <i class="fab fa-telegram me-2"></i> ورود با تلگرام
-                    </button>
-                </div>
-
-                <div id="debug-info" class="mt-4 text-start" style="display: none;">
-                    <small class="text-muted">اطلاعات دیباگ:</small>
-                    <pre id="debug-content" class="bg-light p-2 rounded small" style="max-height: 200px; overflow-y: auto;"></pre>
-                </div>
-            </div>
+    <div id="status-message" class="mb-4">
+        <p class="tg-text-muted">در حال احراز هویت از طریق تلگرام...</p>
+        <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
+            <span class="visually-hidden">در حال بارگذاری...</span>
         </div>
+    </div>
+
+    <div id="manual-login" class="mt-4" style="display: none;">
+        <button id="telegram-login-btn" class="tg-button ripple">
+            <i class="fab fa-telegram me-2"></i> ورود با تلگرام
+        </button>
+    </div>
+
+    <div id="debug-info" class="mt-4 text-start" style="display: none;">
+        <p class="tg-text-muted small mb-2">اطلاعات دیباگ:</p>
+        <pre id="debug-content" class="tg-config-box small" style="max-height: 150px; overflow-y: auto;"></pre>
     </div>
 </div>
 {% endblock %}
@@ -54,36 +52,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Telegram WebApp
     if (!window.Telegram || !window.Telegram.WebApp) {
         document.getElementById('status-message').innerHTML =
-            '<p class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-2"></i>اپلیکیشن تلگرام یافت نشد. لطفاً این صفحه را در تلگرام باز کنید.</p>';
+            '<p class="tg-text-muted mb-3"><i class="fas fa-exclamation-circle me-2"></i>اپلیکیشن تلگرام یافت نشد</p>' +
+            '<p class="small">لطفاً این صفحه را در تلگرام باز کنید</p>';
         document.getElementById('manual-login').style.display = 'block';
         return;
     }
 
     const tg = window.Telegram.WebApp;
     tg.ready();
-
-    // Set theme to match Telegram theme
-    if (tg.colorScheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+    tg.expand();
 
     // Show debug info
     const debugInfo = {
         initData: tg.initData,
         initDataUnsafe: tg.initDataUnsafe,
         version: tg.version,
-        platform: tg.platform
+        platform: tg.platform,
+        colorScheme: tg.colorScheme,
+        themeParams: tg.themeParams
     };
 
     console.log('Telegram WebApp Debug:', debugInfo);
 
-    // Show debug info on page
-    document.getElementById('debug-info').style.display = 'block';
+    document.getElementById('debug-info').style.display = 'none'; // Change to 'block' for debugging
     document.getElementById('debug-content').textContent = JSON.stringify(debugInfo, null, 2);
 
     if (!tg.initData) {
         document.getElementById('status-message').innerHTML =
-            '<p class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-2"></i>اطلاعات اولیه یافت نشد. لطفاً این صفحه را در تلگرام باز کنید.</p>';
+            '<p class="tg-text-muted mb-3"><i class="fas fa-exclamation-circle me-2"></i>اطلاعات اولیه یافت نشد</p>' +
+            '<p class="small">لطفاً این صفحه را در تلگرام باز کنید</p>';
         document.getElementById('manual-login').style.display = 'block';
         return;
     }
@@ -97,12 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify({ 'init_data': tg.initData })
     })
     .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-
         return response.text().then(text => {
-            console.log('Response text:', text);
-
             try {
                 const data = JSON.parse(text);
                 return { ok: response.ok, status: response.status, data: data };
@@ -117,55 +109,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (result.ok && result.data.success) {
             document.getElementById('status-message').innerHTML =
-                '<p class="text-success"><i class="fas fa-check-circle me-2"></i>احراز هویت موفقیت‌آمیز بود! در حال انتقال...</p>';
-
-            // Show success animation
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-animation';
-            successDiv.innerHTML = '<svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>';
-            document.getElementById('status-message').appendChild(successDiv);
+                '<div class="success-animation mb-3">' +
+                '  <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">' +
+                '    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>' +
+                '    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>' +
+                '  </svg>' +
+                '</div>' +
+                '<p class="tg-text-primary">احراز هویت موفقیت‌آمیز بود!</p>';
 
             setTimeout(() => {
                 window.location.href = "{% url 'shop:plan_list' %}";
-            }, 1500);
+            }, 1000);
         } else {
             const errorMsg = result.data.error || 'احراز هویت با مشکل مواجه شد';
             document.getElementById('status-message').innerHTML =
-                `<p class="text-danger"><i class="fas fa-times-circle me-2"></i>خطا: ${errorMsg}</p>
-                 <p class="text-muted">کد وضعیت: ${result.status}</p>`;
+                `<p class="text-danger mb-2"><i class="fas fa-times-circle me-2"></i>خطا</p>
+                 <p class="small text-muted">${errorMsg}</p>`;
             document.getElementById('manual-login').style.display = 'block';
         }
     })
     .catch(error => {
         console.error('Fetch error:', error);
         document.getElementById('status-message').innerHTML =
-            `<p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>خطای اتصال: ${error.message}</p>`;
+            `<p class="text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i>خطای اتصال</p>
+             <p class="small text-muted">${error.message}</p>`;
         document.getElementById('manual-login').style.display = 'block';
     });
 
     // Add event listener for manual login button
     document.getElementById('telegram-login-btn').addEventListener('click', function() {
         tg.expand();
+
+        // Reload the page to retry authentication
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
     });
 });
 </script>
 <style>
     /* Success Animation */
     .success-animation {
-        margin: 20px auto;
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
+        margin: 0 auto;
     }
 
     .checkmark {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         display: block;
         stroke-width: 2;
-        stroke: #4BB71B;
+        stroke: var(--tg-theme-button-color, #0088cc);
         stroke-miterlimit: 10;
-        box-shadow: inset 0px 0px 0px #4BB71B;
+        box-shadow: inset 0px 0px 0px var(--tg-theme-button-color, #0088cc);
         animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
     }
 
@@ -174,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         stroke-dashoffset: 166;
         stroke-width: 2;
         stroke-miterlimit: 10;
-        stroke: #4BB71B;
+        stroke: var(--tg-theme-button-color, #0088cc);
         fill: none;
         animation: stroke .6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
     }
@@ -203,3 +201,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     @keyframes fill {
         100% {
+            box-shadow: inset 0px 0px 0px 30px transparent;
+        }
+    }
+</style>
+{% endblock %}
