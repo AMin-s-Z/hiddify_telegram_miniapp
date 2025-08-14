@@ -30,6 +30,7 @@ class Purchase(models.Model):
     purchase_date = models.DateTimeField("تاریخ خرید", auto_now_add=True)
     status = models.CharField("وضعیت", max_length=10, choices=Status.choices, default=Status.PENDING)
     receipt_image = models.ImageField("تصویر رسید", upload_to="receipts/")
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     vpn_config = models.TextField("کانفیگ VPN", blank=True)
     def __str__(self): return f"خرید {self.plan.name} توسط {self.user.username}"
     class Meta:

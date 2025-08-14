@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase Details{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Purchase Details</h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">{{ purchase.plan.name }}</h5>
+        <p class="card-text"><small class="text-muted">Purchase Date: {{ purchase.purchase_date|date:"Y/m/d H:i" }}</small></p>
+        
+        {% if purchase.status == 'approved' and purchase.vpn_config %}
+        <hr>
+        <h6>Your VPN Configuration:</h6>
+        <p>You can now use the following configuration to connect.</p>
+        <div class="vpn-config-box">
+            <pre><code>{{ purchase.vpn_config }}</code></pre>
+        </div>
+        {% else %}
+        <p class="text-muted">Your purchase is still being processed.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

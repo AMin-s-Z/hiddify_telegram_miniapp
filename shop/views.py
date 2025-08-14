@@ -141,3 +141,72 @@ def telegram_seamless_auth_view(request):
     except Exception as e:
         logger.error(f"Error in seamless auth: {str(e)}", exc_info=True)
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+# core/views.py
+
+# ... keep all your existing imports and add these ...
+from django.http import HttpResponse
+from .utils.telegram import send_telegram_message # Ensure this is imported
+from .admin import generate_vpn_config # We can reuse the function from admin.py
+
+# ... keep all your existing views (home_view, plan_list_view, etc.) ...
+
+@csrf_exempt
+@require_POST
+def telegram_callback_webhook(request, token):
+    # Simple security check
+    if token != settings.TELEGRAM_BOT_TOKEN:
+        return HttpResponse(status=403)
+
+    try:
+        data = json.loads(request.body)
+        if 'callback_query' not in data:
+            return HttpResponse(status=200) # Not a callback, ignore
+
+        callback_data = data['callback_query']['data']
+        action, purchase_id_str = callback_data.split(':')
+        purchase_id = int(purchase_id_str)
+
+        purchase = Purchase.objects.get(id=purchase_id)
+
+        # Prevent re-approving/rejecting
+        if purchase.status != 'pending':
+            return HttpResponse(status=200)
+
+        if action == 'approve':
+            purchase.status = 'approved'
+            purchase.vpn_config = generate_vpn_config(purchase)
+            purchase.save()
+
+            # Create the secure link to the details page for the user
+            details_url = request.build_absolute_uri(
+                reverse('core:purchase_detail', kwargs={'purchase_uuid': purchase.uuid})
+            )
+
+            user_message = (
+                f"✅ Your purchase for the *{purchase.plan.name}* plan has been approved!\n\n"
+                f"You can view your VPN details and configuration at the link below:\n\n"
+                f"{details_url}"
+            )
+            send_telegram_message(purchase.user.telegram_profile.telegram_id, user_message)
+
+        elif action == 'reject':
+            purchase.status = 'rejected'
+            purchase.save()
+            user_message = f"❌ Unfortunately, your payment for the *{purchase.plan.name}* plan was rejected. Please contact support."
+            send_telegram_message(purchase.user.telegram_profile.telegram_id, user_message)
+
+    except (Purchase.DoesNotExist, ValueError, KeyError) as e:
+        logger.error(f"Error in webhook: {e}")
+        # Return 200 even on error to prevent Telegram from retrying
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=200)
+
+
+@login_required
+def purchase_detail_view(request, purchase_uuid):
+    # Fetch the purchase using the secure UUID, ensuring only the owner can see it
+    purchase = get_object_or_404(Purchase, uuid=purchase_uuid, user=request.user)
+    return render(request, 'purchase_detail.html', {'purchase': purchase})
