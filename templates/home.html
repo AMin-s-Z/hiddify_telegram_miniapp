@@ -2,27 +2,74 @@
 {% load static %}
 {% block title %}Login to Store{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-6"><div class="card shadow"><div class="card-body text-center py-5">
-    <h2 class="mb-4">Welcome to the VPN Store</h2>
-    <div id="status-message"><p class="text-muted mb-4">Authenticating you via Telegram...</p><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>
-</div></div></div></div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body text-center py-5">
+                <h2 class="mb-4">Welcome to the VPN Store</h2>
+                <div id="status-message">
+                    <p class="text-muted mb-4">Authenticating you via Telegram...</p>
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% csrf_token %}
 {% endblock %}
+
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    if ({{ user.is_authenticated|yesno:"true,false" }}) { window.location.href = "{% url 'plan_list' %}"; return; }
+    // Check if user is already authenticated
+    {% if user.is_authenticated %}
+        window.location.href = "{% url 'plan_list' %}";
+        return;
+    {% endif %}
+
+    // Initialize Telegram WebApp
     const tg = window.Telegram.WebApp;
     tg.ready();
+
+    console.log('Telegram WebApp initialized:', tg);
+    console.log('Init data:', tg.initData);
+
     if (tg.initData) {
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
         fetch("{% url 'telegram_seamless_auth' %}", {
             method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ 'init_data': tg.initData })
-        }).then(response => response.json()).then(data => {
-            if (data.success) { window.location.href = "{% url 'plan_list' %}"; }
-            else { document.getElementById('status-message').innerHTML = `<p class="text-danger">Error: ${data.error || 'Invalid'}</p>`; }
-        }).catch(error => { document.getElementById('status-message').innerHTML = '<p class="text-danger">Server Error</p>'; });
-    } else { document.getElementById('status-message').innerHTML = '<p class="text-danger fw-bold">Please open this page inside Telegram.</p>'; }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                window.location.href = "{% url 'plan_list' %}";
+            } else {
+                document.getElementById('status-message').innerHTML =
+                    `<p class="text-danger">Error: ${data.error || 'Authentication failed'}</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            document.getElementById('status-message').innerHTML =
+                '<p class="text-danger">Server connection error</p>';
+        });
+    } else {
+        document.getElementById('status-message').innerHTML =
+            '<p class="text-danger fw-bold">Please open this page inside Telegram.</p>';
+    }
 });
 </script>
 {% endblock %}
