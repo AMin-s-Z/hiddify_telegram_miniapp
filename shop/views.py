@@ -49,22 +49,41 @@ def logout_view(request):
     logout(request)
     return redirect('shop:home')
 
-def validate_init_data(init_data_str: str, bot_token: str) -> tuple[bool, dict]:
-    try:
-        secret_key = hmac.new("WebAppData".encode(), bot_token.encode(), hashlib.sha256).digest()
-        parsed_data = dict(parse_qsl(init_data_str))
-        received_hash = parsed_data.pop('hash', None)
-        if not received_hash: return False, {}
-        data_check_string = "\n".join(sorted([f"{k}={v}" for k, v in parsed_data.items()]))
-        calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-        if calculated_hash == received_hash:
-            user_info = json.loads(parsed_data.get('user', '{}'))
-            user_info['auth_date'] = parsed_data.get('auth_date')
-            return True, user_info
-    except Exception as e:
-        logger.error(f"Could not validate initData: {e}")
-    return False, {}
+import hmac
+import hashlib
+from urllib.parse import parse_qs
 
+def validate_init_data(init_data, bot_token):
+    try:
+        parsed_data = parse_qs(init_data)
+        hash_value = parsed_data.get('hash', [None])[0]
+
+        if not hash_value:
+            return False, {}
+
+        # Create data check string
+        data_check_arr = []
+        for key, value in parsed_data.items():
+            if key != 'hash':
+                data_check_arr.append(f"{key}={value[0]}")
+
+        data_check_string = '\n'.join(sorted(data_check_arr))
+
+        # Calculate hash
+        secret_key = hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
+        calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+
+        if calculated_hash != hash_value:
+            return False, {}
+
+        # Parse user data
+        user_data = json.loads(parsed_data.get('user', ['{}'])[0])
+        user_data['auth_date'] = parsed_data.get('auth_date', [None])[0]
+
+        return True, user_data
+    except Exception as e:
+        logger.error(f"Validation error: {e}")
+        return False, {}
 @csrf_exempt
 @require_POST
 def telegram_seamless_auth_view(request):

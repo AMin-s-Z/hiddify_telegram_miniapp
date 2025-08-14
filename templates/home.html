@@ -17,7 +17,6 @@
         </div>
     </div>
 </div>
-{% csrf_token %}
 {% endblock %}
 
 {% block extra_js %}
@@ -33,23 +32,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    console.log('Telegram WebApp initialized:', tg);
+    console.log('Telegram WebApp:', tg);
     console.log('Init data:', tg.initData);
 
     if (tg.initData) {
-        // Get CSRF token
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
         fetch("{% url 'telegram_seamless_auth' %}", {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 'init_data': tg.initData })
         })
         .then(response => {
             console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
