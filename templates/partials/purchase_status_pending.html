@@ -1,8 +1,9 @@
-<div class="status-container"
-     hx-get="{% url 'shop:check_purchase_status' purchase.uuid %}"
-     hx-trigger="every 5s"
+{% if purchase.uuid %}
+<div class="status-container" 
+     hx-get="{% url 'shop:check_purchase_status' purchase.uuid %}" 
+     hx-trigger="every 5s" 
      hx-swap="outerHTML">
-
+     
     <div class="waiting-info mb-3 text-center py-2">
         <div class="spinner-border text-primary spinner-sm" role="status">
             <span class="visually-hidden">در حال بررسی...</span>
@@ -10,3 +11,4 @@
         <p class="small text-muted mt-2 mb-0">در انتظار تأیید پرداخت</p>
     </div>
 </div>
+{% endif %}
