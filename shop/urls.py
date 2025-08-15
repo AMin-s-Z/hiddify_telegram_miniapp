@@ -19,4 +19,6 @@ urlpatterns = [
     # New URL for the Telegram webhook
     # The token makes it a secret URL only you and Telegram should know
     path('telegram-webhook/<str:token>/', views.telegram_callback_webhook, name='telegram_webhook'),
+    path('check-status/<uuid:purchase_uuid>/', views.check_purchase_status, name='check_purchase_status'),
+
 ]

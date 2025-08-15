@@ -211,3 +211,25 @@ def purchase_detail_view(request, purchase_uuid):
     # Fetch the purchase using the secure UUID, ensuring only the owner can see it
     purchase = get_object_or_404(Purchase, uuid=purchase_uuid, user=request.user)
     return render(request, 'purchase_detail.html', {'purchase': purchase})
+
+from django.shortcuts import render, get_object_or_404
+from .models import Purchase
+
+# ... your other views ...
+
+def check_purchase_status(request, purchase_uuid):
+    """
+    Checks the status of a purchase and returns an HTML snippet.
+    This view is specifically for HTMX polling.
+    """
+    purchase = get_object_or_404(Purchase, uuid=purchase_uuid)
+
+    # The context will be passed to the template snippet
+    context = {'purchase': purchase}
+
+    if purchase.status == 'approved':
+        # If approved, render the 'approved' snippet
+        return render(request, 'partials/purchase_status_approved.html', context)
+    else:
+        # If still pending (or rejected), render the 'pending' snippet
+        return render(request, 'partials/purchase_status_pending.html', context)
