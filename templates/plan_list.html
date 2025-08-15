@@ -13,7 +13,7 @@
 
     <div class="row g-3">
         {% for plan in plans %}
-        <div class="col-12 col-md-6 fade-in" style="animation-delay: {{ forloop.counter0|multiply:0.1 }}s;">
+        <div class="col-12 col-md-6 fade-in" style="--delay-index: {{ forloop.counter0 }};">
             <a href="{% url 'shop:purchase_create' plan.id %}" class="plan-card-link">
                 <div class="plan-card h-100 {% if forloop.first %}special-offer{% endif %}">
                     {% if forloop.first %}
@@ -48,6 +48,12 @@
 </div>
 
 <style>
+    /* CORRECTED CSS LOGIC FOR ANIMATION */
+    .fade-in {
+        /* The animation-delay is now calculated using the CSS variable */
+        animation-delay: calc(var(--delay-index, 0) * 0.1s);
+    }
+
     .plan-card-link {
         text-decoration: none;
         color: inherit;
