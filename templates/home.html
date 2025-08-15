@@ -1,86 +1,124 @@
 {% extends "base.html" %}
-{% block title %}VPN Store | دسترسی سریع{% endblock %}
-{% block header_actions %}
-<span class="navbar-text me-2">{{ user.first_name|default:user.username }}</span>
-{% endblock %}
+{% block title %}ورود به سیستم | VPN Store{% endblock %}
 
 {% block content %}
-<div class="min-vh-100 d-flex flex-column justify-content-center align-items-center px-3 py-5">
-    <!-- Logo Section -->
-    <div class="text-center mb-4 fade-in">
+<div class="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center px-3">
+    <!-- اکسپرشن VPN Store -->
+    <div class="text-center mb-5">
         <div class="logo-container mb-4">
-            <i class="fas fa-shield-alt fa-4x text-primary pulse"></i>
+            <i class="fas fa-shield-alt fa-4x text-primary"></i>
         </div>
-        <h1 class="display-4 fw-bold">
+        <h1 class="h2 mb-2">
             <span class="text-primary">VPN</span> Store
-            <span class="badge bg-primary rounded-pill ms-2">مجازی</span>
+            <i class="fas fa-rocket text-primary mx-2"></i>
         </h1>
-        <p class="lead text-muted">ایمن، سریع و خصوصی‌سازی شده</p>
+        <p class="lead text-muted">امن، سریع و خصوصی‌سازی شده</p>
     </div>
 
-    <!-- Status Message -->
-    <div id="status-message" class="card shadow-sm w-100 fade-in">
+    <!-- حالت احراز هویت کاربر -->
+    {% if user.is_authenticated %}
+    <div class="card shadow-sm w-100 max-w-md fade-in">
         <div class="card-body text-center py-5">
-            <div class="status-container mb-4">
-                <!-- Loading Animation -->
-                {% if not user.is_authenticated %}
-                <div class="spinner-border text-primary mb-4" role="status">
+            <div class="success-container mb-4">
+                <div class="success-icon mb-3">
+                    <i class="fas fa-user-check-circle text-success fa-4x"></i>
+                </div>
+                <h3 class="mb-3">سلام، {{ user.first_name|default:user.username }}!</h3>
+                <p class="text-muted">شما با موفقیت وارد حساب کاربری خود شدید.</p>
+                <div class="spinner-border text-primary mt-3" role="status">
                     <span class="visually-hidden">در حال بارگذاری...</span>
                 </div>
-                <p class="h5 fw-bold mb-1">در حال دسترسی به حساب کاربری</p>
-                <p class="text-secondary">برای ادامه لطفاً منتظر بمانید...</p>
-                {% else %}
-                <div class="checkmark-circle mb-4">
-                    <i class="fas fa-check-circle text-success fa-3x"></i>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- حالت احراز هویت از طریق تلگرام -->
+    <div class="card shadow-sm w-100 max-w-md fade-in">
+        <div class="card-body text-center py-5">
+            <div id="auth-container">
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-container">
+                    <div class="spinner-container mb-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">در حال احراز هویت...</span>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">در حال احراز هویت از طریق تلگرام</h4>
+                    <div class="progress mb-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                             role="progressbar" style="width: 75%"></div>
+                    </div>
+                    <p class="text-muted mb-4">لطفاً منتظر بمانید...</p>
+
+                    <!-- دکمه اتصال تلگرام -->
+                    <div id="telegram-connect" class="telegram-connect-section mb-3">
+                        <a href="https://t.me/YourVPNStoreBot"
+                           class="btn btn-primary btn-lg w-100"
+                           target="_blank">
+                            <i class="fab fa-telegram-plane me-2"></i>
+                            اتصال به ربات تلگرام
+                        </a>
+                        <p class="text-muted mt-2 small">برای ادامه کار، ابتدا باید از طریق ربات تلگرام وارد شوید</p>
+                    </div>
                 </div>
-                <p class="h5 fw-bold mb-1">شما با موفقیت وارد شدید</p>
-                <p class="text-secondary">در حال انتقال به صفحه اصلی...</p>
-                {% endif %}
-            </div>
 
-            <!-- Debug Info (hidden by default) -->
-            <div class="text-center">
-                <button id="debug-toggle" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-info-circle me-1"></i> اطلاعات دیباگ
-                </button>
-            </div>
+                <!-- Error State -->
+                <div id="error-state" class="error-container" style="display: none;">
+                    <div class="error-icon mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger fa-4x"></i>
+                    </div>
+                    <h4 class="mb-3">خطا در احراز هویت</h4>
+                    <div id="error-message" class="error-message mb-3">
+                        <p class="text-danger">لطفاً صفحه را رفرش کرده و مجدداً تلاش کنید.</p>
+                    </div>
+                    <div class="error-actions w-100">
+                        <button id="retry-btn" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-redo me-2"></i> تلاش مجدد
+                        </button>
+                        <button id="debug-btn" class="btn btn-outline-info w-100 mb-2">
+                            <i class="fas fa-bug me-2"></i> مشاهده اطلاعات فنی
+                        </button>
+                        <a href="{% url 'shop:plan_list' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times me-2"></i> ورود دستی
+                        </a>
+                    </div>
+                </div>
 
-            <div id="debug-info" class="mt-4 text-start" style="display: none;">
-                <div class="bg-light p-3 rounded">
-                    <small class="text-muted fw-bold">اطلاعات دیباگ:</small>
-                    <pre id="debug-content" class="mt-2 mb-0 small"></pre>
+                <!-- Debug Information -->
+                <div id="debug-info" class="debug-accordion mb-4" style="display: none;">
+                    <div class="accordion" id="debugAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#debugInfo">
+                                    <i class="fas fa-code me-2 text-primary"></i>
+                                    اطلاعات دیباگ
+                                </button>
+                            </h2>
+                            <div id="debugInfo"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#debugAccordion">
+                                <div class="accordion-body bg-light p-3 rounded">
+                                    <pre id="debug-content" class="mb-0 small text-start"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Login Option -->
+                <div class="manual-login mt-4 pt-4 border-top text-center">
+                    <p class="text-muted mb-3">یا از گزینه زیر استفاده کنید:</p>
+                    <a href="{% url 'shop:plan_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-shopping-cart me-2"></i> مشاهده پلن‌ها بدون ورود
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Feature Preview -->
-    <div class="row w-100 mt-5">
-        <div class="col-6 text-center mb-3">
-            <div class="feature-icon text-primary mb-2">
-                <i class="fas fa-bolt fa-2x"></i>
-            </div>
-            <p class="small fw-bold">سرعت بالا</p>
-        </div>
-        <div class="col-6 text-center mb-3">
-            <div class="feature-icon text-primary mb-2">
-                <i class="fas fa-lock fa-2x"></i>
-            </div>
-            <p class="small fw-bold">امنیت بالا</p>
-        </div>
-        <div class="col-6 text-center mb-3">
-            <div class="feature-icon text-primary mb-2">
-                <i class="fas fa-server fa-2x"></i>
-            </div>
-            <p class="small fw-bold">سرورهای قدرتمند</p>
-        </div>
-        <div class="col-6 text-center mb-3">
-            <div class="feature-icon text-primary mb-2">
-                <i class="fas fa-globe fa-2x"></i>
-            </div>
-            <p class="small fw-bold">دسترسی جهانی</p>
-        </div>
-    </div>
+    {% endif %}
 </div>
 
 {% endblock %}
@@ -93,162 +131,224 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('User already authenticated, redirecting...');
     setTimeout(() => {
         window.location.href = "{% url 'shop:plan_list' %}";
-    }, 1000);
+    }, 1500);
     return;
     {% endif %}
 
+    // DOM Elements
+    const loadingState = document.getElementById('loading-state');
+    const errorState = document.getElementById('error-state');
+    const errorMessage = document.getElementById('error-message');
+    const retryBtn = document.getElementById('retry-btn');
+    const debugBtn = document.getElementById('debug-btn');
+    const debugInfo = document.getElementById('debug-info');
+    const debugContent = document.getElementById('debug-content');
+    const telegramConnect = document.getElementById('telegram-connect');
+
     // Initialize Telegram WebApp
     if (!window.Telegram || !window.Telegram.WebApp) {
-        const statusMessage = document.getElementById('status-message');
-        statusMessage.innerHTML = `
-            <div class="card-body text-center py-5">
-                <i class="fas fa-exclamation-circle text-danger fa-4x mb-3"></i>
-                <h3 class="mb-3">خطا در اتصال</h3>
-                <div class="card bg-danger bg-opacity-10 border border-danger">
-                    <div class="card-body py-3">
-                        <p class="mb-0">اپلیکیشن تلگرام یافت نشد. لطفاً از طریق تلگرام وارد شوید.</p>
-                    </div>
-                </div>
-            </div>
-        `;
+        showConnectionError(
+            'اپلیکیشن تلگرام یافت نشد. لطفاً از طریق تلگرام وارد شوید.',
+            'telegram-missing'
+        );
         return;
     }
 
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    // Show debug info on page (optional)
-    const debugInfo = {
-        init_data: tg.initData,
-        init_data_unsafe: tg.initDataUnsafe,
-        version: tg.version,
-        platform: tg.platform,
-        color_scheme: tg.colorScheme,
-        is_vertical: tg.viewport.isVertical,
-        is_stable: tg.viewport.isStable
-    };
-
-    // Initialize debug info functionality
-    const debugToggle = document.getElementById('debug-toggle');
-    const debugContent = document.getElementById('debug-content');
-    const debugInfoContainer = document.getElementById('debug-info');
-
-    debugContent.textContent = JSON.stringify(debugInfo, null, 2);
-
-    if (debugToggle) {
-        debugToggle.addEventListener('click', function() {
-            if (debugInfoContainer.style.display === 'none') {
-                debugInfoContainer.style.display = 'block';
-                debugToggle.innerHTML = '<i class="fas fa-times-circle me-1"></i> مخفی';
-            } else {
-                debugInfoContainer.style.display = 'none';
-                debugToggle.innerHTML = '<i class="fas fa-info-circle me-1"></i> اطلاعات دیباگ';
-            }
-        });
-    }
-
+    // Check if we're inside Telegram
     if (!tg.initData) {
-        const statusMessage = document.getElementById('status-message');
-        statusMessage.innerHTML = `
-            <div class="card-body text-center py-5">
-                <i class="fas fa-exclamation-circle text-danger fa-4x mb-3"></i>
-                <h3 class="mb-3">خطا در احراز هویت</h3>
-                <div class="card bg-danger bg-opacity-10 border border-danger">
-                    <div class="card-body py-3">
-                        <p class="mb-0">اطلاعات اولیه یافت نشد. لطفاً از طریق پیوند معتبر تلگرام وارد شوید.</p>
-                    </div>
-                </div>
-            </div>
-        `;
+        showConnectionError(
+            'شما باید از طریق تلگرام وارد شوید. لطفاً دکمه زیر را بزنید.',
+            'telegram-init-data-missing'
+        );
         return;
     }
 
-    // Send authentication request
-    fetch("{% url 'shop:telegram_seamless_auth' %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
+    // Prepare debug information
+    const debugInfoData = {
+        init_data: tg.initData ? '[Present]' : '[Missing]',
+        init_data_hash: tg.initDataHash ? '[Present]' : '[Missing]',
+        platform: tg.platform,
+        version: tg.version,
+        color_scheme: tg.colorScheme,
+        user_data: tg.initDataUnsafe ? {
+            id: tg.initDataUnsafe.user?.id,
+            first_name: tg.initDataUnsafe.user?.first_name,
+            username: tg.initDataUnsafe.user?.username,
+            language_code: tg.initDataUnsafe.user?.language_code
+        } : '[No user data]',
+        view_port: {
+            is_state_stable: tg.viewport.isStateStable,
+            is_horizontal: tg.viewport.isHorizontal,
+            is_vertical: tg.viewport.isVertical,
+            width: tg.viewport.width,
+            height: tg.viewport.height
         },
-        body: JSON.stringify({
-            'init_data': tg.initData
-        }),
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.text().then(text => {
-            console.log('Response text:', text);
-            try {
-                const data = JSON.parse(text);
-                return { ok: response.ok, status: response.status, data: data };
-            } catch (e) {
-                console.error('Failed to parse JSON:', e);
-                throw new Error('Invalid JSON response: ' + text);
-            }
-        });
-    })
-    .then(result => {
-        console.log('Parsed result:', result);
-        const statusMessage = document.getElementById('status-message');
+        auth_url: window.location.href,
+        timestamp: new Date().toISOString()
+    };
 
-        if (result.ok && result.data.success) {
-            statusMessage.innerHTML = `
-                <div class="card-body text-center py-5">
-                    <div class="checkmark-circle mb-4">
+    debugContent.textContent = JSON.stringify(debugInfoData, null, 2);
+
+    // Show debug info on debug button click
+    debugBtn.addEventListener('click', function() {
+        if (debugInfo.style.display === 'none') {
+            debugInfo.style.display = 'block';
+            this.textContent = 'مخفی کردن اطلاعات';
+        } else {
+            debugInfo.style.display = 'none';
+            this.innerHTML = '<i class="fas fa-bug me-2"></i> مشاهده اطلاعات فنی';
+        }
+    });
+
+    // Retry button functionality
+    retryBtn.addEventListener('click', function() {
+        retryAuth();
+    });
+
+    // Function to retry authentication
+    function retryAuth() {
+        // Hide error state and show loading state
+        errorState.style.display = 'none';
+        loadingState.style.display = 'block';
+        telegramConnect.style.display = 'block';
+
+        // Send authentication request
+        sendAuthRequest(tg.initData);
+    }
+
+    // Function to send authentication request
+    function sendAuthRequest(initData) {
+        console.log('Sending auth request...');
+
+        // Show loading state
+        loadingState.style.display = 'block';
+        errorState.style.display = 'none';
+
+        // Reset progress bar
+        const progressBar = loadingState.querySelector('.progress-bar');
+        progressBar.style.width = '0%';
+        setTimeout(() => {
+            progressBar.style.width = '25%';
+        }, 100);
+
+        fetch("{% url 'shop:telegram_seamless_auth' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({'init_data': initData}),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            // Update progress
+            const progressBar = loadingState.querySelector('.progress-bar');
+            progressBar.style.width = '50%';
+
+            console.log('Response status:', response.status);
+            return response.text().then(text => {
+                console.log('Response text:', text);
+                try {
+                    const data = JSON.parse(text);
+                    return { ok: response.ok, status: response.status, data: data };
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    throw new Error('Invalid JSON response: ' + text);
+                }
+            });
+        })
+        .then(result => {
+            // Update progress
+            const progressBar = loadingState.querySelector('.progress-bar');
+            progressBar.style.width = '75%';
+
+            console.log('Parsed result:', result);
+
+            if (result.ok && result.data.success) {
+                // Authentication successful
+                const successContainer = document.createElement('div');
+                successContainer.className = 'success-container';
+                successContainer.innerHTML = `
+                    <div class="success-icon mb-4">
                         <i class="fas fa-check-circle text-success fa-4x"></i>
                     </div>
-                    <h3 class="mb-3">احراز هویت با موفقیت انجام شد!</h3>
-                    <p class="text-secondary mb-4">در حال انتقال به صفحه اصلی...</p>
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">در حال بارگذاری...</span>
-                    </div>
-                </div>
+                    <h3 class="mb-3">احراز هویت موفق!</h3>
+                    <p class="text-muted">در حال انتقال به صفحه اصلی...</p>
+                `;
+
+                loadingState.innerHTML = '';
+                loadingState.appendChild(successContainer);
+
+                // Complete progress bar
+                const progressBar = loadingState.querySelector('.progress-bar');
+                progressBar.style.width = '100%';
+                progressBar.classList.add('bg-success');
+
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = "{% url 'shop:plan_list' %}";
+                }, 1500);
+            } else {
+                throw new Error(result.data.error || 'Authentication failed');
+            }
+        })
+        .catch(error => {
+            // Update progress to error state
+            const progressBar = loadingState.querySelector('.progress-bar');
+            progressBar.style.width = '100%';
+            progressBar.classList.add('bg-danger');
+
+            console.error('Authentication error:', error);
+            showConnectionError(
+                `خطا در احراز هویت: ${error.message}`,
+                'auth-failed'
+            );
+        });
+    }
+
+    // Function to show connection error
+    function showConnectionError(message, errorType) {
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        errorMessage.innerHTML = `<p class="text-danger">${message}</p>`;
+
+        // Add specific error information for different error types
+        const errorDetail = document.createElement('div');
+        errorDetail.className = 'bg-light p-3 rounded text-start small';
+
+        if (errorType === 'telegram-missing') {
+            errorDetail.innerHTML = `
+                <strong>مشکل:</strong> اپلیکیشن تلگرام یافت نشد.<br>
+                <strong>راه‌حل:</strong> لطفاً این صفحه را در اپلیکیشن تلگرام باز کنید.
             `;
-
-            setTimeout(() => {
-                window.location.href = "{% url 'shop:plan_list' %}";
-            }, 1500);
-        } else {
-            const errorMsg = result.data.error || 'خطا در احراز هویت';
-
-            statusMessage.innerHTML = `
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-exclamation-circle text-danger fa-4x mb-3"></i>
-                    <h3 class="mb-3">خطا در احراز هویت</h3>
-                    <div class="card bg-danger bg-opacity-10 border border-danger">
-                        <div class="card-body py-3">
-                            <p class="mb-0 fw-bold">${errorMsg}</p>
-                            <p class="mb-0 small text-muted">وضعیت: ${result.status}</p>
-                        </div>
-                    </div>
-                    <a href="{% url 'shop:home' %}" class="btn btn-primary mt-4">
-                        <i class="fas fa-redo me-1"></i> تلاش مجدد
-                    </a>
-                </div>
+        } else if (errorType === 'telegram-init-data-missing') {
+            errorDetail.innerHTML = `
+                <strong>مشکل:</strong> اطلاعات احراز هویت تلگرام یافت نشد.<br>
+                <strong>راه‌حل:</strong> از دکمه اتصال به ربات تلگرام استفاده کنید.
+            `;
+        } else if (errorType === 'auth-failed') {
+            errorDetail.innerHTML = `
+                <strong>مشکل:</strong> احراز هویت با شکست مواجه شد.<br>
+                <strong>کد خطا:</strong> ${errorType}<br>
+                <strong>راه‌حل:</strong> با پشتیبانی تماس بگیرید.
             `;
         }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
 
-        const statusMessage = document.getElementById('status-message');
-        statusMessage.innerHTML = `
-            <div class="card-body text-center py-5">
-                <i class="fas fa-exclamation-circle text-danger fa-4x mb-3"></i>
-                <h3 class="mb-3">خطای اتصال</h3>
-                <div class="card bg-danger bg-opacity-10 border border-danger">
-                    <div class="card-body py-3">
-                        <p class="mb-0 fw-bold">خطا در اتصال به سرور: ${error.message}</p>
-                        <p class="mb-0 small text-muted">لطفاً اتصال اینترنت خود را بررسی کرده و مجدداً تلاش کنید.</p>
-                    </div>
-                </div>
-                <a href="{% url 'shop:home' %}" class="btn btn-primary mt-4">
-                    <i class="fas fa-redo me-1"></i> تلاش مجدد
-                </a>
-            </div>
-        `;
-    });
+        errorMessage.appendChild(errorDetail);
+    }
+
+    // Initial attempt at authentication
+    console.log('Attempting initial authentication...');
+    const progressBar = loadingState.querySelector('.progress-bar');
+    progressBar.style.width = '25%';
+
+    setTimeout(() => {
+        progressBar.style.width = '50%';
+        sendAuthRequest(tg.initData);
+    }, 500);
 });
 </script>
 {% endblock %}
