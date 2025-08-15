@@ -25,7 +25,7 @@
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for plan in plans %}
-        <div class="col fade-in animate-on-scroll" style="animation-delay: {{ forloop.counter0 * 0.1 }}s;">
+        <div class="col fade-in animate-on-scroll" style="animation-delay: {% forloop.counter0 * 0.1 %}s;">
             <div class="plan-card h-100 shadow-hover border-radius-15 overflow-hidden">
                 <div class="card-header py-3 px-4 bg-gradient text-white position-relative overflow-hidden">
                     <div class="position-relative z-1">
@@ -76,7 +76,7 @@
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-devices text-warning me-2"></i>
                                     <div>
-                                        <span class="text-muted small">دستگاهspan>
+                                        <span class="text-muted small">دستگاه</span>
                                         <span class="fw-bold primary-text">{{ plan.device_count|default:5 }} دستگاه</span>
                                     </div>
                                 </div>
