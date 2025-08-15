@@ -6,7 +6,7 @@ from pathlib import Path
 # ---
 # Django Settings
 SECRET_KEY = "aa314c0bafe03f4f5408d8a77c53e413"
-DEBUG = False
+DEBUG = True
 
 # PostgreSQL Database Settings
 DB_NAME = "database"
