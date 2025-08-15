@@ -267,7 +267,7 @@ def check_purchase_status(request, purchase_uuid):
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 # تابع create_hiddify_user که در بالا ساختیم را import کنید
-from .utils import create_hiddify_user
+from .utils.telegram import create_hiddify_user
 from .models import Purchase
 
 def approve_purchase_view(request, purchase_id):
