@@ -80,4 +80,24 @@
         align-items: center;
     }
 </style>
+    <div id="status-container-{{ purchase.uuid }}">
+    {% include 'partials/purchase_status_pending.html' %}
+</div>
+
+<script>
+    // This script runs for each pending purchase
+    const purchaseSocket_{{ purchase.uuid }} = new WebSocket(
+        'ws://' + window.location.host + '/ws/check-status/{{ purchase.uuid }}/'
+    );
+
+    purchaseSocket_{{ purchase.uuid }}.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.status === 'approved') {
+            // Replace the 'pending' div with the new HTML from the server
+            const container = document.getElementById('status-container-{{ purchase.uuid }}');
+            container.innerHTML = data.html;
+            purchaseSocket_{{ purchase.uuid }}.close(); // Close the connection
+        }
+    };
+</script>
 {% endblock %}

@@ -212,24 +212,29 @@ def purchase_detail_view(request, purchase_uuid):
     purchase = get_object_or_404(Purchase, uuid=purchase_uuid, user=request.user)
     return render(request, 'purchase_detail.html', {'purchase': purchase})
 
-from django.shortcuts import render, get_object_or_404
-from .models import Purchase
 
-# ... your other views ...
 
-def check_purchase_status(request, purchase_uuid):
-    """
-    Checks the status of a purchase and returns an HTML snippet.
-    This view is specifically for HTMX polling.
-    """
-    purchase = get_object_or_404(Purchase, uuid=purchase_uuid)
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.template.loader import render_to_string
 
-    # The context will be passed to the template snippet
-    context = {'purchase': purchase}
+def approve_purchase(purchase):
+    purchase.status = 'approved'
+    # ... save purchase and generate vpn_config ...
+    purchase.save()
 
-    if purchase.status == 'approved':
-        # If approved, render the 'approved' snippet
-        return render(request, 'partials/purchase_status_approved.html', context)
-    else:
-        # If still pending (or rejected), render the 'pending' snippet
-        return render(request, 'partials/purchase_status_pending.html', context)
+    # Get the channel layer
+    channel_layer = get_channel_layer()
+
+    # Render the new HTML snippet
+    html_snippet = render_to_string('partials/purchase_status_approved.html', {'purchase': purchase})
+
+    # Send a message to the group
+    async_to_sync(channel_layer.group_send)(
+        f'purchase_{purchase.uuid}',
+        {
+            'type': 'purchase_update', # This calls the purchase_update method in the consumer
+            'status': 'approved',
+            'html': html_snippet
+        }
+    )
