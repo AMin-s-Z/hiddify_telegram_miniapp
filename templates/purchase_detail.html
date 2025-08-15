@@ -2,22 +2,22 @@
 {% block title %}جزئیات خرید | VPN Store{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3 py-2">
+<div class="container-fluid px-3 py-4">
     <!-- Back Button -->
-    <div class="d-flex justify-content-start mb-4">
-        <a href="{% url 'shop:purchase_list' %}" class="btn btn-outline-primary">
+    <div class="d-flex justify-content-start mb-4 fade-in animate-on-scroll">
+        <a href="{% url 'shop:purchase_list' %}" class="btn btn-outline-primary px-4 py-2 d-flex align-items-center">
             <i class="fas fa-arrow-left me-2"></i>
             بازگشت
         </a>
     </div>
 
     <!-- Purchase Details Card -->
-    <div class="purchase-card fade-in">
+    <div class="purchase-card fade-in animate-on-scroll" style="animation-delay: 0.1s;">
         <div class="card-body p-4">
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-start mb-4">
                 <div>
-                    <h3 class="h4 mb-0">
+                    <h3 class="h4 mb-1">
                         <i class="fas fa-shopping-cart text-primary me-2"></i>
                         جزئیات خرید
                     </h3>
@@ -27,15 +27,15 @@
                 <!-- Status Badge -->
                 <div class="status-container">
                     {% if purchase.status == 'approved' %}
-                    <span class="badge bg-success rounded-pill">
+                    <span class="badge bg-gradient-success rounded-pill px-3 py-2">
                         <i class="fas fa-check-circle me-1"></i> تأیید شده
                     </span>
                     {% elif purchase.status == 'pending' %}
-                    <span class="badge bg-warning rounded-pill">
+                    <span class="badge bg-gradient-warning rounded-pill px-3 py-2">
                         <i class="fas fa-clock me-1"></i> در انتظار تأیید
                     </span>
                     {% elif purchase.status == 'rejected' %}
-                    <span class="badge bg-danger rounded-pill">
+                    <span class="badge bg-gradient-danger rounded-pill px-3 py-2">
                         <i class="fas fa-times-circle me-1"></i> رد شده
                     </span>
                     {% endif %}
@@ -43,55 +43,67 @@
             </div>
 
             <!-- Plan Info -->
-            <div class="plan-info-card bg-light rounded-3 p-3 mb-4">
+            <div class="plan-info-card bg-gradient-info bg-opacity-10 rounded-3 p-3 mb-4 shadow-sm">
                 <div class="d-flex align-items-center">
-                    <div class="plan-icon me-3">
-                        <i class="fas fa-shield-alt fa-2x text-primary"></i>
+                    <div class="plan-icon-circle me-3 bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                    <div>
-                        <h4 class="mb-0">{{ purchase.plan.name }}</h4>
-                        <p class="mb-0 text-muted">{{ purchase.plan.duration }} روزه · {{ purchase.plan.speed|default:'پیشرفته' }}</p>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1">{{ purchase.plan.name }}</h4>
+                        <p class="mb-0 text-muted small">{{ purchase.plan.duration }} روزه · {{ purchase.plan.speed|default:'پیشرفته' }}</p>
+                        {% if purchase.plan.description %}
+                        <p class="mb-0 text-muted small mt-1">{{ purchase.plan.description|truncatewords:3 }}</p>
+                        {% endif %}
                     </div>
+                    {% if forloop.first %}
+                    <span class="badge bg-danger ms-auto rounded-pill">پیشنهاد ویژه</span>
+                    {% endif %}
                 </div>
             </div>
 
             <!-- Purchase Information -->
-            <div class="row mb-4">
-                <div class="col-6 mb-3">
-                    <div class="info-item">
-                        <i class="fas fa-calendar-check text-primary me-2"></i>
-                        <span class="text-muted small">تاریخ خرید:</span>
-                        <span class="ms-auto">{{ purchase.purchase_date|date:"Y/m/d H:i" }}</span>
+            <div class="purchase-info mb-4 shadow-sm rounded-3 p-4">
+                <h5 class="mb-3 text-muted fw-bold">
+                    <i class="fas fa-file-invoice-dollar me-2"></i>
+                    اطلاعات سفارش
+                </h5>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="info-item">
+                            <i class="fas fa-calendar-check text-primary me-2"></i>
+                            <span class="text-muted small">تاریخ خرید:</span>
+                            <span class="ms-auto fw-bold">{{ purchase.purchase_date|date:"Y/m/d H:i" }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 mb-3">
-                    <div class="info-item">
-                        <i class="fas fa-money-bill-wave text-success me-2"></i>
-                        <span class="text-muted small">مبلغ پرداختی:</span>
-                        <span class="ms-auto">{{ purchase.plan.price|floatformat:"0" }} تومان</span>
+                    <div class="col-6 mb-3">
+                        <div class="info-item">
+                            <i class="fas fa-money-bill-wave text-success me-2"></i>
+                            <span class="text-muted small">مبلغ پرداختی:</span>
+                            <span class="ms-auto fw-bold">{{ purchase.plan.price|floatformat:"0" }} تومان</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 mb-3">
-                    <div class="info-item">
-                        <i class="fas fa-hourglass-half text-warning me-2"></i>
-                        <span class="text-muted small">پایان اعتبار:</span>
-                        <span class="ms-auto">{{ purchase.expiry_date|date:"Y/m/d" }}</span>
+                    <div class="col-6 mb-3">
+                        <div class="info-item">
+                            <i class="fas fa-hourglass-half text-warning me-2"></i>
+                            <span class="text-muted small">پایان اعتبار:</span>
+                            <span class="ms-auto fw-bold">{{ purchase.expiry_date|date:"Y/m/d" }}</span>
+                        </div>
                     </div>
-                </div>
-                {% if purchase.status == 'approved' %}
-                <div class="col-6 mb-3">
-                    <div class="info-item">
-                        <i class="fas fa-calendar-check text-info me-2"></i>
-                        <span class="text-muted small">تاریخ فعال‌سازی:</span>
-                        <span class="ms-auto">{{ purchase.activation_date|date:"Y/m/d" }}</span>
+                    {% if purchase.status == 'approved' %}
+                    <div class="col-6 mb-3">
+                        <div class="info-item">
+                            <i class="fas fa-calendar-check text-info me-2"></i>
+                            <span class="text-muted small">تاریخ فعال‌سازی:</span>
+                            <span class="ms-auto fw-bold">{{ purchase.activation_date|date:"Y/m/d" }}</span>
+                        </div>
                     </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
 
             <!-- VPN Configuration -->
             {% if purchase.status == 'approved' and purchase.vpn_config %}
-            <div class="config-section">
+            <div class="config-section fade-in animate-on-scroll" style="animation-delay: 0.2s;">
                 <h5 class="mb-3">
                     <i class="fas fa-shield-alt text-success me-2"></i>
                     کانفیگ VPN شما
@@ -109,52 +121,68 @@
                     </button>
                 </div>
 
-                <div class="vpn-config-box p-3 rounded">
-                    <pre class="mb-0">{{ purchase.vpn_config }}</pre>
+                <div class="vpn-config-box shadow-sm border-radius-15 p-3 position-relative mb-4">
+                    <div class="config-header">
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded">
+                            <i class="fas fa-key me-1"></i> کانفیگ VPN
+                        </span>
+                    </div>
+                    <button class="btn btn-sm btn-link position-absolute top-2 start-2 text-muted" onclick="copyConfig()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <pre class="config-content mb-0">{{ purchase.vpn_config }}</pre>
                 </div>
 
                 <!-- Usage Guide -->
-                <div class="usage-guide mt-4">
-                    <h6 class="mb-3">
-                        <i class="fas fa-book text-primary me-2"></i>
+                <div class="usage-guide bg-gradient-info bg-opacity-5 rounded-3 p-4 border-radius-15">
+                    <h6 class="mb-3 text-primary">
+                        <i class="fas fa-book me-2"></i>
                         راهنمای استفاده
                     </h6>
 
                     <div class="steps-container">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div>
-                                <h6>کپی کانفیگ</h6>
-                                <p class="mb-0 small text-muted">کانفیگ بالا را کپی کرده یا دانلود کنیدp>
+                        <div class="step mb-3">
+                            <div class="d-flex">
+                                <div class="step-number">1</div>
+                                <div class="flex-grow-1">
+                                    <h6>کپی کانفیگ</h6>
+                                    <p class="mb-0 small text-muted">کانفیگ بالا را کپی کرده یا دانلود کنید</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step mb-3">
+                            <div class="d-flex">
+                                <div class="step-number">2</div>
+                                <div class="flex-grow-1">
+                                    <h6>نرم‌افزار VPN را باز کنید</h6>
+                                    <p class="mb-0 small text-muted">نرم‌افزار مورد نظر خود را باز کنید</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step mb-3">
+                            <div class="d-flex">
+                                <div class="step-number">3</div>
+                                <div class="flex-grow-1">
+                                    <h6>کانفیگ را وارد کنید</h6>
+                                    <p class="mb-0 small text-muted">کانفیگ را وارد کرده یا از طریق کلیپ‌بورد اضافه کنید</p>
+                                </div>
                             </div>
                         </div>
                         <div class="step">
-                            <div class="step-number">2</div>
-                            <div>
-                                <h6>نرم‌افزار VPN را باز کنید</h6>
-                                <p class="mb-0 small text-muted">نرم‌افزار مورد نظر خود را باز کنید</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div>
-                                <h6>کانفیگ را وارد کنید</h6>
-                                <p class="mb-0 small text-muted">کانفیگ را وارد کرده یا از طریق کلیپ‌بورد اضافه کنید</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">4</div>
-                            <div>
-                                <h6>به شبکه متصل شوید</h6>
-                                <p class="mb-0 small text-muted">روی دکمه اتصال کلیک کنید</p>
+                            <div class="d-flex">
+                                <div class="step-number">4</div>
+                                <div class="flex-grow-1">
+                                    <h6>به شبکه متصل شوید</h6>
+                                    <p class="mb-0 small text-muted">روی دکمه اتصال کلیک کنید</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             {% elif purchase.status == 'pending' %}
-            <div class="pending-section">
-                <div class="alert alert-info rounded-3 border-0 p-4">
+            <div class="pending-section fade-in animate-on-scroll" style="animation-delay: 0.2s;">
+                <div class="alert alert-info rounded-3 border-0 p-4 shadow-sm">
                     <div class="d-flex align-items-center">
                         <div class="spinner-border text-primary me-3" role="status">
                             <span class="visually-hidden">در حال بررسی...</span>
@@ -166,13 +194,13 @@
                     </div>
                 </div>
 
-                <div class="progress-info mt-4">
+                <div class="progress-info mt-4 p-3 bg-light rounded-3">
                     <div class="d-flex justify-content-between mb-2">
                         <span>بررسی سفارش</span>
                         <span>۲۰%</span>
                     </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-primary" style="width: 20%; transition: width 0.3s ease;"></div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-gradient-primary" style="width: 20%; transition: width 0.3s ease;"></div>
                     </div>
                     <p class="small text-muted mt-2">
                         <i class="fas fa-info-circle me-1"></i>
@@ -181,8 +209,8 @@
                 </div>
             </div>
             {% elif purchase.status == 'rejected' %}
-            <div class="rejected-section">
-                <div class="alert alert-danger rounded-3 border-0 p-4">
+            <div class="rejected-section fade-in animate-on-scroll" style="animation-delay: 0.2s;">
+                <div class="alert alert-danger rounded-3 border-0 p-4 shadow-sm">
                     <div class="text-center mb-3">
                         <i class="fas fa-times-circle fa-3x"></i>
                     </div>
@@ -190,11 +218,11 @@
                     <p class="text-center mb-0">متأسفانه سفارش شما تأیید نشده است. لطفاً با پشتیبانی تماس بگیرید.</p>
                 </div>
 
-                <div class="d-flex mt-4">
-                    <button class="btn btn-danger me-2">
+                <div class="d-flex mt-4 justify-content-center">
+                    <button class="btn btn-gradient-danger py-2 px-5 me-3">
                         <i class="fas fa-phone-alt me-1"></i> تماس پشتیبانی
                     </button>
-                    <a href="{% url 'shop:plan_list' %}" class="btn btn-outline-primary">
+                    <a href="{% url 'shop:plan_list' %}" class="btn btn-outline-primary py-2 px-5">
                         <i class="fas fa-shopping-cart me-1"></i> مشاهده پلن‌ها
                     </a>
                 </div>
@@ -207,35 +235,218 @@
 <!-- QR Code Modal -->
 <div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">QR کد کانفیگ</h5>
+        <div class="modal-content border-radius-15 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-3">
+                <h5 class="modal-title">
+                    <i class="fas fa-qrcode me-2"></i> QR کد کانفیگ
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <div id="qrcode-container" class="mb-3"></div>
+            <div class="modal-body text-center py-4">
+                <div id="qrcode-container" class="mb-4 bg-white p-4 rounded-3 shadow-sm d-inline-block"></div>
                 <p class="small text-muted">برای اسکن، دوربین گوشی خود را روی QR کد بگیرید.</p>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+/* Status Badge Styles */
+.gradient-success {
+    background: var(--gradient-4);
+}
+
+.gradient-warning {
+    background: var(--gradient-2);
+}
+
+.gradient-danger {
+    background: linear-gradient(135deg, #f43f5e, #ef4444);
+}
+
+.gradient-info {
+    background: var(--gradient-3);
+}
+
+/* Plan Info Card */
+.plan-info-card {
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.plan-info-card:hover {
+    transform: translateY(-3px);
+}
+
+.plan-icon-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+   -webkit-filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Purchase Info */
+.purchase-info {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.info-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item i {
+    color: var(--primary-color);
+    width: 24px;
+    text-align: center;
+}
+
+/* VPN Config Box */
+.vpn-config-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.config-header {
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.config-content {
+    color: #2d3748;
+    font-family: monospace;
+    font-size: 0.8rem;
+    max-height: 250px;
+    overflow-y: auto;
+    direction: ltr;
+    white-space: pre-wrap;
+}
+
+/* Configuration Actions Buttons */
+.config-actions .btn {
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.config-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Usage Guide */
+.usage-guide {
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.step {
+    padding: 15px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.step:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--gradient-1);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+/* Progress Info */
+.progress {
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.progress-bar {
+    background: var(--gradient-1);
+    border-radius: 10px;
+}
+
+/* Rejected Section */
+.alert-danger {
+    background: linear-gradient(135deg, #f43f5e, #ef4444);
+    color: white;
+}
+
+.btn-gradient-danger {
+    background: radial-gradient(circle, #f43f5e, #ef4444);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .info-item {
+        padding: 8px 0;
+    }
+
+    .step {
+        margin-bottom: 10px;
+    }
+
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+        margin-left: 10px;
+    }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 // Copy configuration to clipboard
 function copyConfig() {
-    navigator.clipboard.writeText('{{ purchase.vpn_config }}').then(function() {
-        showNotification('کانفیگ با موفقیت کپی شد!', 'success');
+    const config = '{{ purchase.vpn_config|escapejs }}';
+    navigator.clipboard.writeText(config).then(function() {
+        // Show notification
+        createToast('کانفیگ با موفقیت کپی شد!', 'success');
     }, function() {
-        showNotification('خطا در کپی کردن کانفیگ', 'error');
+        createToast('خطا در کپی کردن کانفیگ', 'error');
     });
 }
 
 // Download configuration
 function downloadConfig() {
-    const configText = '{{ purchase.vpn_config }}';
+    const configText = '{{ purchase.vpn_config|escapejs }}';
     const blob = new Blob([configText], {type: 'text/plain'});
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -246,12 +457,12 @@ function downloadConfig() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    showNotification('فایل کانفیگ دانلود شد!', 'success');
+    createToast('فایل کانفیگ دانلود شد!', 'success');
 }
 
 // Show QR Code
 function showQRCode() {
-    const configText = '{{ purchase.vpn_config }}';
+    const configText = '{{ purchase.vpn_config|escapejs }}';
     const qrContainer = document.getElementById('qrcode-container');
     qrContainer.innerHTML = '';
 
@@ -261,8 +472,8 @@ function showQRCode() {
             text: configText,
             width: 256,
             height: 256,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
+            colorDark: "#000000",
+            colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
         });
 
@@ -270,17 +481,25 @@ function showQRCode() {
         const modal = new bootstrap.Modal(document.getElementById('qrModal'));
         modal.show();
     } else {
-        showNotification('QR code library not loaded', 'error');
+        createToast('کتابخانه QR code یافت نشد', 'error');
     }
 }
 
-// Show notification
-function showNotification(message, type = 'info') {
-    // Create toast notification
-    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+// Create Toast Notification
+function createToast(message, type = 'info') {
+    // Remove existing toasts
+    const existingToast = document.querySelector('.toast-container');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    // Create toast container
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    toastContainer.style.zIndex = '1080';
 
     const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'primary'} border-0`;
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
     toast.setAttribute('role', 'alert');
     toast.innerHTML = `
         <div class="d-flex">
@@ -292,28 +511,49 @@ function showNotification(message, type = 'info') {
     `;
 
     toastContainer.appendChild(toast);
+    document.body.appendChild(toastContainer);
+
     const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
     bsToast.show();
 
     toast.addEventListener('hidden.bs.toast', () => {
         toast.remove();
+        if (toastContainer.childElementCount === 0) {
+            toastContainer.remove();
+        }
     });
 }
 
-// Create toast container if not exists
-function createToastContainer() {
-    const container = document.createElement('div');
-    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-    container.style.zIndex = '1055';
-    document.body.appendChild(container);
-    return container;
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize popovers toolips
+    // Initialize tooltips and popovers
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Auto-copy on selection of config content
+    const configContent = document.querySelector('.config-content');
+    if (configContent) {
+        configContent.addEventListener('mouseup', function() {
+            const selection = window.getSelection();
+            if (selection.toString().length > 10) {
+                createToast('متن انتخاب شد، برای کپی کردن دکمه کپی را بزنید', 'info');
+            }
+        });
+    }
+
+    // Page load animations
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    animatedElements.forEach(el => {
+        observer.observe(el);
     });
 });
 </script>

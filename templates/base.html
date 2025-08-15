@@ -13,23 +13,604 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css">
     {% load static %}
 
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css">
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css">
+
     <style id="telegram-theme"></style>
     <style id="dynamic-styles"></style>
+
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --telegram-blue: #0088cc;
+            --soft-bg: rgba(255, 255, 255, 0.9);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark-color);
+            direction: rtl;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Background Pattern */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a0aec0' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        /* Loading Bar */
+        .loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: rgba(99, 102, 241, 0.1);
+            z-index: 1050;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            animation: loading 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Header Styles */
+        .tg-header {
+            background-color: var(--soft-bg);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .tg-back-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tg-back-button:hover {
+            transform: scale(1.05);
+            background-color: var(--secondary-color);
+        }
+
+        .tg-back-button:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        .ripple-bg {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            background-color: rgba(255, 255, 255, 0.4);
+            animation: ripple 0.6s linear;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .tg-title-area {
+            margin-right: 10px;
+        }
+
+        .tg-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 4px;
+        }
+
+        .title-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .title-text::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-1);
+            border-radius: 3px;
+        }
+
+        .tg-subtitle {
+            font-size: 0.875rem;
+        }
+
+        /* Content Styles */
+        .tg-content {
+            flex: 1;
+            padding-top: 20px;
+            padding-bottom: 100px;
+        }
+
+        .content-wrapper {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Bottom Navigation */
+        .tg-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--soft-bg);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tg-nav-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .tg-nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #6b7280;
+            padding: 6px 12px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .tg-nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .tg-nav-item.active .tg-nav-link {
+            color: var(--primary-color);
+        }
+
+        .nav-icon-wrapper {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .tg-nav-item.active .nav-icon-wrapper {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+        }
+
+        .nav-icon-wrapper i {
+            font-size: 1rem;
+        }
+
+        .nav-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Main Action Button */
+        .tg-main-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 900;
+        }
+
+        .tg-main-button button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .tg-main-button button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .button-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: wave 1.5s infinite;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Utility Classes */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .border-radius-15 {
+            border-radius: 15px;
+        }
+
+        .border-radius-20 {
+            border-radius: 20px;
+        }
+
+        .shadow-hover {
+            transition: var(--transition);
+        }
+
+        .shadow-hover:hover {
+            box-shadow: var(--shadow-xl) !important;
+            transform: translateY(-5px);
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        body.dark-theme .tg-header,
+        body.dark-theme .tg-bottom-nav {
+            background-color: rgba(30, 41, 59, 0.8);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        body.dark-theme .tg-title,
+        body.dark-theme h2,
+        body.dark-theme h3,
+        body.dark-theme h4 {
+            color: #f8fafc;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Telegram App Container */
+        .telegram-app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container-fluid {
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .container-fluid.min-vh-100 {
+            min-height: 100vh;
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-footer {
+            background-color: transparent;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+        }
+
+        /* Button Styles */
+        .btn {
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--gradient-4);
+            color: white;
+        }
+
+        .btn-success:hover {
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Input Styles */
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 12px 15px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.15);
+        }
+
+        /* Badge Styles */
+        .badge {
+            border-radius: 6px;
+            font-weight: 600;
+            padding: 6px 12px;
+        }
+
+        .badge-pill {
+            border-radius: 30px;
+            padding: 6px 16px;
+        }
+
+        /* Alert Styles */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 15px 20px;
+        }
+
+        .alert-info {
+            background-color: var(--gradient-3);
+            color: white;
+        }
+
+        .alert-success {
+            background: var(--gradient-4);
+            color: white;
+        }
+
+        .alert-warning {
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f43f5e, #ef4444);
+            color: white;
+        }
+
+        /* Loading Animation */
+        .loader {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress Bar */
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-bar {
+            background: var(--gradient-1);
+            border-radius: 10px;
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 0.6s ease-out;
+        }
+
+        .animate-on-scroll.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .tg-title {
+                font-size: 1.25rem;
+            }
+
+            .card {
+                margin: 15px 0;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
 <body class="telegram-app">
     <!-- Background Pattern -->
     <div class="bg-pattern"></div>
 
     <!-- Progress Bar -->
-    <div id="loading-bar" class="loading-bar"></div>
+    <div class="loading-bar"></div>
 
     <!-- Telegram App Container -->
     <div id="app-container">
@@ -38,13 +619,13 @@
             <div class="container-fluid">
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                        <button id="back-button" class="tg-back-button me-2">
+                        <button id="back-button" class="tg-back-button">
                             <i class="fas fa-arrow-left"></i>
-                            <span class="ripple-bg"></span>
+                            <div class="ripple-bg"></div>
                         </button>
                         <div class="tg-title-area">
-                            <h1 class="tg-title mb-0">
-                                <span class="tg-title-icon me-1">🚀</span>
+                            <h1 class="tg-title">
+                                <span class="tg-title-icon">🚀</span>
                                 <span class="title-text">VPN Store</span>
                             </h1>
                             <div class="tg-subtitle text-muted small">
@@ -102,8 +683,11 @@
     </div>
 
     <!-- Main Action Button -->
-    <div id="main-button" class="tg-main-button">
-        <button class="tg-main-button-text">ادامه</button>
+    <div id="main-button" class="tg-main-button" style="display: none;">
+        <button class="tg-main-button-text">
+            <i class="fas fa-check me-2"></i>
+            ادامه
+        </button>
         <div class="button-wave"></div>
     </div>
 
@@ -163,26 +747,26 @@
 
                 styleElement.textContent = `
                     :root {
-                        --tg-theme-bg-color: #${tg.themeParams.bg_color || '212529'};
-                        --tg-theme-text-color: #${tg.themeParams.text_color || 'ffffff'};
-                        --tg-theme-hint-color: #${tg.themeParams.hint_color || 'aaaaaa'};
-                        --tg-theme-link-color: #${tg.themeParams.link_color || '#62bcf9'};
-                        --tg-theme-button-color: #${tg.themeParams.button_color || '#2481cc'};
+                        --tg-theme-bg-color: #${tg.themeParams.bg_color || '#0f172a'};
+                        --tg-theme-text-color: #${tg.themeParams.text_color || '#f1f5f9'};
+                        --tg-theme-hint-color: #${tg.themeParams.hint_color || '#94a3b8'};
+                        --tg-theme-link-color: #${tg.themeParams.link_color || '#3b82f6'};
+                        --tg-theme-button-color: #${tg.themeParams.button_color || '#3b82f6'};
                         --tg-theme-button-text-color: #${tg.themeParams.button_text_color || '#ffffff'};
-                        --tg-theme-secondary-bg-color: #${tg.themeParams.secondary_bg_color || '#313338'};
+                        --tg-theme-secondary-bg-color: #${tg.themeParams.secondary_bg_color || '#1e293b'};
                         --tg-theme-accent: var(--tg-theme-button-color);
                     }
                 `;
             } else {
                 styleElement.textContent = `
                     :root {
-                        --tg-theme-bg-color: #${tg.themeParams.bg_color || 'ffffff'};
-                        --tg-theme-text-color: #${tg.themeParams.text_color || '#222222'};
-                        --tg-theme-hint-color: #${tg.themeParams.hint_color || '#999999'};
-                        --tg-theme-link-color: #${tg.themeParams.link_color || '#2481cc'};
-                        --tg-theme-button-color: #${tg.themeParams.button_color || '#0088cc'};
+                        --tg-theme-bg-color: #${tg.themeParams.bg_color || '#ffffff'};
+                        --tg-theme-text-color: #${tg.themeParams.text_color || '#1e293b'};
+                        --tg-theme-hint-color: #${tg.themeParams.hint_color || '#94a3b8'};
+                        --tg-theme-link-color: #${tg.themeParams.link_color || '#3b82f6'};
+                        --tg-theme-button-color: #${tg.themeParams.button_color || '#3b82f6'};
                         --tg-theme-button-text-color: #${tg.themeParams.button_text_color || '#ffffff'};
-                        --tg-theme-secondary-bg-color: #${tg.themeParams.secondary_bg_color || '#f0f0f0'};
+                        --tg-theme-secondary-bg-color: #${tg.themeParams.secondary_bg_color || '#f1f5f9'};
                         --tg-theme-accent: var(--tg-theme-button-color);
                     }
                 `;
@@ -200,7 +784,7 @@
                     color: var(--tg-theme-accent);
                 }
                 .box-shadow-accent {
-                    box-shadow: 0 4px 12px rgba(36, 129, 204, 0.15);
+                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
                 }
             `;
         }
@@ -227,20 +811,20 @@
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in-up');
+                        entry.target.classList.add('animate-on-scroll', 'active');
                         observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
 
-            document.querySelectorAll('.animate-scroll').forEach(el => {
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
                 observer.observe(el);
             });
         }
 
         // Initialize ripple effects
         function initRippleEffects() {
-            document.querySelectorAll('.ripple-effect').forEach(element => {
+            document.querySelectorAll('.tg-back-button').forEach(element => {
                 element.addEventListener('click', function(e) {
                     createRipple(e, this);
                 });
@@ -251,16 +835,18 @@
         function createRipple(event, element) {
             const ripple = document.createElement('span');
             const rect = element.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = event.clientX - rect.left - size / 2;
-            const y = event.clientY - rect.top - size / 2;
+            const diameter = Math.max(rect.width, rect.height);
+            const radius = diameter / 2;
 
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
+            const x = event.clientX - rect.left - radius;
+            const y = event.clientY - rect.top - radius;
 
-            const ripples = element.querySelectorAll('.ripple');
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            ripple.classList.add('ripple-bg');
+
+            const ripples = element.querySelectorAll('.ripple-bg');
             if (ripples.length > 0) {
                 ripples[ripples.length - 1].remove();
             }
@@ -274,8 +860,18 @@
 
         // Setup micro-interactions
         function setupMicroInteractions() {
+            // Button hover effect
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
             // Card hover effect
-            document.querySelectorAll('.card-hover').forEach(card => {
+            document.querySelectorAll('.card').forEach(card => {
                 card.addEventListener('mouseenter', function() {
                     this.style.transform = 'translateY(-5px)';
                     this.classList.add('box-shadow-accent');
@@ -284,17 +880,6 @@
                 card.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
                     this.classList.remove('box-shadow-accent');
-                });
-            });
-
-            // Button pulse animation
-            document.querySelectorAll('.pulse-btn').forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    this.classList.add('pulse');
-                });
-
-                btn.addEventListener('mouseleave', function() {
-                    this.classList.remove('pulse');
                 });
             });
         }

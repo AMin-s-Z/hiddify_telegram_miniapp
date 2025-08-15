@@ -3,26 +3,31 @@
 {% block nav_history_active %}active{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3 py-2">
+<div class="container-fluid px-3 py-4">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">
-            <i class="fas fa-history text-primary me-2"></i>
-            تاریخچه خریدها
-        </h1>
-        <button class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-filter me-1"></i>
-            فیلتر
-        </button>
+    <div class="d-flex justify-content-between align-items-center mb-4 fade-in animate-on-scroll">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-history text-primary me-2"></i>
+                تاریخچه خریدها
+            </h1>
+            <p class="text-muted mb-0 small">هر آنچه نیاز به دانستن دارید</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-primary px-3 py-2 d-flex align-items-center" id="filter-btn">
+                <i class="fas fa-filter me-2"></i>
+                فیلتر
+            </button>
+        </div>
     </div>
 
     <!-- Stats Overview -->
     {% if purchases %}
-    <div class="row mb-4">
+    <div class="row mb-4 fade-in animate-on-scroll" style="animation-delay: 0.1s;">
         <div class="col-md-4">
-            <div class="stat-card bg-primary bg-gradient text-white rounded-3 p-3">
+            <div class="stat-card bg-gradient-primary bg-opacity-10 text-white rounded-3 p-3 shadow-sm border border-white border-opacity-10">
                 <div class="stat-icon">
-                    <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                    <i class="fas fa-shopping-cart fa-2x text-primary opacity-50"></i>
                 </div>
                 <div class="stat-content">
                     <h3 class="mb-1">{{ purchases|length }}</h3>
@@ -31,9 +36,9 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card bg-success bg-gradient text-white rounded-3 p-3">
+            <div class="stat-card bg-gradient-success bg-opacity-10 text-white rounded-3 p-3 shadow-sm border border-white border-opacity-10">
                 <div class="stat-icon">
-                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    <i class="fas fa-check-circle fa-2x text-success opacity-50"></i>
                 </div>
                 <div class="stat-content">
                     <h3 class="mb-1">{{ approved_count|default:0 }}</h3>
@@ -42,9 +47,9 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card bg-warning bg-gradient text-white rounded-3 p-3">
+            <div class="stat-card bg-gradient-warning bg-opacity-10 text-white rounded-3 p-3 shadow-sm border border-white border-opacity-10">
                 <div class="stat-icon">
-                    <i class="fas fa-clock fa-2x opacity-75"></i>
+                    <i class="fas fa-clock fa-2x text-warning opacity-50"></i>
                 </div>
                 <div class="stat-content">
                     <h3 class="mb-1">{{ pending_count|default:0 }}</h3>
@@ -55,10 +60,52 @@
     </div>
     {% endif %}
 
+    <!-- Filter Section -->
+    <div id="filter-section" class="card shadow-sm mb-4 border-radius-15" style="display: none;">
+        <div class="card-body p-4">
+            <h5 class="mb-3">
+                <i class="fas fa-filter me-2"></i> فیلترها
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">وضعیت</label>
+                    <select class="form-select">
+                        <option value="">همه</option>
+                        <option value="approved">تأیید شده</option>
+                        <option value="pending">در انتظار بررسی</option>
+                        <option value="rejected">رد شده</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">بازه زمانی</label>
+                    <select class="form-select">
+                        <option value="all">همه</option>
+                        <option value="week">هفته گذشته</option>
+                        <option value="month">ماه گذشته</option>
+                        <option value="year">سال گذشته</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">مرتب‌سازیlabel>
+                    <select class="form-select">
+                        <option value="date-desc">جدیدترین</option>
+                        <option value="date-asc">قدیمی‌ترین</option>
+                        <option value="price-desc">گران‌ترین</option>
+                        <option value="price-asc">ارزان‌ترین</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-secondary btn-sm me-2">پاک کردن</button>
+                <button class="btn btn-primary">اعمال فیلتر</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Purchase List -->
     {% for purchase in purchases %}
-    <div class="purchase-card mb-3 fade-in" style="animation-delay: {{ forloop.counter0 * 0.1 }}s;">
-        <div class="card shadow-sm">
+    <div class="purchase-card mb-3 fade-in animate-on-scroll" style="animation-delay: {{ forloop.counter0 * 0.1 }}s;">
+        <div class="card shadow-sm border-radius-15">
             <div class="card-body p-4">
                 <div class="card-top d-flex justify-content-between align-items-center mb-3">
                     <div>
@@ -72,15 +119,15 @@
                     <!-- Status Badge -->
                     <div>
                         {% if purchase.status == 'approved' %}
-                        <span class="badge bg-success rounded-pill">
+                        <span class="badge bg-gradient-success rounded-pill px-3 py-2">
                             <i class="fas fa-check-circle me-1"></i> تأیید شده
                         </span>
                         {% elif purchase.status == 'pending' %}
-                        <span class="badge bg-warning rounded-pill">
+                        <span class="badge bg-gradient-warning rounded-pill px-3 py-2">
                             <i class="fas fa-clock me-1"></i> در انتظار تأیید
                         </span>
                         {% elif purchase.status == 'rejected' %}
-                        <span class="badge bg-danger rounded-pill">
+                        <span class="badge bg-gradient-danger rounded-pill px-3 py-2">
                             <i class="fas fa-times-circle me-1"></i> رد شده
                         </span>
                         {% endif %}
@@ -91,7 +138,7 @@
                 <div class="p-3 bg-light rounded-3 mb-3">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <p class="mb-0 small">{{ purchase.plan.description|truncatewords:15 }}</p>
+                            <p class="mb-0 small text-muted">{{ purchase.plan.description|truncatewords:15 }}</p>
                         </div>
                         <div class="col-md-4 text-start">
                             <p class="mb-0">
@@ -102,52 +149,62 @@
                     </div>
                 </div>
 
-                <!-- VPN Config (if approved) -->
-                {% if purchase.status == 'approved' and purchase.vpn_config %}
-                <div class="config-preview mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0 text-secondary">
-                            <i class="fas fa-keyboard me-2"></i> کانفیگ VPN
-                        </h6>
-                        <div>
-                            <button class="btn btn-sm btn-outline-primary me-1" onclick="copyConfig('{{ purchase.vpn_config }}', this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                            <a href="{% url 'shop:purchase_detail' purchase.id %}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
+                <!-- Actions -->
+                <div class="action-buttons mb-3">
+                    {% if purchase.status == 'approved' and purchase.vpn_config %}
+                    <div class="config-preview mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 text-secondary">
+                                <i class="fas fa-keyboard me-2"></i> کانفیگ VPN
+                            </h6>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-1 copy-btn" onclick="copyConfig('{{ purchase.vpn_config|escapejs }}', this)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <a href="{% url 'shop:purchase_detail' purchase.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="config-box bg-light p-2 rounded small text-muted">
+                            <code>{{ purchase.vpn_config|truncate:50 }}</code>
                         </div>
                     </div>
+                    {% endif %}
 
-                    <div class="config-box bg-light p-2 rounded small text-muted">
-                        <code>{{ purchase.vpn_config|truncate:50 }}</code>
+                    <div class="d-flex justify-content-center">
+                        <a href="{% url 'shop:purchase_detail' purchase.id %}" class="btn btn-sm btn-outline-primary py-1">
+                            <i class="fas fa-info-circle me-1"></i> مشاهده جزئیات
+                        </a>
                     </div>
                 </div>
-                {% else %}
-                <!-- No Config -->
+
+                <!-- Status Indicator -->
                 {% if purchase.status == 'pending' %}
-                <div class="waiting-info mb-3 text-center py-2">
+                <div class="waiting-info mb-2 text-center py-2">
                     <div class="spinner-border text-primary spinner-sm" role="status">
                         <span class="visually-hidden">در حال بررسی...</span>
                     </div>
-                    <p class="small text-muted mt-2 mb-0">در انتظار تأیید پرداخت</p>
+                    <p class="small text-muted mt-1 mb-0">در انتظار تأیید پرداخت</p>
                 </div>
                 {% elif purchase.status == 'rejected' %}
-                <div class="error-info mb-3 text-center py-2 bg-danger bg-opacity-10 rounded">
-                    <i class="fas fa-exclamation-circle text-danger mb-2"></i>
+                <div class="error-info mb-2 text-center py-2 bg-gradient-danger bg-opacity-5 rounded-2">
+                    <i class="fas fa-exclamation-circle text-danger mb-1"></i>
                     <p class="small text-danger mb-0">سفارش شما تأیید نشده است</p>
                 </div>
-                {% endif %}
                 {% endif %}
             </div>
         </div>
     </div>
     {% empty %}
-    <div class="empty-state text-center py-5">
-        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+    <div class="empty-state text-center py-5 fade-in animate-on-scroll">
+        <div class="empty-icon">
+            <i class="fas fa-inbox fa-4x text-muted"></i>
+        </div>
         <h4 class="text-muted mb-3">هیچ خریدی یافت نشد</h4>
         <p class="text-muted mb-4">شما تاکنون هیچ خریدی انجام نداده‌اید. برای شروع، یک پلن VPN انتخاب کنید.</p>
-        <a href="{% url 'shop:plan_list' %}" class="btn btn-primary">
+        <a href="{% url 'shop:plan_list' %}" class="btn btn-primary py-2 px-5">
             <i class="fas fa-shopping-cart me-2"></i>
             مشاهده پلن‌ها
         </a>
@@ -156,8 +213,8 @@
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <nav aria-label="Page navigation" class="mt-4">
-        <ul class="pagination justify-content-center">
+    <nav aria-label="Page navigation" class="mt-4 fade-in animate-on-scroll">
+        <ul class="pagination justify-content-center mb-0">
             {% if page_obj.has_previous %}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
@@ -188,7 +245,240 @@
     {% endif %}
 </div>
 
-{% endblock %}
+<style>
+/* Card Styles */
+.purchase-card {
+    animation: fadeIn 0.5s ease-out;
+    transition: transform 0.3s;
+}
+
+.purchase-card:hover {
+    transform: translateY(-5px);
+}
+
+.card {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-top {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 15px;
+}
+
+/* Status Badges */
+.gradient-success {
+    background: var(--gradient-4);
+}
+
+.gradient-warning {
+    background: var(--gradient-2);
+}
+
+.gradient-danger {
+    background: linear-gradient(135deg, #f43f5e, #ef4444);
+}
+
+/* Plan Details */
+.plan-details {
+    background-color: rgba(241, 245, 249, 0.5);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+/* Config Preview */
+.config-preview {
+    background-color: rgba(241, 245, 249, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.config-box {
+    max-height: 60px;
+    overflow: hidden;
+    font-family: monospace;
+    font-size: 0.8rem;
+    direction: ltr;
+    white-space: nowrap;
+    position: relative;
+}
+
+.config-box::after {
+    content: '...';
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+    background-color: rgba(241, 245, 249, 0.7);
+    padding-left: 10px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-buttons .btn {
+    border-radius: 10px;
+}
+
+/* Waiting Info */
+.waiting-info {
+    background-color: rgba(99, 102, 241, 0.05);
+    border-radius: 10px;
+}
+
+.spinner-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Error Info */
+.error-info {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-radius: 10px;
+}
+
+/* Empty State */
+.empty-state {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    border-radius: 20px;
+    padding: 40px 20px;
+    margin: 30px 0;
+}
+
+.empty-icon i {
+    opacity: 0.7;
+    transition: transform 0.3s;
+}
+
+.empty-state:hover .empty-icon i {
+    transform: scale(1.1);
+}
+
+/* Stat Cards */
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.stat-icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    opacity: 0.1;
+    font-size: 4rem;
+}
+
+.stat-content {
+    position: relative;
+    z-index: 1;
+    text-align: right;
+}
+
+/* Filter Button */
+#filter-btn {
+    transition: all 0.3s ease;
+}
+
+#filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Pagination */
+.pagination .page-link {
+    border-radius: 8px;
+    color: var(--primary-color);
+    border: 1px solid #e2e8f0;
+    margin: 0 3px;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--gradient-1);
+    border-color: transparent;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Buttons */
+.btn {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background: var(--gradient-1);
+    border: none;
+}
+
+/* Form Controls */
+.form-select {
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .purchase-card {
+        margin-bottom: 20px;
+    }
+
+    .empty-state {
+        padding: 30px 15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .stat-content {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .stat-icon {
+        display: none;
+    }
+}
+</style>
 
 {% block extra_js %}
 <script>
@@ -197,24 +487,32 @@ function copyConfig(config, button) {
     navigator.clipboard.writeText(config).then(function() {
         // Show success feedback
         button.innerHTML = '<i class="fas fa-check"></i>';
-        showNotification('کانفیگ با موفقیت کپی شد!');
+        createToast('کانفیگ با موفقیت کپی شد!');
 
         // Reset button after delay
         setTimeout(() => {
             button.innerHTML = '<i class="fas fa-copy"></i>';
         }, 2000);
     }, function() {
-        showNotification('خطا در کپی کردن کانفیگ', 'error');
+        createToast('خطا در کپی کردن کانفیگ', 'error');
     });
 }
 
-// Show notification
-function showNotification(message, type = 'success') {
-    // Create toast notification
-    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+// Create Toast Notification
+function createToast(message, type = 'success') {
+    // Remove existing toast container if any
+    const existingToastContainer = document.querySelector('.toast-container');
+    if (existingToastContainer) {
+        existingToastContainer.remove();
+    }
+
+    // Create toast container
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    toastContainer.style.zIndex = '1080';
 
     const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+    toast.className = `toast align-items-center text-white border-0 bg-${type === 'success' ? 'success' : 'danger'}`;
     toast.setAttribute('role', 'alert');
     toast.innerHTML = `
         <div class="d-flex">
@@ -226,21 +524,17 @@ function showNotification(message, type = 'success') {
     `;
 
     toastContainer.appendChild(toast);
+    document.body.appendChild(toastContainer);
+
     const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
     bsToast.show();
 
     toast.addEventListener('hidden.bs.toast', () => {
         toast.remove();
+        if (toastContainer.childElementCount === 0) {
+            toastContainer.remove();
+        }
     });
-}
-
-// Create toast container if not exists
-function createToastContainer() {
-    const container = document.createElement('div');
-    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-    container.style.zIndex = '1055';
-    document.body.appendChild(container);
-    return container;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -248,6 +542,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Show/Hide Filter Section
+    const filterBtn = document.getElementById('filter-btn');
+    const filterSection = document.getElementById('filter-section');
+
+    if (filterBtn && filterSection) {
+        filterBtn.addEventListener('click', () => {
+            if (filterSection.style.display === 'none') {
+                filterSection.style.display = 'block';
+                setTimeout(() => {
+                    filterSection.classList.add('show');
+                }, 10);
+            } else {
+                filterSection.classList.remove('show');
+                setTimeout(() => {
+                    filterSection.style.display = 'none';
+                }, 300);
+            }
+        });
+    }
+
+    // Animate cards on scroll
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    animatedElements.forEach(el => {
+        observer.observe(el);
     });
 });
 </script>
