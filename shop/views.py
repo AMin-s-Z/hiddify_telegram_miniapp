@@ -50,74 +50,100 @@ def logout_view(request):
     logout(request)
     return redirect('shop:home')
 
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-import json
+import hmac
+import hashlib
+from urllib.parse import parse_qs
 
-@csrf_exempt
-def telegram_seamless_auth(request):
-    if request.method == 'POST':
-        try:
-            init_data = json.loads(request.body).get('init_data')
-
-            # در اینجا باید از کتابخانه telethon استفاده کنید
-            # یا روشی دیگر برای تأیید init_data داشته باشید
-
-            # مثال ساده:
-            print(f"Received init_data: {init_data}")
-
-            # تأیید که init_data معتبر است و از تلگرام آمده است
-            # مدیریت خطا
-
-            # تأیید کاربر
-            user_data = parse_telegram_init_data(init_data)
-
-            if user_data:
-                # ورود کاربر به سیستم
-                login_user(user_data)
-
-                return JsonResponse({
-                    'success': True,
-                    'message': 'Authentication successful'
-                })
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Invalid authentication data'
-                }, status=400)
-
-        except Exception as e:
-            print(f"Authentication error: {str(e)}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, status=500)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-def parse_telegram_init_data(init_data):
-    """
-    این تابع init_data را تجزیه کرده و اطلاعات کاربر را استخراج می‌کند
-    """
+def validate_init_data(init_data, bot_token):
     try:
-        # در اینجا باید logika مناسب برای تجزیه init_data داشته باشید
-        # با استفاده از متدهای موجود در telegraph
+        parsed_data = parse_qs(init_data)
+        hash_value = parsed_data.get('hash', [None])[0]
 
-        # مثال ساده:
-        # parsed_data = parse_web_app_data(init_data)
-        # return {
-        #     'id': parsed_data.user.id,
-        #     'username': parsed_data.user.username,
-        #     'first_name': parsed_data.user.first_name
-        # }
+        if not hash_value:
+            return False, {}
 
-        return None
+        # Create data check string
+        data_check_arr = []
+        for key, value in parsed_data.items():
+            if key != 'hash':
+                data_check_arr.append(f"{key}={value[0]}")
+
+        data_check_string = '\n'.join(sorted(data_check_arr))
+
+        # Calculate hash
+        secret_key = hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
+        calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+
+        if calculated_hash != hash_value:
+            return False, {}
+
+        # Parse user data
+        user_data = json.loads(parsed_data.get('user', ['{}'])[0])
+        user_data['auth_date'] = parsed_data.get('auth_date', [None])[0]
+
+        return True, user_data
+    except Exception as e:
+        logger.error(f"Validation error: {e}")
+        return False, {}
+@csrf_exempt
+@require_POST
+def telegram_seamless_auth_view(request):
+    try:
+        payload = json.loads(request.body)
+        init_data = payload.get('init_data', '')
+
+        is_valid, user_data = validate_init_data(init_data, settings.TELEGRAM_BOT_TOKEN)
+
+        if not is_valid:
+            return JsonResponse({'success': False, 'error': 'Validation failed'}, status=403)
+
+        # بررسی وجود user_data['id']
+        if 'id' not in user_data:
+            return JsonResponse({'success': False, 'error': 'Invalid user data'}, status=400)
+
+        user, created = User.objects.get_or_create(
+            username=f"tg_{user_data['id']}",
+            defaults={
+                'first_name': user_data.get('first_name', ''),
+                'last_name': user_data.get('last_name', '')
+            }
+        )
+
+        # تبدیل auth_date به datetime با مدیریت خطا
+        try:
+            auth_timestamp = int(user_data.get('auth_date', 0))
+            # بررسی معقول بودن timestamp
+            current_timestamp = int(datetime.datetime.now().timestamp())
+            if auth_timestamp > current_timestamp:
+                # اگر تاریخ در آینده است، از زمان فعلی استفاده کن
+                auth_date = make_aware(datetime.datetime.now())
+            else:
+                auth_date = make_aware(datetime.datetime.fromtimestamp(auth_timestamp))
+        except (ValueError, TypeError):
+            auth_date = make_aware(datetime.datetime.now())
+
+        TelegramProfile.objects.update_or_create(
+            user=user,
+            defaults={
+                'telegram_id': user_data['id'],
+                'username': user_data.get('username'),
+                'first_name': user_data.get('first_name'),
+                'last_name': user_data.get('last_name'),
+                'photo_url': user_data.get('photo_url'),
+                'auth_date': auth_date
+            }
+        )
+
+        # لاگین کاربر با backend مشخص
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+        return JsonResponse({'success': True})
 
     except Exception as e:
-        print(f"Error parsing init_data: {str(e)}")
-        return None
+        logger.error(f"Error in seamless auth: {str(e)}", exc_info=True)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
 # core/views.py
 
 # ... keep all your existing imports and add these ...
