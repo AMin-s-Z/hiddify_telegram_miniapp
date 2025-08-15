@@ -7,6 +7,8 @@ class Plan(models.Model):
     price = models.PositiveIntegerField("قیمت (تومان)")
     duration = models.PositiveIntegerField("مدت زمان (روز)")
     description = models.TextField("توضیحات", blank=True)
+    duration = models.IntegerField()  # مدت زمان به روز، مثلا 30
+    data_limit_gb = models.IntegerField()  # حجم به گیگابایت، مثلا 50
     def __str__(self): return self.name
     class Meta: verbose_name, verbose_name_plural = "پلن", "پلن‌ها"
 

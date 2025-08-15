@@ -261,3 +261,42 @@ def check_purchase_status(request, purchase_uuid):
     else:
         # If still pending (or rejected), render the 'pending' snippet
         return render(request, 'partials/purchase_status_pending.html', context)
+
+
+
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+# تابع create_hiddify_user که در بالا ساختیم را import کنید
+from .utils import create_hiddify_user
+from .models import Purchase
+
+def approve_purchase_view(request, purchase_id):
+    # این یک مثال است و شما باید منطق دسترسی ادمین را اضافه کنید
+    if not request.user.is_staff:
+        return redirect('shop:dashboard')
+
+    purchase = get_object_or_404(Purchase, id=purchase_id)
+
+    # اگر کاربر از قبل در هیدیفای ساخته نشده بود
+    if not hasattr(purchase.user, 'hiddify_uuid') or not purchase.user.hiddify_uuid:
+        # ۱. کاربر را در هیدیفای بساز
+        new_uuid = create_hiddify_user(plan=purchase.plan, user=purchase.user)
+
+        if new_uuid:
+            # ۲. UUID دریافتی را در مدل کاربر خود ذخیره کن
+            purchase.user.hiddify_uuid = new_uuid
+            purchase.user.save()
+
+            # ۳. وضعیت خرید را به 'تایید شده' تغییر بده
+            purchase.status = 'approved'
+            purchase.save()
+
+            messages.success(request, f"کاربر {purchase.user.username} با موفقیت در هیدیفای ساخته شد.")
+        else:
+            messages.error(request, "خطا در ساخت کاربر در پنل هیدیفای.")
+    else:
+        # اگر کاربر از قبل وجود داشت، می‌توانید منطق تمدید را اینجا پیاده‌سازی کنید
+        # (مثلاً با ارسال درخواست PATCH به API برای آپدیت کاربر)
+        messages.info(request, "این کاربر از قبل در پنل هیدیفای وجود دارد.")
+
+    return redirect('admin:shop_purchase_changelist') # بازگشت به لیست خریدها در ادمین

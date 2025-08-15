@@ -105,3 +105,13 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles" # CORRECT: "staticfiles" is a different folderHIS LINE
+
+# ==============================================================================
+# HIDDIFY PANEL API SETTINGS
+# ==============================================================================
+# آدرس پنل هیدیفای خود را وارد کنید (بدون اسلش در انتها)
+# مثال: 'https://mypanel.com'
+HIDDIFY_URL = 'https://sub.albaloo.site/vxezQz6HbIPAazG5UKhAvprk'
+
+# کلید ادمین (admin_secret) خود را از تنظیمات پنل هیدیفای پیدا و وارد کنید
+HIDDIFY_ADMIN_SECRET = '3b2a7b97-1d0b-43c4-aca0-230248f4f0f8'
