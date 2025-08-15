@@ -238,3 +238,26 @@ def approve_purchase(purchase):
             'html': html_snippet
         }
     )
+
+from django.shortcuts import render, get_object_or_404
+from .models import Purchase # Make sure the Purchase model is imported
+
+# ... (your other views like purchase_list, purchase_detail, etc. are here) ...
+
+
+# 👇 ADD THIS ENTIRE FUNCTION TO THE FILE 👇
+def check_purchase_status(request, purchase_uuid):
+    """
+    Checks the status of a purchase and returns an HTML snippet.
+    This view is for the HTMX polling.
+    """
+    purchase = get_object_or_404(Purchase, uuid=purchase_uuid)
+
+    context = {'purchase': purchase}
+
+    if purchase.status == 'approved':
+        # If approved, render the 'approved' snippet
+        return render(request, 'partials/purchase_status_approved.html', context)
+    else:
+        # If still pending (or rejected), render the 'pending' snippet
+        return render(request, 'partials/purchase_status_pending.html', context)
