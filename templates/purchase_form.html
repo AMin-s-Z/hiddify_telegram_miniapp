@@ -1,684 +1,177 @@
 {% extends "base.html" %}
 {% block title %}تکمیل خرید | VPN Store{% endblock %}
+
 {% block setup_main_button %}
-const mainButton = document.querySelector('.tg-main-button');
-if (mainButton) {
-    const mainButtonText = mainButton.querySelector('.tg-main-button-text');
-    if (mainButtonText && mainButtonText.textContent.trim() !== '') {
-        mainButtonText.innerHTML = '<i class="fas fa-check me-2"></i> ارسال رسید';
-        mainButton.addEventListener('click', submitForm);
-    }
-    mainButton.style.display = 'block';
-}
+    const mainButton = Telegram.WebApp.MainButton;
+    mainButton.setText('ارسال رسید و تکمیل خرید');
+    mainButton.show();
+    mainButton.onClick(function() {
+        document.getElementById('uploadForm').submit();
+    });
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3 py-4">
-    <!-- Back Button -->
-    <div class="d-flex justify-content-start mb-4 fade-in animate-on-scroll">
-        <a href="{% url 'shop:plan_list' %}" class="btn btn-outline-primary px-4 py-2 d-flex align-items-center">
-            <i class="fas fa-arrow-left me-2"></i>
-            بازگشت
-        </a>
-    </div>
-
-    <!-- Order Summary Card -->
-    <div class="card shadow-sm mb-4 fade-in animate-on-scroll" style="animation-delay: 0.1s;">
+<div class="container-fluid px-3 py-2">
+    <div class="card mb-4 fade-in">
         <div class="card-body p-4">
-            <h3 class="card-title mb-4">
-                <i class="fas fa-file-invoice-dollar text-primary me-2"></i>
-                اطلاعات سفارش
-            </h3>
-
-            <!-- Plan Info -->
-            <div class="plan-info p-3 bg-gradient-primary bg-opacity-10 rounded-3 mb-4 border-radius-15 shadow-sm">
-                <div class="d-flex align-items-center">
-                    <div class="plan-icon-circle me-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h4 class="mb-0">{{ plan.name }}</h4>
-                        <p class="text-muted mb-0 small">
-                            {{ plan.duration }} روزه
-                            {% if plan.speed %}· سرعت {{ plan.speed }} · {% endif %}
-                            {% if plan.description %}{{ plan.description|truncatewords:3 }}{% endif %}
-                        </p>
-                    </div>
-                    {% if forloop.first %}
-                    <span class="badge bg-danger rounded-pill">پیشنهاد ویژه</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Price Info -->
-            <div class="price-info p-3 bg-white rounded-3 d-flex justify-content-between align-items-center shadow-sm border-radius-15">
-                <span class="text-muted fw-bold">مبلغ قابل پرداخت:</span>
-                <span class="price-amount fs-5 text-primary fw-bold">{{ plan.price|floatformat:"0" }} تومان</span>
+            <h3 class="card-title mb-3"><i class="fas fa-file-invoice text-primary me-2"></i>خلاصه سفارش</h3>
+            <div class="d-flex justify-content-between align-items-center">
+                <span>پلن: <strong>{{ plan.name }}</strong></span>
+                <span class="price-amount">{{ plan.price|floatformat:"0" }} تومان</span>
             </div>
         </div>
     </div>
 
-    <!-- Payment Card -->
-    <div class="card shadow-sm mb-4 fade-in animate-on-scroll" style="animation-delay: 0.2s;">
+    <div class="card mb-4 fade-in" style="animation-delay: 0.1s;">
         <div class="card-body p-4">
-            <h3 class="card-title mb-4">
-                <i class="fas fa-money-check-alt text-success me-2"></i>
-                مرحله ۱: انتقال وجه
-            </h3>
-
-            <div class="alert alert-info rounded-3 mb-4 border-radius-12">
-                <h5 class="alert-heading mb-2">لطفاً مبلغ <strong>{{ plan.price|floatformat:"0" }} تومان</strong> را به شماره کارت زیر واریز کنید:</h5>
+            <h3 class="card-title mb-3"><i class="fas fa-credit-card text-success me-2"></i>مرحله ۱: پرداخت</h3>
+            <div class="alert alert-info small">
+                لطفاً مبلغ <strong>{{ plan.price|floatformat:"0" }} تومان</strong> را به شماره کارت زیر واریز کنید.
             </div>
-
-            <!-- Bank Card -->
-            <div class="bank-card p-4 mb-4 rounded-3 shadow-sm">
-                <div class="bank-header bg-gradient-primary p-3 rounded-top-3 mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="text-white-50 small">بانک</span>
-                            <div class="fw-bold text-white">{{ ADMIN_BANK_NAME }}</div>
-                        </div>
-                        <i class="fas fa-university text-white fa-2x opacity-50"></i>
-                    </div>
+            <div class="bank-card p-3">
+                <span class="small text-muted">شماره کارت</span>
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong class="card-number" id="cardNumber">{{ ADMIN_BANK_CARD }}</strong>
+                    <button class="btn btn-sm btn-light copy-btn" data-copy="{{ ADMIN_BANK_CARD }}">
+                        <i class="fas fa-copy"></i>
+                    </button>
                 </div>
-
-                <div class="credit-card-info">
-                    <div class="payment-item mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="small text-muted">شماره کارت</span>
-                                <div class="card-number">
-                                    <i class="fas fa-lock text-success me-2"></i>
-                                    <span class="fw-bold">{{ ADMIN_BANK_CARD }}</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-primary copy-btn"
-                                    data-copy="{{ ADMIN_BANK_CARD }}"
-                                    data-bs-toggle="tooltip"
-                                    title="کپی شماره کارت">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="payment-item">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <span class="small text-muted">صاحب حساب</span>
-                                <div class="account-holder">{{ ADMIN_BANK_NAME }}</div>
-                            </div>
-                        </div>
-
-                        <div class="payment-options">
-                            <div class="row g-2 text-center">
-                                <div class="col-4">
-                                    <div class="p-2 bg-light rounded small">شماره شبا</div>
-                                    <div class="fw-bold mt-1">IR...</div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="p-2 bg-light rounded small">شماره کارت</div>
-                                    <div class="fw-bold mt-1">{{ ADMIN_BANK_CARD[:4] }}****</div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="p-2 bg-light rounded small">بانک</div>
-                                    <div class="fw-bold mt-1">{{ ADMIN_BANK_NAME }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Tip -->
-            <div class="payment-tip bg-light p-3 rounded-3 d-flex align-items-center">
-                <div class="payment-tip-icon me-3">
-                    <i class="fas fa-lightbulb text-warning"></i>
-                </div>
-                <small class="text-muted">در بخش توضیحات واریز، شماره همراه خود را به صورت کامل وارد کنید تا پرداخت شما سریع‌تر تأیید شود.</small>
             </div>
         </div>
     </div>
 
-    <!-- Upload Card -->
-    <div class="card shadow-sm fade-in animate-on-scroll" style="animation-delay: 0.3s;">
+    <div class="card fade-in" style="animation-delay: 0.2s;">
         <div class="card-body p-4">
-            <h3 class="card-title mb-4">
-                <i class="fas fa-upload text-info me-2"></i>
-                مرحله ۲: آپلود رسید
-            </h3>
-
-            <p class="mb-4">پس از انتقال وجه، تصویر رسید را آپلود کنید:</p>
-
-            <!-- Upload Form -->
-            <form method="post" enctype="multipart/form-data" id="uploadForm" class="needs-validation" novalidate>
+            <h3 class="card-title mb-3"><i class="fas fa-upload text-info me-2"></i>مرحله ۲: آپلود رسید</h3>
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
                 {% csrf_token %}
-
-                <!-- Upload Area -->
-                <div class="upload-area mb-4" id="uploadArea">
-                    <div class="upload-container position-relative">
-                        <input type="file"
-                               class="position-absolute opacity-0 w-100 h-100 top-0 start-0"
-                               id="receiptImage"
-                               name="{{ form.receipt_image.html_name }}"
-                               accept="image/*"
-                               onchange="handleFileSelect(this)">
-
-                        <label for="receiptImage" class="p-5 text-center d-block rounded-3 border border-dashed border-light bg-gradient-primary bg-opacity-5 hover-bg-opacity-10 transition-all cursor-pointer">
-                            <div class="upload-preview">
-                                <div class="upload-icon mb-3">
-                                    <i class="fas fa-cloud-upload-alt text-primary fa-2x"></i>
-                                </div>
-                                <h6>برای آپلود عکس رسید کلیک کنید</h6>
-                                <p class="text-muted small">یا فایل را اینجا رها کنید</p>
-                                <p class="text-muted small">فرمت: JPG, PNG | حداکثر حجم: 2 مگابایت</p>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Preview Area -->
-                    <div class="preview-area mt-4" id="previewArea" style="display: none;">
-                        <div class="image-preview rounded-3 overflow-hidden position-relative">
-                            <img id="previewImage" src="" alt="Preview" class="w-100">
-                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2 bg-white bg-opacity-50" onclick="clearPreview()"></button>
+                <div class="upload-area mb-3" id="uploadArea">
+                    <input type="file" id="receiptImage" name="{{ form.receipt_image.html_name }}" accept="image/*" class="d-none">
+                    <label for="receiptImage" class="upload-label">
+                        <div id="upload-prompt">
+                            <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-muted"></i>
+                            <p class="mb-0">برای آپلود کلیک کنید یا فایل را بکشید</p>
+                            <small class="text-muted">حداکثر حجم: 2MB</small>
                         </div>
-                        <div class="preview-details mt-2 text-center">
-                            <small class="text-muted" id="previewName"></small>
+                        <div id="preview-container" class="d-none">
+                            <img id="previewImage" src="" alt="Preview"/>
+                            <span id="fileName"></span>
                         </div>
-                    </div>
+                    </label>
                 </div>
-
-                <!-- Form Errors -->
                 {% if form.receipt_image.errors %}
-                <div class="alert alert-danger small mb-3 rounded-2 alert-dismissible fade show" role="alert">
-                    {% for error in form.receipt_image.errors %}
-                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-                    {% endfor %}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                <div class="alert alert-danger small p-2">{{ form.receipt_image.errors.0 }}</div>
                 {% endif %}
-
-                <!-- Buyer Information -->
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="buyerName" class="form-label">نام کامل</label>
-                        <input type="text"
-                               class="form-control"
-                               id="buyerName"
-                               value="{{ request.user.full_name|default:request.user.username }}"
-                               required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="buyerPhone" class="form-label">شماره همراه</label>
-                        <input type="tel"
-                               class="form-control"
-                               id="buyerPhone"
-                               value="{{ request.user.phone }}"
-                               required>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary w-100 py-3 fs-5">
-                    <i class="fas fa-paper-plane me-2"></i>
-                    ارسال رسید
-                </button>
             </form>
         </div>
     </div>
 </div>
 
 <style>
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Bank Card Styles */
-.bank-card {
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.bank-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.me-hover:hover {
-    background-color: rgba(102, 126, 234, 0.05);
-    transition: all 0.3s ease;
-}
-
-.payment-item {
-    padding-bottom: 15px;
-}
-
-.card-number {
-    font-family: monospace;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2d3748;
-}
-
-.account-holder {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #2d3748;
-}
-
-/* Payment Tip */
-.payment-tip {
-    border-left: 4px solid #f59e0b;
-    border-radius: 10px;
-}
-
-.payment-tip-icon {
-    font-size: 1.5rem;
-}
-
-/* Upload Area */
-.upload-area {
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.upload-container {
-    position: relative;
-}
-
-.label-for-upload {
-    border: 2px dashed #cbd5e0;
-    border-radius: 15px;
-    padding: 30px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.label-for-upload:hover {
-    border-color: #667eea;
-    background-color: rgba(102, 126, 234, 0.05);
-}
-
-.preview-image {
-    max-height: 200px;
-    object-fit: contain;
-}
-
-/* Image Preview */
-.image-preview {
-    max-height: 300px;
-    overflow: hidden;
-}
-
-.image-preview img {
-    max-height: 250px;
-    object-fit: contain;
-    width: 100%;
-}
-
-/* Payment Options */
-.payment-options .p-2 {
-    background-color: #f7fafc;
-    border-radius: 8px;
-    margin-bottom: 8px;
-}
-
-/* Form Field Styles */
-.form-label {
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 8px;
-}
-
-.form-control {
-    border-radius: 10px;
-    border: 1px solid #cbd5e0;
-    padding: 12px 15px;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Buttons */
-.btn {
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 10px rgba(102, 126, 234, 0.3);
-}
-
-.btn-outline-primary {
-    border-color: #667eea;
-    color: #667eea;
-}
-
-.btn-outline-primary:hover {
-    background-color: #667eea;
-    border-color: #667eea;
-    color: white;
-}
-
-/* Copy Buttons */
-.copy-btn {
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 0.875rem;
-}
-
-/* Plan Icon */
-.plan-icon-circle {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
-}
-
-/* Animations */
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.hover-bg-opacity-10:hover {
-    background-color: rgba(102, 126, 234, 0.1) !important;
-}
-
-.transition-all {
-    transition: all 0.3s ease;
-}
-
-/* Dropzone animation */
-.upload-area.drag-over {
-    background-color: rgba(102, 126, 234, 0.05);
-    border: 2px dashed #667eea;
-    border-radius: 15px;
-}
-
-/* Icon animations */
-.upload-icon {
-    animation: pulse 2s infinite;
-}
-
-/* Toast Notifications */
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1050;
-}
-
-.toast {
-    border-radius: 10px;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.toast-body {
-    padding: 10px 15px;
-}
-
-/* Drag and drop effects */
-.upload-area.drag-active {
-    background-color: rgba(102, 126, 234, 0.05);
-    border: 2px dashed #667eea;
-    border-radius: 15px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+    .price-amount {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--tg-theme-accent);
+    }
     .bank-card {
-        margin: 0 -15px;
+        background: var(--tg-theme-bg-color);
+        border: 1px solid rgba(var(--tg-theme-text-color-rgb), 0.1);
+        border-radius: var(--tg-border-radius-md);
     }
-
-    .upload-container {
-        padding: 0 15px;
+    .card-number {
+        letter-spacing: 2px;
+        font-size: 1.1rem;
     }
-
-    .payment-options {
-        margin: 0 -15px;
-        padding: 0 15px;
+    .copy-btn {
+        color: var(--tg-theme-hint-color);
     }
-
-    .form-control {
-        font-size: 0.9rem;
+    .upload-area {
+        border: 2px dashed rgba(var(--tg-theme-text-color-rgb), 0.2);
+        border-radius: var(--tg-border-radius-md);
+        background: var(--tg-theme-bg-color);
+        transition: border-color 0.2s, background-color 0.2s;
     }
-
-    .btn {
-        padding: 10px;
-        font-size: 0.9rem;
+    .upload-area.highlight {
+        border-color: var(--tg-theme-accent);
+        background-color: rgba(var(--tg-theme-button-color-rgb), 0.1);
     }
-}
+    .upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 150px;
+        cursor: pointer;
+        text-align: center;
+    }
+    #preview-container img {
+        max-height: 100px;
+        border-radius: var(--tg-border-radius-sm);
+        margin-bottom: 10px;
+    }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Handle file selection
-function handleFileSelect(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        const previewArea = document.getElementById('previewArea');
-        const previewImage = document.getElementById('previewImage');
-        const previewName = document.getElementById('previewName');
-        const file = input.files[0];
-
-        // Check file size (2MB max)
-        if (file.size > 2 * 1024 * 1024) {
-            createToast('حجم فایل نباید بیشتر از 2 مگابایت باشد', 'error');
-            input.value = '';
-            return;
-        }
-
-        reader.onload = function(e) {
-            previewImage.src = e.target.result;
-            previewName.textContent = file.name;
-            previewArea.style.display = 'block';
-
-            // Update upload button to show replace option
-            const uploadLabel = document.querySelector('label[for="receiptImage"]');
-            uploadLabel.innerHTML = `
-                <div class="upload-preview">
-                    <div class="mb-3">
-                        <i class="fas fa-file-image text-primary"></i>
-                    </div>
-                    <h6>عکس انتخاب شد</h6>
-                    <p class="text-muted small">برای جایگزینی کلیک کنید</p>
-                </div>
-            `;
-        };
-
-        reader.readAsDataURL(file);
-    }
-}
-
-// Clear preview
-function clearPreview() {
-    const fileInput = document.getElementById('receiptImage');
-    const uploadLabel = document.querySelector('label[for="receiptImage"]');
-    const previewArea = document.getElementById('previewArea');
-    const previewImage = document.getElementById('previewImage');
-
-    fileInput.value = '';
-    uploadLabel.innerHTML = `
-        <div class="upload-preview">
-            <div class="upload-icon mb-3">
-                <i class="fas fa-cloud-upload-alt text-primary fa-2x"></i>
-            </div>
-            <h6>برای آپلود عکس رسید کلیک کنید</h6>
-            <p class="text-muted small">یا فایل را اینجا رها کنید</p>
-            <p class="text-muted small">فرمت: JPG, PNG | حداکثر حجم: 2 مگابایت</p>
-        </div>
-    `;
-    previewArea.style.display = 'none';
-    previewImage.src = '';
-}
-
-// Submit form
-function submitForm() {
-    const form = document.getElementById('uploadForm');
-    const fileInput = document.getElementById('receiptImage');
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    // Show loading state
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> در حال ارسال...';
-
-    if (!fileInput.files.length) {
-        createToast('لطفاً تصویر رسید را انتخاب کنید', 'warning');
-        fileInput.focus();
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> ارسال رسید';
-        return;
-    }
-
-    if (form.checkValidity()) {
-        form.submit();
-    } else {
-        form.classList.add('was-validated');
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i> ارسال رسید';
-    }
-}
-
-// Create Toast Notification
-function createToast(message, type = 'info') {
-    // Remove existing toast container if any
-    const existingToastContainer = document.querySelector('.toast-container');
-    if (existingToastContainer) {
-        existingToastContainer.remove();
-    }
-
-    // Create toast container
-    const toastContainer = document.createElement('div');
-    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-    toastContainer.style.zIndex = '1080';
-
-    const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white border-0 bg-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'error' ? 'danger' : 'info'}`;
-    toast.setAttribute('role', 'alert');
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-
-    toastContainer.appendChild(toast);
-    document.body.appendChild(toastContainer);
-
-    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
-    bsToast.show();
-
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-        if (toastContainer.childElementCount === 0) {
-            toastContainer.remove();
-        }
-    });
-}
-
-// Copy to clipboard
 document.addEventListener('DOMContentLoaded', function() {
-    const copyButtons = document.querySelectorAll('.copy-btn');
-
-    copyButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const textToCopy = this.getAttribute('data-copy');
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                // Success feedback
-                this.innerHTML = '<i class="fas fa-check text-success"></i>';
-                createToast('شماره کارت با موفقیت کپی شد', 'success');
-
-                setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-copy"></i>';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                createToast('خطا در کپی کردن شماره کارت', 'error');
-            });
+    // Copy to clipboard
+    document.querySelector('.copy-btn').addEventListener('click', function() {
+        const textToCopy = this.getAttribute('data-copy');
+        navigator.clipboard.writeText(textToCopy.replace(/\s/g, '')).then(() => {
+            alert('شماره کارت کپی شد.');
         });
     });
 
-    // Setup drag and drop
-    const uploadContainer = document.getElementById('uploadArea');
+    // File Upload & Drag-n-Drop
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('receiptImage');
+    const uploadPrompt = document.getElementById('upload-prompt');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('previewImage');
+    const fileNameEl = document.getElementById('fileName');
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        uploadContainer.addEventListener(eventName, preventDefaults, false);
+        uploadArea.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
     });
 
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
     ['dragenter', 'dragover'].forEach(eventName => {
-        uploadContainer.addEventListener(eventName, highlight, false);
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.add('highlight'), false);
     });
 
     ['dragleave', 'drop'].forEach(eventName => {
-        uploadContainer.addEventListener(eventName, unhighlight, false);
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('highlight'), false);
     });
 
-    function highlight(e) {
-        uploadContainer.classList.add('drag-active');
-    }
+    uploadArea.addEventListener('drop', e => {
+        fileInput.files = e.dataTransfer.files;
+        handleFiles(fileInput.files);
+    }, false);
 
-    function unhighlight(e) {
-        uploadContainer.classList.remove('drag-active');
-    }
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
-    uploadContainer.addEventListener('drop', handleDrop, false);
+    function handleFiles(files) {
+        if (files.length === 0) return;
+        const file = files[0];
 
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-
-        if (files.length > 0) {
-            document.getElementById('receiptImage').files = files;
-            handleFileSelect(document.getElementById('receiptImage'));
+        if (file.size > 2 * 1024 * 1024) {
+            alert('حجم فایل نباید بیشتر از 2 مگابایت باشد.');
+            fileInput.value = '';
+            return;
         }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            fileNameEl.textContent = file.name;
+            uploadPrompt.classList.add('d-none');
+            previewContainer.classList.remove('d-none');
+        }
+        reader.readAsDataURL(file);
     }
-
-    // Form validation
-    const form = document.getElementById('uploadForm');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        }, false);
-    }
-
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Animate form on load
-    setTimeout(() => {
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            el.classList.add('active');
-        });
-    }, 300);
 });
 </script>
 {% endblock %}

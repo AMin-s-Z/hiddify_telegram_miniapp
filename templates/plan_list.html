@@ -3,314 +3,106 @@
 {% block nav_plans_active %}active{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3 py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 fade-in animate-on-scroll">
-        <div>
-            <h1 class="h3 mb-1">
-                <i class="fas fa-shield-alt text-primary me-2"></i>
-                پلن‌های VPN
-            </h1>
-            <p class="text-muted mb-0 small">انتخاب بهترین پلن مناسب شما</p>
-        </div>
-        <div class="features-highlights">
-            <span class="badge bg-success rounded-pill me-1">
-                <i class="fas fa-check-circle me-1"></i> تضمین آپتایم
-            </span>
-            <span class="badge bg-info rounded-pill">
-                <i class="fas fa-tachometer-alt me-1"></i> پرسرعت
-            </span>
-        </div>
+<div class="container-fluid px-3 py-2">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-shield-alt text-primary me-2" style="color: var(--tg-theme-accent) !important;"></i>
+            پلن‌های VPN
+        </h1>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="row g-3">
         {% for plan in plans %}
-        <div class="col fade-in animate-on-scroll" style="animation-delay: {% forloop.counter0 * 0.1 %}s;">
-            <div class="plan-card h-100 shadow-hover border-radius-15 overflow-hidden">
-                <div class="card-header py-3 px-4 bg-gradient text-white position-relative overflow-hidden">
-                    <div class="position-relative z-1">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="card-title mb-0">{{ plan.name }}</h4>
-                            {% if forloop.first %}
-                            <span class="badge bg-danger rounded-pill">پیشنهاد ویژه</span>
-                            {% endif %}
+        <div class="col-12 col-md-6 fade-in" style="animation-delay: {{ forloop.counter0|multiply:0.1 }}s;">
+            <a href="{% url 'shop:purchase_create' plan.id %}" class="plan-card-link">
+                <div class="plan-card h-100 {% if forloop.first %}special-offer{% endif %}">
+                    {% if forloop.first %}
+                    <div class="special-badge">پیشنهاد ویژه</div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h4 class="card-title mb-1">{{ plan.name }}</h4>
+                        <div class="plan-price-container mb-3">
+                            <span class="plan-price">{{ plan.price|floatformat:"0" }}</span>
+                            <span class="text-muted small">تومان</span>
                         </div>
-                        <div class="price-tag bg-white bg-opacity-20 px-2 py-1 rounded">
-                            <i class="fas fa-tag me-1"></i>
-                            <span class="fw-bold">{{ plan.price|floatformat:"0" }} تومان</span>
-                        </div>
-                    </div>
-                    <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-r from-transparent via-white via-opacity-5 to-transparent opacity-20 animate-gradient"></div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="plan-details">
-                        <div class="plan-highlight mb-3 text-center">
-                            <div class="badge bg-primary bg-opacity-10 text-primary">
-                                <i class="fas fa-clock me-1"></i>
-                                <strong>{{ plan.duration }}</strong> روزه
-                            </div>
-                        </div>
-
-                        <ul class="list-unstyled features-list mb-4">
-                            {% if plan.speed %}
-                            <li class="mb-3 border-bottom pb-2">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-tachometer-alt text-primary me-2"></i>
-                                    <div>
-                                        <span class="text-muted small">سرعت</span>
-                                        <span class="fw-bold primary-text">{{ plan.speed }}</span>
-                                    </div>
-                                </div>
-                            </li>
-                            {% endif %}
-                            <li class="mb-3 border-bottom pb-2">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-server text-info me-2"></i>
-                                    <div>
-                                        <span class="text-muted small">دسترسی</span>
-                                        <span class="fw-bold primary-text">{{ plan.server_count|default:100 }}+ سرور</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="mb-3 border-bottom pb-2">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-devices text-warning me-2"></i>
-                                    <div>
-                                        <span class="text-muted small">دستگاه</span>
-                                        <span class="fw-bold primary-text">{{ plan.device_count|default:5 }} دستگاه</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="mb-0">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-headset text-success me-2"></i>
-                                    <div>
-                                        <span class="text-muted small">پشتیبانی</span>
-                                        <span class="fw-bold primary-text">24/7</span>
-                                    </div>
-                                </div>
-                            </li>
+                        <ul class="list-unstyled features-list">
+                            <li><i class="fas fa-check-circle"></i><strong>{{ plan.duration }}</strong> روز اعتبار</li>
+                            {% if plan.speed %}<li><i class="fas fa-check-circle"></i>سرعت <strong>{{ plan.speed }}</strong></li>{% endif %}
+                            <li><i class="fas fa-check-circle"></i><strong>{{ plan.device_count|default:5 }}</strong> کاربر همزمان</li>
                         </ul>
-
-                        {% if plan.description %}
-                        <div class="plan-description mb-4">
-                            <p class="text-muted small">{{ plan.description|linebreaksbr }}</p>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
-                <div class="card-footer bg-transparent py-3 px-4 d-flex justify-content-between align-items-center">
-                    <div class="price-label text-muted small">
-                        <i class="fas fa-tag me-1"></i>
-                        قیمت نهایی
-                    </div>
-                    <a href="{% url 'shop:purchase_create' plan.id %}" class="btn btn-primary py-2 px-4">
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        خرید پلن
-                    </a>
-                </div>
-            </div>
+            </a>
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="alert alert-warning text-center rounded-3 py-5 fade-in animate-on-scroll">
-                <i class="fas fa-exclamation-circle fa-3x mb-3 text-warning"></i>
-                <h4 class="alert-heading mb-3">هیچ پلنی موجود نیست</h4>
-                <p class="mb-0">متأسفانه در حال حاضر هیچ پلنی موجود نیست. لطفاً بعداً مراجعه کنید.</p>
+            <div class="card text-center p-5">
+                <i class="fas fa-exclamation-circle fa-3x mb-3" style="color: var(--tg-theme-hint-color);"></i>
+                <h4 class="mb-3">هیچ پلنی موجود نیست</h4>
+                <p class="mb-0" style="color: var(--tg-theme-hint-color);">متأسفانه در حال حاضر پلنی برای فروش وجود ندارد.</p>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- FAQ Section -->
-    <div class="row mt-5 fade-in animate-on-scroll">
-        <div class="col-12">
-            <div class="card shadow-sm border-radius-15">
-                <div class="card-header bg-white border-0 py-4 px-4 border-bottom">
-                    <h3 class="h5 mb-0 d-flex align-items-center">
-                        <i class="fas fa-question-circle text-info me-2"></i>
-                        سوالات متداول
-                    </h3>
-                </div>
-                <div class="card-body p-4">
-                    <div class="accordion accord-border" id="faqAccordion">
-                        <div class="accordion-item border-bottom mb-3 rounded-2">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-clock me-3 text-primary"></i>
-                                        <div class="text-start me-auto">
-                                            <span class="fw-bold">زمان فعال‌سازی سرویس چقدر است؟</span>
-                                            <p class="mb-0 small text-muted mt-1">بعد از خرید چه زمانی VPN فعال می‌شود؟</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            </h2>
-                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body p-4 bg-light rounded">
-                                    <p>معمولاً پس از تأیید پرداخت (که معمولاً حداکثر ۲۴ ساعت طول می‌کشد)، سرویس VPN شما فعال می‌شود. در موارد استثنایی، ممکن است این زمان بیشتر شود.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item border-bottom mb-3 rounded-2">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-sync-alt me-3 text-primary"></i>
-                                        <div class="text-start me-auto">
-                                            <span class="fw-bold">امکان تمدید سرویس وجود دارد؟</span>
-                                            <p class="mb-0 small text-muted mt-1">چگونه سرویس خود را تمدید کنم؟</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body p-4 bg-light rounded">
-                                    <p>بله، شما می‌توانید قبل از پایان اعتبار سرویس خود، آن را با همان پلن یا پلن جدیدی تمدید کنید. برای تمدید به حساب کاربری خود مراجعه کرده و دکمه "تمدید" را بزنید.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item rounded-2">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-plug me-3 text-primary"></i>
-                                        <div class="text-start me-auto">
-                                            <span class="fw-bold">نحوه فعال‌سازی VPN چگونه است؟</span>
-                                            <p class="mb-0 small text-muted mt-1">چگونه از کانفیگ VPN استفاده کنم؟</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body p-4 bg-light rounded">
-                                    <p>پس از خرید و فعال‌سازی سرویس، کانفیگ VPN در حساب کاربری شما در دسترس قرار می‌گیرد. راهنمای کامل استفاده به همراه نمونه‌های مختلف ارائه شده است. شما می‌توانید از طریق نرم‌افزارهای مختلف این کانفیگ‌ها را وارد کنید.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <style>
-/* Plan Card Styles */
-.plan-card {
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-}
-
-.plan-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-/* Header Gradients */
-.bg-gradient {
-    background: var(--gradient-1) !important;
-}
-
-.animate-gradient {
-    animation: gradient-animation 3s ease infinite;
-    background-size: 200% 200%;
-}
-
-@keyframes gradient-animation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Accent Text */
-.primary-text {
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-/* Price Tag */
-.price-tag {
-    font-size: 0.9rem;
-}
-
-/* Features List */
-.features-list i {
-    opacity: 0.8;
-}
-
-.feature-highlight {
-    position: relative;
-}
-
-.feature-highlight::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--primary-color);
-    transition: width 0.3s;
-}
-
-.features-list li:hover .primary-text {
-    position: relative;
-}
-
-.features-list li:hover .primary-text::after {
-    width: 100%;
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    right: 0;
-    height: 3px;
-    background-color: var(--primary-color);
-}
-
-/* Accordion Customization */
-.accordion-button:not(.collapsed) {
-    background-color: rgba(99, 102, 241, 0.05);
-    color: var(--primary-color);
-}
-
-.accordion-button:focus {
-    box-shadow: none;
-}
-
-.border-bottom {
-    border-color: rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Price Label */
-.price-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .plan-card {
-        margin-bottom: 20px;
+    .plan-card-link {
+        text-decoration: none;
+        color: inherit;
     }
-
-    .dimension-tag {
+    .plan-card {
+        background-color: var(--tg-theme-secondary-bg-color);
+        border: 1px solid transparent;
+        border-radius: var(--tg-border-radius-lg);
+        padding: 20px;
+        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+    .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--tg-shadow-md);
+        border-color: var(--tg-theme-accent);
+    }
+    .plan-card.special-offer {
+        border-color: var(--tg-theme-accent);
+    }
+    .special-badge {
         position: absolute;
         top: 15px;
-        right: 15px;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.75rem;
+        left: -40px;
+        background-color: var(--tg-theme-accent);
+        color: var(--tg-theme-button-text-color);
+        padding: 4px 40px;
+        font-size: 0.8rem;
         font-weight: 600;
-        color: white;
+        transform: rotate(-45deg);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-
-    .bg-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    .card-title {
+        font-weight: 700;
+        color: var(--tg-theme-text-color);
     }
-}
+    .plan-price-container .plan-price {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--tg-theme-accent);
+    }
+    .features-list {
+        padding: 0;
+        margin: 0;
+    }
+    .features-list li {
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: var(--tg-theme-text-color);
+    }
+    .features-list i {
+        color: #28a745; /* Success Green */
+        margin-left: 8px;
+    }
 </style>
+
 {% endblock %}

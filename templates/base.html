@@ -5,193 +5,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}فروشگاه VPN{% endblock %}</title>
 
-    <!-- Bootstrap RTL & Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Vazirmatn Font -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css">
+
     {% load static %}
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css">
+    <style id="telegram-theme-variables">
+        /* These variables will be populated by JavaScript based on the Telegram theme */
+        :root {
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #222222;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-link-color: #2481cc;
+            --tg-theme-button-color: #0088cc;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #f0f0f0;
+            --tg-theme-accent: #0088cc;
+            --tg-border-radius-sm: 8px;
+            --tg-border-radius-md: 12px;
+            --tg-border-radius-lg: 16px;
+            --tg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --tg-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
 
-    <style id="telegram-theme"></style>
-    <style id="dynamic-styles"></style>
+        body.dark-theme {
+            --tg-theme-bg-color: #18222d;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #708499;
+            --tg-theme-link-color: #52a9ee;
+            --tg-theme-button-color: #2ea6ff;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #212e3b;
+        }
+    </style>
 
     <style>
-        :root {
-            --primary-color: #6366f1;
-            --secondary-color: #8b5cf6;
-            --accent-color: #ec4899;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #3b82f6;
-            --light-color: #f8fafc;
-            --dark-color: #1e293b;
-            --telegram-blue: #0088cc;
-            --soft-bg: rgba(255, 255, 255, 0.9);
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
+        /* --- General & Body Styles --- */
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Vazirmatn', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        body {
-            background-color: #f0f2f5;
-            color: var(--dark-color);
-            direction: rtl;
-            position: relative;
-            overflow-x: hidden;
+        #app-container {
+            padding-top: 70px; /* Header height */
+            padding-bottom: 80px; /* Bottom Nav height */
             min-height: 100vh;
         }
 
-        /* Background Pattern */
-        .bg-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a0aec0' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            z-index: -1;
-        }
-
-        /* Loading Bar */
-        .loading-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: rgba(99, 102, 241, 0.1);
-            z-index: 1050;
-        }
-
-        .loading-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 50%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            animation: loading 1.5s ease-in-out infinite;
-        }
-
-        @keyframes loading {
-            0% { transform: translateX(-100%); }
-            50% { transform: translateX(100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* Header Styles */
+        /* --- Header --- */
         .tg-header {
-            background-color: var(--soft-bg);
-            box-shadow: var(--shadow-md);
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 1000;
+            left: 0;
+            right: 0;
+            background-color: rgba(var(--tg-theme-bg-color-rgb), 0.8);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-        }
-
-        .tg-back-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tg-back-button:hover {
-            transform: scale(1.05);
-            background-color: var(--secondary-color);
-        }
-
-        .tg-back-button:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
-        }
-
-        .ripple-bg {
-            position: absolute;
-            border-radius: 50%;
-            transform: scale(0);
-            background-color: rgba(255, 255, 255, 0.4);
-            animation: ripple 0.6s linear;
-        }
-
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+            border-bottom: 1px solid rgba(var(--tg-theme-text-color-rgb), 0.1);
+            padding: 10px 15px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            height: 70px;
         }
 
         .tg-title-area {
-            margin-right: 10px;
+            text-align: right;
+        }
+        .tg-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--tg-theme-text-color);
+        }
+        .tg-subtitle {
+            font-size: 0.8rem;
+            color: var(--tg-theme-hint-color);
         }
 
-        .tg-title {
+        .tg-back-button {
+            background: transparent;
+            border: none;
+            color: var(--tg-theme-text-color);
             font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--dark-color);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .tg-back-button:hover {
+            background-color: rgba(var(--tg-theme-text-color-rgb), 0.1);
+        }
+
+        /* --- Content Area --- */
+        .tg-content {
+            padding-top: 15px;
+        }
+
+        /* --- Bottom Navigation --- */
+        .tg-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-top: 1px solid rgba(var(--tg-theme-text-color-rgb), 0.1);
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 65px;
+        }
+        .tg-nav-item {
+            flex: 1;
+            text-align: center;
+        }
+        .tg-nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--tg-theme-hint-color);
+            padding: 8px 0;
+            transition: color 0.3s, transform 0.2s;
+            font-size: 0.7rem;
+        }
+        .nav-icon-wrapper {
+            font-size: 1.3rem;
             margin-bottom: 4px;
         }
-
-        .title-text {
-            position: relative;
-            display: inline-block;
+        .tg-nav-item.active .tg-nav-link {
+            color: var(--tg-theme-accent);
+            transform: translateY(-3px);
+        }
+        .tg-nav-item:not(.active) .tg-nav-link:hover {
+            color: var(--tg-theme-text-color);
         }
 
-        .title-text::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
+        /* --- Main Action Button (Telegram Style) --- */
+        .tg-main-button {
+            position: fixed;
+            bottom: 0;
             left: 0;
+            right: 0;
+            padding: 15px;
+            background: var(--tg-theme-bg-color);
+            border-top: 1px solid rgba(var(--tg-theme-text-color-rgb), 0.1);
+            z-index: 1001;
+            display: none; /* Hidden by default */
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        }
+        .tg-main-button button {
             width: 100%;
-            height: 3px;
-            background: var(--gradient-1);
-            border-radius: 3px;
+            height: 50px;
+            border: none;
+            border-radius: var(--tg-border-radius-md);
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .tg-main-button button:active {
+            transform: scale(0.98);
         }
 
-        .tg-subtitle {
-            font-size: 0.875rem;
+        /* --- General Components & Animations --- */
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border: none;
+            border-radius: var(--tg-border-radius-lg);
+            box-shadow: var(--tg-shadow-md);
+            color: var(--tg-theme-text-color);
         }
 
-        /* Content Styles */
-        .tg-content {
-            flex: 1;
-            padding-top: 20px;
-            padding-bottom: 100px;
+        .btn-primary {
+            background-color: var(--tg-theme-button-color);
+            border-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border-radius: var(--tg-border-radius-md);
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(var(--tg-theme-button-color-rgb), 0.3);
         }
 
-        .content-wrapper {
-            animation: fadeIn 0.5s ease-out;
+        /* Fade-in Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
         }
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -203,432 +225,37 @@
             }
         }
 
-        /* Bottom Navigation */
-        .tg-bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--soft-bg);
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 8px 0;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .tg-nav-item {
-            flex: 1;
-            text-align: center;
-        }
-
-        .tg-nav-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #6b7280;
-            padding: 6px 12px;
-            border-radius: 12px;
-            transition: var(--transition);
-        }
-
-        .tg-nav-link:hover {
-            color: var(--primary-color);
-        }
-
-        .tg-nav-item.active .tg-nav-link {
-            color: var(--primary-color);
-        }
-
-        .nav-icon-wrapper {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 4px;
-        }
-
-        .tg-nav-item.active .nav-icon-wrapper {
-            background-color: rgba(99, 102, 241, 0.1);
-            border-radius: 8px;
-        }
-
-        .nav-icon-wrapper i {
-            font-size: 1rem;
-        }
-
-        .nav-text {
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Main Action Button */
-        .tg-main-button {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            z-index: 900;
-        }
-
-        .tg-main-button button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 12px 24px;
-            font-weight: 600;
-            font-size: 1rem;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .tg-main-button button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .button-wave {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: wave 1.5s infinite;
-        }
-
-        @keyframes wave {
-            0% {
-                transform: scale(0);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
-
-        /* Utility Classes */
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .border-radius-15 {
-            border-radius: 15px;
-        }
-
-        .border-radius-20 {
-            border-radius: 20px;
-        }
-
-        .shadow-hover {
-            transition: var(--transition);
-        }
-
-        .shadow-hover:hover {
-            box-shadow: var(--shadow-xl) !important;
-            transform: translateY(-5px);
-        }
-
-        /* Dark Theme */
+        /* Add RGB versions of colors for rgba() usage */
         body.dark-theme {
-            background-color: #0f172a;
-            color: #f1f5f9;
+            --tg-theme-bg-color-rgb: 24, 34, 45;
+            --tg-theme-text-color-rgb: 255, 255, 255;
+            --tg-theme-button-color-rgb: 46, 166, 255;
+        }
+        body:not(.dark-theme) {
+            --tg-theme-bg-color-rgb: 255, 255, 255;
+            --tg-theme-text-color-rgb: 34, 34, 34;
+            --tg-theme-button-color-rgb: 0, 136, 204;
         }
 
-        body.dark-theme .tg-header,
-        body.dark-theme .tg-bottom-nav {
-            background-color: rgba(30, 41, 59, 0.8);
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        body.dark-theme .tg-title,
-        body.dark-theme h2,
-        body.dark-theme h3,
-        body.dark-theme h4 {
-            color: #f8fafc;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Telegram App Container */
-        .telegram-app {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
-            margin-right: auto;
-            margin-left: auto;
-        }
-
-        .container-fluid.min-vh-100 {
-            min-height: 100vh;
-        }
-
-        /* Card Styles */
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            transition: var(--transition);
-            margin-bottom: 20px;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-5px);
-        }
-
-        .card-header {
-            background-color: transparent;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 15px 20px;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .card-footer {
-            background-color: transparent;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 15px 20px;
-        }
-
-        /* Button Styles */
-        .btn {
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: var(--transition);
-            border: none;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary {
-            background: var(--gradient-1);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--gradient-4);
-            color: white;
-        }
-
-        .btn-success:hover {
-            color: white;
-        }
-
-        .btn-outline-primary {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        /* Input Styles */
-        .form-control {
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 12px 15px;
-            transition: var(--transition);
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.15);
-        }
-
-        /* Badge Styles */
-        .badge {
-            border-radius: 6px;
-            font-weight: 600;
-            padding: 6px 12px;
-        }
-
-        .badge-pill {
-            border-radius: 30px;
-            padding: 6px 16px;
-        }
-
-        /* Alert Styles */
-        .alert {
-            border-radius: 12px;
-            border: none;
-            padding: 15px 20px;
-        }
-
-        .alert-info {
-            background-color: var(--gradient-3);
-            color: white;
-        }
-
-        .alert-success {
-            background: var(--gradient-4);
-            color: white;
-        }
-
-        .alert-warning {
-            background: var(--gradient-2);
-            color: white;
-        }
-
-        .alert-danger {
-            background: linear-gradient(135deg, #f43f5e, #ef4444);
-            color: white;
-        }
-
-        /* Loading Animation */
-        .loader {
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 3px solid var(--primary-color);
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Progress Bar */
-        .progress {
-            height: 8px;
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .progress-bar {
-            background: var(--gradient-1);
-            border-radius: 10px;
-        }
-
-        /* Animation Classes */
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: 0.6s ease-out;
-        }
-
-        .animate-on-scroll.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .pulse {
-            animation: pulse-animation 2s infinite;
-        }
-
-        @keyframes pulse-animation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Responsive */
-        @media (max-width: 576px) {
-            .tg-title {
-                font-size: 1.25rem;
-            }
-
-            .card {
-                margin: 15px 0;
-            }
-
-            .btn {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-        }
     </style>
+
 </head>
 <body class="telegram-app">
-    <!-- Background Pattern -->
-    <div class="bg-pattern"></div>
 
-    <!-- Progress Bar -->
-    <div class="loading-bar"></div>
-
-    <!-- Telegram App Container -->
     <div id="app-container">
-        <!-- Animated Header -->
         <header class="tg-header">
             <div class="container-fluid">
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                        <button id="back-button" class="tg-back-button">
+                        <button id="back-button" class="tg-back-button me-2">
                             <i class="fas fa-arrow-left"></i>
-                            <div class="ripple-bg"></div>
                         </button>
                         <div class="tg-title-area">
-                            <h1 class="tg-title">
-                                <span class="tg-title-icon">🚀</span>
+                            <h1 class="tg-title mb-0">
+                                <span class="tg-title-icon me-1">🚀</span>
                                 <span class="title-text">VPN Store</span>
                             </h1>
-                            <div class="tg-subtitle text-muted small">
+                            <div class="tg-subtitle">
                                 امن، سریع و مطمئن
                             </div>
                         </div>
@@ -640,7 +267,6 @@
             </div>
         </header>
 
-        <!-- Content Area -->
         <main class="tg-content">
             <div class="container-fluid px-3">
                 <div class="content-wrapper">
@@ -649,31 +275,24 @@
             </div>
         </main>
 
-        <!-- Bottom Navigation -->
         {% if user.is_authenticated %}
         <nav class="tg-bottom-nav">
             <div class="nav-container">
                 <div class="tg-nav-item {% block nav_plans_active %}{% endblock %}">
                     <a href="{% url 'shop:plan_list' %}" class="tg-nav-link">
-                        <div class="nav-icon-wrapper">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
+                        <div class="nav-icon-wrapper"><i class="fas fa-shield-alt"></i></div>
                         <span class="nav-text">پلن‌ها</span>
                     </a>
                 </div>
                 <div class="tg-nav-item {% block nav_history_active %}{% endblock %}">
                     <a href="{% url 'shop:purchase_list' %}" class="tg-nav-link">
-                        <div class="nav-icon-wrapper">
-                            <i class="fas fa-history"></i>
-                        </div>
+                        <div class="nav-icon-wrapper"><i class="fas fa-history"></i></div>
                         <span class="nav-text">تاریخچه</span>
                     </a>
                 </div>
                 <div class="tg-nav-item">
                     <a href="{% url 'shop:logout' %}" class="tg-nav-link">
-                        <div class="nav-icon-wrapper">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </div>
+                        <div class="nav-icon-wrapper"><i class="fas fa-sign-out-alt"></i></div>
                         <span class="nav-text">خروج</span>
                     </a>
                 </div>
@@ -682,209 +301,83 @@
         {% endif %}
     </div>
 
-    <!-- Main Action Button -->
-    <div id="main-button" class="tg-main-button" style="display: none;">
-        <button class="tg-main-button-text">
-            <i class="fas fa-check me-2"></i>
-            ادامه
-        </button>
-        <div class="button-wave"></div>
+    <div id="main-button" class="tg-main-button">
+        <button class="tg-main-button-text">ادامه</button>
     </div>
 
-    <!-- Micro-interactions Helper -->
-    <div id="micro-interaction"></div>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
-
     <script>
-        // Initialize Telegram WebApp
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                const tg = window.Telegram.WebApp;
-                tg.ready();
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
 
-                // Apply Telegram theme colors
-                applyTelegramTheme(tg);
-
-                // Setup Back Button
-                const backButton = document.getElementById('back-button');
-                if (backButton) {
-                    backButton.addEventListener('click', function() {
-                        if (window.history.length > 1) {
-                            window.history.back();
-                        } else {
-                            tg.close();
-                        }
-                    });
+            // Function to apply Telegram theme
+            function applyTelegramTheme(tg) {
+                const styleElement = document.getElementById('telegram-theme-variables');
+                if (tg.colorScheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.remove('dark-theme');
                 }
 
-                // Highlight active nav item
-                updateActiveNavItem();
-
-                // Setup Main Button if needed
-                {% block setup_main_button %}{% endblock %}
-            }
-
-            // Animate on scroll
-            initScrollAnimations();
-
-            // Setup ripple effects
-            initRippleEffects();
-
-            // Setup micro-interactions
-            setupMicroInteractions();
-        });
-
-        // Apply Telegram theme colors
-        function applyTelegramTheme(tg) {
-            const styleElement = document.getElementById('telegram-theme');
-
-            if (tg.colorScheme === 'dark') {
-                document.body.classList.add('dark-theme');
-
                 styleElement.textContent = `
                     :root {
-                        --tg-theme-bg-color: #${tg.themeParams.bg_color || '#0f172a'};
-                        --tg-theme-text-color: #${tg.themeParams.text_color || '#f1f5f9'};
-                        --tg-theme-hint-color: #${tg.themeParams.hint_color || '#94a3b8'};
-                        --tg-theme-link-color: #${tg.themeParams.link_color || '#3b82f6'};
-                        --tg-theme-button-color: #${tg.themeParams.button_color || '#3b82f6'};
-                        --tg-theme-button-text-color: #${tg.themeParams.button_text_color || '#ffffff'};
-                        --tg-theme-secondary-bg-color: #${tg.themeParams.secondary_bg_color || '#1e293b'};
-                        --tg-theme-accent: var(--tg-theme-button-color);
+                        --tg-theme-bg-color: ${tg.themeParams.bg_color || '#ffffff'};
+                        --tg-theme-text-color: ${tg.themeParams.text_color || '#222222'};
+                        --tg-theme-hint-color: ${tg.themeParams.hint_color || '#999999'};
+                        --tg-theme-link-color: ${tg.themeParams.link_color || '#2481cc'};
+                        --tg-theme-button-color: ${tg.themeParams.button_color || '#0088cc'};
+                        --tg-theme-button-text-color: ${tg.themeParams.button_text_color || '#ffffff'};
+                        --tg-theme-secondary-bg-color: ${tg.themeParams.secondary_bg_color || '#f0f0f0'};
+                        --tg-theme-accent: ${tg.themeParams.button_color || '#0088cc'};
+                        --tg-border-radius-sm: 8px;
+                        --tg-border-radius-md: 12px;
+                        --tg-border-radius-lg: 16px;
+                        --tg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+                        --tg-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
                     }
-                `;
-            } else {
-                styleElement.textContent = `
-                    :root {
-                        --tg-theme-bg-color: #${tg.themeParams.bg_color || '#ffffff'};
-                        --tg-theme-text-color: #${tg.themeParams.text_color || '#1e293b'};
-                        --tg-theme-hint-color: #${tg.themeParams.hint_color || '#94a3b8'};
-                        --tg-theme-link-color: #${tg.themeParams.link_color || '#3b82f6'};
-                        --tg-theme-button-color: #${tg.themeParams.button_color || '#3b82f6'};
-                        --tg-theme-button-text-color: #${tg.themeParams.button_text_color || '#ffffff'};
-                        --tg-theme-secondary-bg-color: #${tg.themeParams.secondary_bg_color || '#f1f5f9'};
-                        --tg-theme-accent: var(--tg-theme-button-color);
+                    body.dark-theme {
+                         --tg-theme-bg-color: ${tg.themeParams.bg_color || '#18222d'};
+                         --tg-theme-text-color: ${tg.themeParams.text_color || '#ffffff'};
+                         --tg-theme-hint-color: ${tg.themeParams.hint_color || '#708499'};
+                         --tg-theme-link-color: ${tg.themeParams.link_color || '#52a9ee'};
+                         --tg-theme-button-color: ${tg.themeParams.button_color || '#2ea6ff'};
+                         --tg-theme-button-text-color: ${tg.themeParams.button_text_color || '#ffffff'};
+                         --tg-theme-secondary-bg-color: ${tg.themeParams.secondary_bg_color || '#212e3b'};
                     }
                 `;
             }
 
-            // Dynamic style for highlights
-            document.getElementById('dynamic-styles').textContent = `
-                .highlight-accent {
-                    background-color: var(--tg-theme-accent);
-                }
-                .border-accent {
-                    border-color: var(--tg-theme-accent);
-                }
-                .text-accent {
-                    color: var(--tg-theme-accent);
-                }
-                .box-shadow-accent {
-                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-                }
-            `;
-        }
+            applyTelegramTheme(tg);
+            tg.onEvent('themeChanged', () => applyTelegramTheme(tg));
 
-        // Update active nav item in bottom navigation
-        function updateActiveNavItem() {
-            const navItems = document.querySelectorAll('.tg-nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                const link = item.querySelector('a');
-                if (link && link.href === window.location.href) {
-                    item.classList.add('active');
-                }
-            });
-        }
-
-        // Initialize scroll animations
-        function initScrollAnimations() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-on-scroll', 'active');
-                        observer.unobserve(entry.target);
+            // Back Button Logic
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        tg.close();
                     }
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                observer.observe(el);
-            });
-        }
-
-        // Initialize ripple effects
-        function initRippleEffects() {
-            document.querySelectorAll('.tg-back-button').forEach(element => {
-                element.addEventListener('click', function(e) {
-                    createRipple(e, this);
-                });
-            });
-        }
-
-        // Create ripple effect
-        function createRipple(event, element) {
-            const ripple = document.createElement('span');
-            const rect = element.getBoundingClientRect();
-            const diameter = Math.max(rect.width, rect.height);
-            const radius = diameter / 2;
-
-            const x = event.clientX - rect.left - radius;
-            const y = event.clientY - rect.top - radius;
-
-            ripple.style.width = ripple.style.height = `${diameter}px`;
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            ripple.classList.add('ripple-bg');
-
-            const ripples = element.querySelectorAll('.ripple-bg');
-            if (ripples.length > 0) {
-                ripples[ripples.length - 1].remove();
             }
 
-            element.appendChild(ripple);
-
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        }
-
-        // Setup micro-interactions
-        function setupMicroInteractions() {
-            // Button hover effect
-            document.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(1.02)';
-                });
-                btn.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scale(1)';
-                });
+            // Highlight active nav item
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.tg-nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.parentElement.classList.add('active');
+                }
             });
 
-            // Card hover effect
-            document.querySelectorAll('.card').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                    this.classList.add('box-shadow-accent');
-                });
-
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.classList.remove('box-shadow-accent');
-                });
-            });
+            // Setup Main Button if block is present
+            {% block setup_main_button %}{% endblock %}
         }
+    });
     </script>
-
     {% block extra_js %}{% endblock %}
 </body>
 </html>

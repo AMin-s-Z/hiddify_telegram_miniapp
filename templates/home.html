@@ -3,30 +3,19 @@
 
 {% block content %}
 {% csrf_token %}
-<div class="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center px-3 auth-page">
-    <!-- Animated Background -->
-    <div class="animated-bg">
-        <div class="wave wave1"></div>
-        <div class="wave wave2"></div>
-        <div class="wave wave3"></div>
-    </div>
 
-    <!-- Logo Section -->
+<div class="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center px-3 auth-page">
+
     <div class="text-center mb-5 logo-section">
-        <div class="logo-container mb-4">
-            <div class="logo-wrapper">
-                <div class="logo-icon">
-                    <i class="fab fa-telegram"></i>
-                </div>
-                <div class="logo-pulse"></div>
-            </div>
+        <div class="logo-wrapper mb-4">
+            <i class="fas fa-shield-alt logo-icon"></i>
+            <div class="logo-pulse"></div>
         </div>
         <h1 class="h2 mb-3 brand-title">
             <span class="gradient-text">VPN</span>
-            <span class="text-white">Store</span>
-            <span class="badge bg-gradient-primary ms-2 premium-badge">PREMIUM</span>
+            <span style="color: var(--tg-theme-text-color);">Store</span>
         </h1>
-        <p class="lead text-white subtitle">
+        <p class="lead subtitle" style="color: var(--tg-theme-hint-color);">
             <i class="fas fa-lock me-2 text-success"></i>امن
             <span class="mx-2">•</span>
             <i class="fas fa-rocket me-2 text-primary"></i>سریع
@@ -35,9 +24,8 @@
         </p>
     </div>
 
-    <!-- Authentication Card -->
     {% if user.is_authenticated %}
-    <div class="card auth-card shadow-lg w-100 fade-in-up animate-on-scroll">
+    <div class="card auth-card shadow-lg w-100 fade-in">
         <div class="card-body text-center py-5">
             <div class="success-container">
                 <div class="success-checkmark mb-4">
@@ -49,7 +37,7 @@
                     </div>
                 </div>
                 <h3 class="mb-3 welcome-text">خوش آمدید، {{ user.first_name|default:user.username }}!</h3>
-                <p class="text-muted mb-4">شما با موفقیت وارد حساب کاربری خود شدید</p>
+                <p class="mb-4" style="color: var(--tg-theme-hint-color);">شما با موفقیت وارد شدید. در حال انتقال...</p>
                 <div class="loading-dots">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -58,703 +46,191 @@
             </div>
         </div>
     </div>
-    <script>
-        window.setTimeout(function() {
-            window.location.href = "{% url 'shop:plan_list' %}";
-        }, 2000);
-    </script>
     {% else %}
-    <!-- Authentication Process -->
-    <div class="card auth-card shadow-lg w-100 fade-in-up animate-on-scroll">
-        <div class="card-header bg-gradient-primary text-white text-center py-3 rounded-top-3">
-            <h5 class="mb-0">
-                <i class="fab fa-telegram me-2"></i>
-                احراز هویت با تلگرام
-            </h5>
-        </div>
-        <div class="card-body py-5">
+    <div class="card auth-card shadow-lg w-100 fade-in">
+        <div class="card-body p-4 p-md-5">
             <div id="auth-container">
-                <!-- Loading State -->
                 <div id="loading-state" class="loading-container text-center">
-                    <div class="telegram-loader mb-4 position-relative">
-                        <div class="telegram-plane">
-                            <i class="fab fa-telegram"></i>
-                        </div>
-                        <div class="cloud cloud1"></div>
-                        <div class="cloud cloud2"></div>
-                        <div class="cloud cloud3"></div>
+                    <div class="telegram-loader mb-4">
+                        <i class="fab fa-telegram-plane"></i>
                     </div>
-                    <h4 class="mb-3 auth-title">در حال احراز هویت</h4>
-                    <p class="text-muted mb-4">لطفاً چند لحظه صبر کنید...</p>
-
-                    <div class="progress auth-progress mb-4">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated"
-                             role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                            <span class="progress-text">25%</span>
-                        </div>
-                    </div>
-
-                    <div class="auth-steps">
-                        <div class="step active" id="step1">
-                            <div class="step-icon">
-                                <i class="fas fa-plug"></i>
-                            </div>
-                            <span>اتصال</span>
-                        </div>
-                        <div class="step" id="step2">
-                            <div class="step-icon">
-                                <i class="fas fa-user-check"></i>
-                            </div>
-                            <span>احراز هویت</span>
-                        </div>
-                        <div class="step" id="step3">
-                            <div class="step-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <span>تکمیل</span>
-                        </div>
+                    <h4 class="mb-2 auth-title">در حال احراز هویت</h4>
+                    <p class="mb-4" style="color: var(--tg-theme-hint-color);">لطفاً چند لحظه صبر کنید...</p>
+                    <div class="progress auth-progress">
+                        <div class="progress-bar" role="progressbar" style="width: 10%"></div>
                     </div>
                 </div>
 
-                <!-- Error State -->
                 <div id="error-state" class="error-container text-center" style="display: none;">
-                    <div class="error-animation mb-4">
-                        <div class="error-icon-wrapper">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
+                    <div class="error-icon-wrapper mb-4">
+                        <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <h4 class="mb-3 error-title">خطا در احراز هویت</h4>
-                    <div id="error-message" class="error-message mb-4"></div>
-
-                    <div class="error-actions">
-                        <button id="retry-btn" class="btn btn-gradient-primary btn-lg mb-3 w-100">
-                            <i class="fas fa-redo me-2"></i>
-                            تلاش مجدد
-                        </button>
-                        <button id="debug-btn" class="btn btn-outline-white btn-sm">
-                            <i class="fas fa-info-circle me-2"></i>
-                            اطلاعات بیشتر
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Success State -->
-                <div id="success-state" class="success-container text-center" style="display: none;">
-                    <div class="success-animation mb-4">
-                        <div class="success-checkmark">
-                            <div class="check-icon">
-                                <span class="icon-line line-tip"></span>
-                                <span class="icon-line line-long"></span>
-                                <div class="icon-circle"></div>
-                                <div class="icon-fix"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <h3 class="mb-3 success-title">احراز هویت موفق!</h3>
-                    <p class="text-muted mb-4">در حال انتقال به صفحه اصلی...</p>
-                    <div class="loading-dots">
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                    </div>
-                </div>
-
-                <!-- Debug Information -->
-                <div id="debug-info" class="debug-info mt-4" style="display: none;">
-                    <div class="card border-info">
-                        <div class="card-header bg-info text-white">
-                            <i class="fas fa-code me-2"></i>
-                            اطلاعات فنی
-                        </div>
-                        <div class="card-body bg-light">
-                            <pre id="debug-content" class="mb-0 small text-start"></pre>
-                        </div>
-                    </div>
+                    <div id="error-message" class="error-message mb-4" style="color: var(--tg-theme-hint-color);"></div>
+                    <button id="retry-btn" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-redo me-2"></i> تلاش مجدد
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     {% endif %}
-
-    <!-- Features -->
-    <div class="features-row mt-5">
-        <div class="feature-item animate-on-scroll">
-            <div class="feature-icon">
-                <i class="fas fa-tachometer-alt"></i>
-            </div>
-            <span class="feature-text">سرعت بالا</span>
-        </div>
-        <div class="feature-item animate-on-scroll">
-            <div class="feature-icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <span class="feature-text">امنیت کامل</span>
-        </div>
-        <div class="feature-item animate-on-scroll">
-            <div class="feature-icon">
-                <i class="fas fa-globe"></i>
-            </div>
-            <span class="feature-text">سرورهای جهانی</span>
-        </div>
-        <div class="feature-item animate-on-scroll">
-            <div class="feature-icon">
-                <i class="fas fa-headset"></i>
-            </div>
-            <span class="feature-text">پشتیبانی 24/7</span>
-        </div>
-    </div>
 </div>
 
 <style>
-/* Page Background */
-.auth-page {
-    background: var(--gradient-1);
-    position: relative;
-    overflow: hidden;
-    padding-bottom: 80px;
-}
-
-/* Animated Background Waves */
-.animated-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    z-index: 0;
-}
-
-.wave {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 120px;
-    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="rgba(255,255,255,0.3)" opacity=".3"/></svg>') no-repeat;
-    background-size: 1200px 120px;
-    animation: float 10s linear infinite;
-}
-
-.wave1 {
-    opacity: 0.5;
-    animation-duration: 15s;
-    animation-delay: 0s;
-}
-
-.wave2 {
-    bottom: 10px;
-    opacity: 0.3;
-    animation-duration: 20s;
-    animation-delay: -5s;
-    animation-timing-function: ease-out;
-}
-
-.wave3 {
-    bottom: 20px;
-    opacity: 0.2;
-    animation-duration: 25s;
-    animation-delay: -2s;
-    animation-timing-function: cubic-bezier(.36,.45,.63,.53);
-}
-
-@keyframes float {
-    0% { background-position-x: 0; }
-    100% { background-position-x: 1200px; }
-}
-
-/* Logo Section */
-.logo-section {
-    position: relative;
-    z-index: 1;
-}
-
-.logo-wrapper {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto;
-}
-
-.logo-icon {
-    font-size: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(45deg, #fff, #f0f0f0);
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-    color: var(--telegram-blue);
-    z-index: 2;
-}
-
-.logo-pulse {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-    animation: pulse 2s ease-in-out infinite;
-    z-index: 1;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(0.8); opacity: 0.7; }
-    50% { transform: scale(1.3); opacity: 0; }
-}
-
-/* Brand Title */
-.brand-title {
-    font-weight: 800;
-    letter-spacing: -1px;
-}
-
-.gradient-text {
-    background: var(--gradient-1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-}
-
-.premium-badge {
-    font-size: 0.7em;
-    padding: 4px 12px;
-    background: var(--gradient-2);
-    animation: shine 3s linear infinite;
-}
-
-@keyframes shine {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-}
-
-/* Auth Card */
-.auth-card {
-    max-width: 480px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-    position: relative;
-    z-index: 1;
-}
-
-.bg-gradient-primary {
-    background: var(--gradient-1);
-}
-
-.btn-gradient-primary {
-    background: var(--gradient-1);
-    color: white;
-    border: none;
-    transition: var(--transition);
-    border-radius: 10px;
-    padding: 12px 24px;
-    font-weight: 600;
-}
-
-.btn-gradient-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-}
-
-/* Telegram Loader Animation */
-.telegram-loader {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto;
-}
-
-.telegram-plane {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    color: var(--telegram-blue);
-    animation: fly 2s ease-in-out infinite;
-    z-index: 10;
-}
-
-@keyframes fly {
-    0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-    25% { transform: translate(-30%, -70%) rotate(-10deg); }
-    50% { transform: translate(-50%, -50%) rotate(0deg); }
-    75% { transform: translate(-70%, -30%) rotate(10deg); }
-}
-
-.cloud {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 100px;
-}
-
-.cloud1 {
-    width: 40px;
-    height: 15px;
-    top: 20%;
-    left: 20%;
-    animation: drift 3s infinite;
-}
-
-.cloud2 {
-    width: 30px;
-    height: 10px;
-    top: 40%;
-    right: 20%;
-    animation: drift 4s infinite;
-}
-
-.cloud3 {
-    width: 35px;
-    height: 12px;
-    bottom: 20%;
-    left: 30%;
-    animation: drift 5s infinite;
-}
-
-@keyframes drift {
-    0%, 100% { transform: translateX(0); opacity: 0.3; }
-    50% { transform: translateX(20px); opacity: 0.8; }
-}
-
-/* Progress Bar */
-.auth-progress {
-    height: 30px;
-    border-radius: 15px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.progress-bar {
-    background: var(--gradient-1);
-    border-radius: 15px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.progress-text {
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-/* Auth Steps */
-.auth-steps {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 30px;
-}
-
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    opacity: 0.3;
-    transition: opacity 0.3s;
-    cursor: default;
-}
-
-.step.active {
-    opacity: 1;
-}
-
-.step-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--gradient-1);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-    transition: transform 0.3s;
-}
-
-.step.active .step-icon {
-    transform: scale(1.2);
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
-}
-
-.step span {
-    font-size: 12px;
-    font-weight: 500;
-}
-
-/* Success Animation */
-.success-checkmark {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.check-icon {
-    width: 80px;
-    height: 80px;
-    position: relative;
-    border-radius: 50%;
-    box-sizing: content-box;
-    border: 4px solid #4caf50;
-    animation: rotate-circle 4.25s ease-in;
-}
-
-.check-icon::before {
-    top: 3px;
-    left: -2px;
-    width: 30px;
-    transform-origin: 100% 50%;
-    border-radius: 100px 0 0 100px;
-}
-
-.check-icon::after {
-    top: 0;
-    left: 30px;
-    width: 60px;
-    transform-origin: 0 50%;
-    border-radius: 0 100px 100px 0;
-    animation: rotate-circle 4.25s ease-in;
-}
-
-.icon-line {
-    height: 5px;
-    background-color: #4caf50;
-    display: block;
-    border-radius: 2px;
-    position: absolute;
-    z-index: 10;
-}
-
-.line-tip {
-    top: 38px;
-    left: 14px;
-    width: 25px;
-    transform: rotate(45deg);
-    animation: check-tip 0.75s cubic-bezier(0.71, -0.46, 0.88, 0.6) 1s forwards;
-}
-
-.line-long {
-    top: 34px;
-    right: 8px;
-    width: 47px;
-    transform: rotate(-45deg);
-    animation: check-long 0.75s cubic-bezier(0.13, 0.81, 0.25, 1) 1s forwards;
-}
-
-@keyframes rotate-circle {
-    0% { transform: rotate(-45deg); }
-    5% { transform: rotate(-45deg); }
-    12% { transform: rotate(-405deg); }
-    100% { transform: rotate(-405deg); }
-}
-
-@keyframes check-tip {
-    0% { width: 0; left: 1px; top: 19px; }
-    54% { width: 0; left: 1px; top: 19px; }
-    70% { width: 50px; left: -8px; top: 37px; }
-    84% { width: 17px; left: 21px; top: 48px; }
-    100% { width: 25px; left: 14px; top: 45px; }
-}
-
-@keyframes check-long {
-    0% { width: 0; right: 46px; top: 54px; }
-    65% { width: 0; right: 46px; top: 54px; }
-    84% { width: 55px; right: 0; top: 35px; }
-    100% { width: 47px; right: 8px; top: 38px; }
-}
-
-/* Error Animation */
-.error-animation {
-    animation: shake 0.5s;
-}
-
-.error-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    border-radius: 50%;
-    background: var(--gradient-2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2.5rem;
-    animation: pulse-error 2s infinite;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-    20%, 40%, 60%, 80% { transform: translateX(10px); }
-}
-
-@keyframes pulse-error {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-}
-
-/* Loading Dots */
-.loading-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
-
-.dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.8);
-    animation: dot-pulse 1.5s ease-in-out infinite;
-}
-
-.dot:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.dot:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes dot-pulse {
-    0%, 100% { transform: scale(0.8); opacity: 0.5; }
-    50% { transform: scale(1.2); opacity: 1; }
-}
-
-/* Features Row */
-.features-row {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 1;
-}
-
-.feature-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    transition: var(--transition);
-    cursor: default;
-}
-
-.feature-item:hover {
-    transform: translateY(-5px);
-}
-
-.feature-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 15px;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.feature-text {
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-/* Alerts */
-.alert {
-    border-radius: 12px;
-    border: none;
-    padding: 15px 20px;
-}
-
-.alert-info {
-    background-color: var(--gradient-3);
-    color: white;
-}
-
-.alert-success {
-    background: var(--gradient-4);
-    color: white;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+    #app-container {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .tg-header, .tg-bottom-nav {
+      display: none;
     }
-}
 
-/* Responsive */
-@media (max-width: 576px) {
+    .auth-page {
+        background: var(--tg-theme-bg-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Logo Section */
+    .logo-wrapper {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .logo-icon {
+        font-size: 4rem;
+        color: var(--tg-theme-accent);
+        animation: float 3s ease-in-out infinite;
+        z-index: 2;
+    }
+    .logo-pulse {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: var(--tg-theme-accent);
+        animation: pulse 2s ease-out infinite;
+        z-index: 1;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes pulse {
+        0% { transform: scale(0.8); opacity: 0.5; }
+        70% { transform: scale(1.5); opacity: 0; }
+        100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* Brand Title */
+    .brand-title { font-weight: 800; }
+    .gradient-text {
+        background: linear-gradient(45deg, var(--tg-theme-accent), var(--tg-theme-link-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Auth Card */
     .auth-card {
-        margin: 0 10px;
+        max-width: 400px;
+        background: var(--tg-theme-secondary-bg-color);
     }
 
-    .features-row {
-        gap: 15px;
+    /* Telegram Loader Animation */
+    .telegram-loader {
+        font-size: 3rem;
+        color: var(--tg-theme-accent);
+        animation: fly 2.5s ease-in-out infinite;
+    }
+    @keyframes fly {
+        0% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-15px) rotate(-10deg); }
+        50% { transform: translateY(0px) rotate(0deg); }
+        75% { transform: translateY(15px) rotate(10deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
     }
 
-    .feature-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.3rem;
+    /* Progress Bar */
+    .auth-progress {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(var(--tg-theme-text-color-rgb), 0.1);
+        overflow: hidden;
+    }
+    .progress-bar {
+        background: var(--tg-theme-accent);
+        transition: width 0.5s ease-in-out;
     }
 
-    .feature-text {
-        font-size: 12px;
+    /* Success Animation */
+    .success-checkmark { width: 80px; height: 80px; margin: 0 auto; }
+    .check-icon {
+        width: 80px; height: 80px; position: relative; border-radius: 50%;
+        box-sizing: content-box; border: 4px solid #4caf50;
+        transform: scale(0);
+        animation: scale-in 0.4s ease-out forwards;
     }
-}
+    @keyframes scale-in { from {transform: scale(0);} to {transform: scale(1);}}
+
+    .icon-line { height: 5px; background-color: #4caf50; display: block; border-radius: 2px; position: absolute; z-index: 10; }
+    .line-tip { top: 46px; left: 14px; width: 0; transform: rotate(45deg); animation: draw-line 0.3s ease-out 0.4s forwards; }
+    .line-long { top: 38px; right: 8px; width: 0; transform: rotate(-45deg); animation: draw-line 0.4s ease-out 0.6s forwards; }
+
+    @keyframes draw-line {
+        to { width: 25px; }
+    }
+    @keyframes draw-line-long {
+        to { width: 47px; }
+    }
+    .line-long { animation-name: draw-line-long; }
+
+    /* Error Animation */
+    .error-icon-wrapper {
+        width: 80px; height: 80px; margin: 0 auto; border-radius: 50%;
+        background: #f44336; color: white; display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem; animation: shake 0.5s, scale-in 0.4s;
+    }
+    @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
+    /* Loading Dots */
+    .loading-dots { display: flex; justify-content: center; gap: 8px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tg-theme-accent); animation: dot-pulse 1.4s infinite ease-in-out both; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+    .dot:nth-child(3) { animation-delay: -0.32s; }
+    @keyframes dot-pulse {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1.0); }
+    }
 </style>
 {% endblock %}
+
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded');
-
-    // Check if user is already authenticated
     {% if user.is_authenticated %}
-    console.log('User already authenticated, redirecting...');
-    setTimeout(() => {
-        window.location.href = "{% url 'shop:plan_list' %}";
-    }, 2000);
-    return;
+        setTimeout(() => { window.location.href = "{% url 'shop:plan_list' %}"; }, 2500);
+        return;
     {% endif %}
 
-    // DOM Elements
     const loadingState = document.getElementById('loading-state');
     const errorState = document.getElementById('error-state');
-    const successState = document.getElementById('success-state');
-    const errorMessage = document.getElementById('error-message');
+    const errorMessageEl = document.getElementById('error-message');
     const retryBtn = document.getElementById('retry-btn');
-    const debugBtn = document.getElementById('debug-btn');
-    const debugInfo = document.getElementById('debug-info');
-    const debugContent = document.getElementById('debug-content');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    // Get CSRF token
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-    // Initialize Telegram WebApp
     if (!window.Telegram || !window.Telegram.WebApp) {
-        showError('اپلیکیشن تلگرام یافت نشد. لطفاً از طریق تلگرام وارد شوید.', 'telegram-missing');
+        showError('لطفاً از طریق اپلیکیشن تلگرام وارد شوید.');
         return;
     }
 
@@ -763,132 +239,59 @@ document.addEventListener('DOMContentLoaded', function() {
     tg.expand();
 
     if (!tg.initData) {
-        showError('لطفاً از طریق ربات تلگرام وارد شوید.', 'init-data-missing');
+        showError('اطلاعات کاربری تلگرام یافت نشد. لطفاً از طریق ربات وارد شوید.');
         return;
     }
 
-    // Debug info
-    const debugData = {
-        init_data: tg.initData ? '[Present]' : '[Missing]',
-        user: tg.initDataUnsafe?.user,
-        platform: tg.platform,
-        version: tg.version
-    };
+    retryBtn.addEventListener('click', () => {
+        errorState.style.display = 'none';
+        loadingState.style.display = 'block';
+        authenticate(tg.initData);
+    });
 
-    debugContent.textContent = JSON.stringify(debugData, null, 2);
-
-    // Event listeners
-    if (debugBtn) {
-        debugBtn.addEventListener('click', () => {
-            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
-        });
-    }
-
-    if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
-            errorState.style.display = 'none';
-            loadingState.style.display = 'block';
-            authenticate(tg.initData);
-        });
-    }
-
-    // Update progress with steps
-    function updateProgress(percent, stepNumber) {
+    function updateProgress(percent) {
         const progressBar = loadingState.querySelector('.progress-bar');
-        const progressText = loadingState.querySelector('.progress-text');
-
-        if (progressBar) {
-            progressBar.style.width = percent + '%';
-            progressBar.setAttribute('aria-valuenow', percent);
-            progressText.textContent = percent + '%';
-        }
-
-        // Update steps
-        for (let i = 1; i <= 3; i++) {
-            const step = document.getElementById('step' + i);
-            if (step) {
-                if (i <= stepNumber) {
-                    step.classList.add('active');
-                } else {
-                    step.classList.remove('active');
-                }
-            }
-        }
+        if (progressBar) progressBar.style.width = percent + '%';
     }
 
-    // Authentication function
     function authenticate(initData) {
-        console.log('Starting authentication...');
-        updateProgress(25, 1);
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        };
-
-        if (csrfToken) {
-            headers['X-CSRFToken'] = csrfToken;
-        }
-
+        updateProgress(25);
         setTimeout(() => {
-            updateProgress(50, 2);
-
             fetch("{% url 'shop:telegram_seamless_auth' %}", {
                 method: 'POST',
-                headers: headers,
-                body: JSON.stringify({'init_data': initData}),
-                credentials: 'same-origin'
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({'init_data': initData})
             })
             .then(response => {
-                updateProgress(75, 2);
+                updateProgress(75);
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
             .then(data => {
                 if (data.success) {
-                    updateProgress(100, 3);
-                    showSuccess();
+                    updateProgress(100);
+                    setTimeout(() => window.location.reload(), 500);
                 } else {
-                    throw new Error(data.error || 'Authentication failed');
+                    throw new Error(data.error || 'Authentication failed on server.');
                 }
             })
             .catch(error => {
                 console.error('Auth error:', error);
-                showError('خطا در احراز هویت: ' + error.message, 'auth-failed');
+                showError('خطا در ارتباط با سرور: ' + error.message);
             });
         }, 1000);
     }
 
-    // Show success state
-    function showSuccess() {
-        loadingState.style.display = 'none';
-        successState.style.display = 'block';
-
-        setTimeout(() => {
-            window.location.href = "{% url 'shop:plan_list' %}";
-        }, 2000);
-    }
-
-    // Show error state
-    function showError(message, type) {
+    function showError(message) {
         loadingState.style.display = 'none';
         errorState.style.display = 'block';
-
-        let detail = '';
-        if (type === 'telegram-missing') {
-            detail = '<div class="alert alert-warning mt-3">لطفاً این صفحه را در اپلیکیشن تلگرام باز کنید.</div>';
-        } else if (type === 'init-data-missing') {
-            detail = '<div class="alert alert-info mt-3">از طریق ربات تلگرام وارد شوید.</div>';
-        } else {
-            detail = '<div class="alert alert-danger mt-3">لطفاً دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.</div>';
-        }
-
-        errorMessage.innerHTML = `<p>${message}</p>${detail}`;
+        errorMessageEl.textContent = message;
     }
 
-    // Start authentication
-    setTimeout(() => {
-        authenticate(tg.initData);
-    }, 500);
+    setTimeout(() => { authenticate(tg.initData); }, 500);
 });
 </script>
 {% endblock %}
